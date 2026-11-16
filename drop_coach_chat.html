@@ -434,11 +434,14 @@
 /* =====================================================================
    DROP. Coach — 投稿づくりチャット v5（drop_coach_chat.html）  2026/11/16
    ---------------------------------------------------------------------
+   v5.3（2026/11/17）
+   - 話し方を切りかえると、それまでの会話（ぽとりのセリフ・あいさつ・問い・おすすめの理由）も新しい話し方で言いなおす
+   - 前の版（関西弁が既定だったころ）のチャットは続きから開かず、新しく始める
    v5.2（2026/11/17）
    - 投稿文の下に「コピーしないで次へ →」：コピーしない人（前の回にコピーした人も）も、おまけの宝箱と運営からの質問まで進める。本数には数えない（お知らせで伝える）
      あとから「やっぱりコピーする」でコピーすると、そこで本数に数える。記録の終了は「nocopy」（記録用 GAS v9.1 では「コピーせず」）
    v5.1（2026/11/16 夕方）
-   - ぽとりの話し方を「〜だよ」に。右上の「関西弁」ボタンでワンタップ切りかえ（この端末に保存。いまの問いから新しい話し方）
+   - ぽとりの話し方を「〜だよ」に。右上の「関西弁」ボタンでワンタップ切りかえ（この端末に保存。v5.3 から、それまでの会話も言いなおす）
    - ひみつの部屋（任意の問い）を、投稿文のあと・コピーのあとからでも答えられる（答えたら AI の案をもう 1 つ。前の案は残る）
    - 2 本目以降のあいさつに「○本目は、この端末でコピーした数から数えている」ことを書いた
    - 見やすさ：小さい文字・バッジ・注釈・無効ボタン・宝石のふちの色を濃く（コントラスト 4.5:1 前後）
@@ -469,7 +472,7 @@
    - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v9）の /exec URL（★ 同上）。記録と「チャットの設定」の配布
    - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
 ===================================================================== */
-const APP_VERSION = "chat-v5.2 (2026-11-17)";
+const APP_VERSION = "chat-v5.3 (2026-11-17)";
 const CONFIG = {
   // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
   GAS_URL: "https://script.google.com/macros/s/AKfycbzdkIa8xnE0useu-5tuXMfLTBXCU80_9yhhpN0C6pcxnkePNdfR2jtVZ51PqyAb3XRe/exec",   // 仕上げ用 GAS（DROP_COACH_GPT v10）
@@ -792,7 +795,10 @@ const VOICE_IX = { kansai: 0, standard: 1, casual: 2 };
 const baseVoice = () => (VOICE_IX[CONFIG.VOICE] != null && CONFIG.VOICE !== "kansai" ? CONFIG.VOICE : "casual");
 let VOICE = (() => { try { const v = JSON.parse(localStorage.getItem(CONFIG.KEYS.VOICE)); if (v === "kansai" || v === "base") return v === "kansai" ? "kansai" : baseVoice(); } catch (e) {} return CONFIG.VOICE === "kansai" ? "kansai" : baseVoice(); })();
 const aiVoice = () => (VOICE === "kansai" ? "kansai" : "standard");   // AI（ぽとりのひとこと）には kansai／standard（＝やさしい話しことば）で伝える
-const T = (k, a = {}) => { const v = TXT[k]; const s = Array.isArray(v) ? (v[VOICE_IX[VOICE]] ?? v[1]) : String(v || k); return s.replace(/\{(\w+)\}/g, (m, n) => (a[n] ?? "")); };
+/** セリフ。どのセリフか（k・a）を覚えた文字列を返す → 話し方を切りかえたら、それまでの会話も新しい話し方で言いなおす */
+const T = (k, a = {}) => { const v = TXT[k]; const s = Array.isArray(v) ? (v[VOICE_IX[VOICE]] ?? v[1]) : String(v || k); const o = new String(s.replace(/\{(\w+)\}/g, (m, n) => (a[n] ?? ""))); o.k = k; o.a = a; return o; };
+const plainArgs = a => { const o = {}; Object.keys(a || {}).forEach(x => { const v = a[x]; o[x] = typeof v === "number" ? v : String(v ?? ""); }); return o; };
+const tMeta = (v, kk, ka) => (v instanceof String && v.k ? { [kk]: v.k, [ka]: plainArgs(v.a) } : {});
 /** 運営が設定した問い文（です・ます）を、話し方に合わせて語尾を変える（だよ口調・関西弁） */
 function kq(q) {
   if (VOICE === "standard") return q;
@@ -840,7 +846,7 @@ const RT = { busy: false, typing: false, rendered: 0, sel: [], freeText: {}, hin
 
 function newSession() {
   return {
-    v: 40, sid: uid(), started: new Date().toISOString(), t0: now(),
+    v: 52, sid: uid(), started: new Date().toISOString(), t0: now(),
     msgs: [], cur: null, phase: "ask",
     det: { feels: [], who: "", next: false, subject: "" },          // ひとことから読み取ったもの
     ans: { text1: "", who: null, why: [], feel: [], find: [], face: [], next: [], profile: null, score: null },
@@ -1057,7 +1063,9 @@ function bot(text, extra = {}) {
     RT.typing = true; renderMsgs();
     setTimeout(() => {
       if (g !== RT.gen) return res(false);
-      RT.typing = false; S.msgs.push({ who: "bot", text, ...extra }); renderMsgs(); save(); res(true);
+      RT.typing = false;
+      S.msgs.push({ who: "bot", ...extra, text: String(text), ...(extra.sub != null ? { sub: String(extra.sub) } : {}), ...tMeta(text, "tk", "ta"), ...tMeta(extra.sub, "sk", "sa") });
+      renderMsgs(); save(); res(true);
     }, CONFIG.BOT_DELAY);
   });
 }
@@ -1404,7 +1412,8 @@ function bindDock(st) {
         const neg = d.negCue || d.feels.some(id => { const it = item("feel", id) || {}; return it.negative || (typeof it.val === "number" && it.val < 0); });
         const pos = !neg && d.feels.some(id => { const it = item("feel", id) || {}; return typeof it.val === "number" && it.val > 0; });
         const n = PROG_STEPS.filter(id => !S.done.includes(id)).length;
-        if (!await bot(T(neg ? "react_neg" : pos ? "react_pos" : "react_neu", { t: short }) + T("react_tail", { n }), { sub: T("react_sub") })) return;
+        const r1 = T(neg ? "react_neg" : pos ? "react_pos" : "react_neu", { t: short }), r2 = T("react_tail", { n });
+        if (!await bot(r1 + r2, { sub: T("react_sub"), parts: [[r1.k, plainArgs(r1.a)], [r2.k, plainArgs(r2.a)]] })) return;
         await advance(st.id, g);
         return;
       }
@@ -1992,7 +2001,7 @@ function pickRecs(ex) {
   const used = out.map(x => x.it);
   const bm = pool.filter(it => it.note && !used.includes(it)).map(it => ({ it, v: sc.get(it.id) + rnd() * 1.2 })).sort((a, b) => b.v - a.v)[0];
   if (bm) out.push({ kind: "bmen", it: bm.it });
-  return out.map(p => ({ id: p.it.id, kind: p.kind, why: recWhy(p, U, kwHit) }));
+  return out.map(p => { const w = recWhy(p, U, kwHit); return { id: p.it.id, kind: p.kind, why: String(w), ...tMeta(w, "wk", "wa") }; });
 }
 function recWhy(p, U, kwHit) {
   if (p.kind === "bmen") return p.it.note || "";
@@ -2381,17 +2390,14 @@ const closeMenu = () => { $("menu").hidden = true; $("menuBtn").setAttribute("ar
 document.addEventListener("click", e => { if (!$("menu").hidden && !e.target.closest("#menu") && !e.target.closest("#menuBtn")) closeMenu(); });
 $("mBig").addEventListener("click", () => { const b = !document.documentElement.classList.contains("big"); document.documentElement.classList.toggle("big", b); LS.set(CONFIG.KEYS.BIG, b); syncMenu(); syncDockH(); });
 $("mExamples").addEventListener("click", () => { closeMenu(); openExamples(); });
-/* 関西弁ボタン：ワンタップで ぽとりの話し方を切りかえる（この端末に保存）。いまの問いは新しい話し方で言いなおす（それまでの会話はそのまま） */
+/* 関西弁ボタン：ワンタップで ぽとりの話し方を切りかえる（この端末に保存）。それまでの会話も新しい話し方で言いなおす（あなたの答え・運営からのお知らせ・AI が作った文はそのまま） */
 function syncVoiceBtn() { const b = $("voiceBtn"); b.hidden = !CONFIG.VOICE_TOGGLE; b.classList.toggle("on", VOICE === "kansai"); b.setAttribute("aria-pressed", String(VOICE === "kansai")); }
 $("voiceBtn").addEventListener("click", () => {
   VOICE = VOICE === "kansai" ? baseVoice() : "kansai";
   LS.set(CONFIG.KEYS.VOICE, VOICE === "kansai" ? "kansai" : "base");
   syncVoiceBtn(); toast(T(VOICE === "kansai" ? "voice_on" : "voice_off"));
   if (!S) return;
-  if (S.phase === "ask" && S.cur) {
-    const st = stepOf(S.cur), m = [...S.msgs].reverse().find(x => x.qid === S.cur);
-    if (st && m) { m.text = st.q(); const sub = st.sub ? st.sub() : ""; if (sub) m.sub = sub; else delete m.sub; save(); }
-  }
+  relocalize();
   RT.noScroll = true; renderMsgs(); RT.noScroll = false;
   if (!RT.busy) { if (S.phase === "compose") renderComposeDock(); else renderDock(); }
 });
@@ -2446,17 +2452,36 @@ async function start() {
   save(); renderMsgs(); renderStaff(); lockDock(); warmLogin();
   const g = RT.gen;
   const ps = postStats();
-  const wl = wantList().length;
-  const countNote = `※「${ps.n + 1}本目」は、この端末で投稿文をコピーした数から数えています（コピーしなかった投稿は数えません）`;
-  const hello = ps.n > 0 ? [T("hello2", { n: ps.n + 1 }), { sub: T("hello2sub") + (wl ? "\n" + T("hello_want", { n: wl }) : "") + "\n" + countNote }] : [T("hello1"), { sub: T("hello1sub") }];
-  if (!await bot(hello[0], hello[1])) return;
+  const h = { n: ps.n > 0 ? ps.n + 1 : 0, wl: wantList().length }, hp = helloParts(h);
+  if (!await bot(hp[0], { sub: hp[1], hello: h })) return;
   S.msgs.push({ who: "bot", notice: true }); renderMsgs(); save();   // 個人情報のおねがい（毎回はじめに）
   await advance(null, g);
 }
+/** あいさつの文（2 本目以降は、本数の数え方も書く） */
+function helloParts(h) {
+  if (!h || !h.n) return [String(T("hello1")), String(T("hello1sub"))];
+  const note = `※「${h.n}本目」は、この端末で投稿文をコピーした数から数えています（コピーしなかった投稿は数えません）`;
+  return [String(T("hello2", { n: h.n })), String(T("hello2sub")) + (h.wl ? "\n" + T("hello_want", { n: h.wl }) : "") + "\n" + note];
+}
+/** それまでの会話を、いまの話し方で言いなおす（ぽとりのセリフ・あいさつ・問い。運営からのお知らせと、あなたの答えはそのまま） */
+function relocalize() {
+  if (!S) return;
+  S.msgs.forEach(m => {
+    if (m.who !== "bot") return;
+    if (m.hello) { const hp = helloParts(m.hello); m.text = hp[0]; m.sub = hp[1]; return; }
+    if (m.qid) { const st = stepOf(m.qid); if (st) { try { m.text = String(st.q()); const sb = st.sub ? String(st.sub()) : ""; if (sb) m.sub = sb; else delete m.sub; } catch (e) {} } return; }
+    if (m.parts) m.text = m.parts.map(([k, a]) => String(T(k, a))).join("");   // いくつかのセリフをつないだ文
+    else if (m.tk) m.text = String(T(m.tk, m.ta));
+    if (m.sk) m.sub = String(T(m.sk, m.sa));
+  });
+  if (S.rec && S.rec.picks) S.rec.picks.forEach(p => { if (p.wk) p.why = String(T(p.wk, p.wa)); });
+  save();
+}
 function restore() {
   const s = LS.get(CONFIG.KEYS.SESSION, null);
-  if (!s || s.v !== 40 || !s.sid || now() - (s.t0 || 0) > CONFIG.RESUME_HOURS * 3600e3 || s.copied) return false;
+  if (!s || s.v !== 52 || !s.sid || now() - (s.t0 || 0) > CONFIG.RESUME_HOURS * 3600e3 || s.copied) return false;
   S = s; S.msgs = (S.msgs || []).filter(m => m && m.who);
+  relocalize();   // 話し方が変わっていたら、いまの話し方で
   const p = SS.get(CONFIG.KEYS.PHOTO, null);
   if (p && p.sid === S.sid && /^data:image\/jpeg;base64,/.test(p.img || "")) PHOTO = p;
   RT.rendered = S.msgs.length; renderMsgs(); renderStaff(); warmLogin();

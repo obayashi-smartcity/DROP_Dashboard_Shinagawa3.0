@@ -1569,7 +1569,7 @@ function makeDemo() {
       "組み立て文面": reached ? composed : "", "AI文面": aiText, "最終文面": final, "採用": chosen, "手で編集": reached ? (edited ? "あり" : "なし") : "", "コーチ関与": level, "ハッシュタグ": "",
       "AI分類": aiOk ? `${code} ${label}` : "", "AIソフト": aiOk ? `①${(raw.c1 / (tot || 1)).toFixed(2)} ②${(raw.c2 / (tot || 1)).toFixed(2)} ③${(raw.c3 / (tot || 1)).toFixed(2)} 愛${((raw.att + .2) / (tot || 1)).toFixed(2)}` : "",
       "AI感情の向き": aiOk && valence !== "" ? Math.max(-1, Math.min(1, Math.round((valence + (rnd() - .5) * .6) * 100) / 100)) : "", "AI行動": aiOk ? ACTL[tp[3]] : "", "AIコンテンツ": aiOk ? tp[0] : "", "AI空間": aiOk && rnd() < .5 ? pick(["屋台", "広場", "品川駅前"]) : "",
-      "AI評価": aiOk ? pick(["高", "中", "中", "低"]) : "", "AIひとこと": aiOk ? "様子が伝わる投稿やわ" : "", "写真と本文": aiOk && photo ? "一致：写真の内容" : "", "AI注意": "",
+      "AI評価": aiOk ? pick(["高", "中", "中", "低"]) : "", "AIひとこと": aiOk ? "様子が伝わる投稿だね" : "", "写真と本文": aiOk && photo ? "一致：写真の内容" : "", "AI注意": "",
       "ヒント状態": has1 ? (rnd() < .92 ? `OK（${(2 + rnd() * 6).toFixed(1)}秒）` : "TIMEOUT（90秒）") : "", "ほかの人の例を見た": rnd() < .25 ? `1回：${pick(["どこが", "気持ち", "投稿文"])}（${Math.round(20 + rnd() * 60)}秒）` : "", "投稿イメージを開いた": rnd() < .3 ? 1 : 0, "表示順": "", "問いごとの秒": secTxt,
       "AIモデル": aiOk ? "gpt-6-luna" : "", "プロンプト版": aiOk ? "demo" : "", "AI秒": aiOk ? Math.round((9 + rnd() * 10) * 10) / 10 : "", "アプリ版": "chat-v5.0（デモ）",
       "どこがの気持ち": why.length ? whyFor : "", "どこがの重み": why.filter(w => w !== own.why).map((l, n) => `${l} ${[1, .75, .5, .25][n] ?? .25}`).join(" / "), "設定版": "初期値",
