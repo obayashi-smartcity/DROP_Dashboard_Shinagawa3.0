@@ -16,13 +16,13 @@
        （ぽとりの問い・確かめ＝白／あなたが選んだもの・送るボタン＝こげ茶）
      - かけら集めはダンジョン風：5 つの部屋をまわって、かけらを集める。上の地図で「いまどこか」「どれだけ集まったか」が見える
        自分のことばで答えるとキラかけら✦、任意の問い（ひみつの部屋）はレアかけら。5 つそろうと DROP の原石が完成
-     - 案内役「ぽとり」：DROP の色ガラスのようなしずく（オリジナル）。関西弁（CONFIG.VOICE で標準語）
+     - 案内役「ぽとり」：DROP の色ガラスのようなしずく（オリジナル）。話し方は「〜だよ」（右上の「関西弁」でワンタップ切りかえ）
      - 運営からのお知らせ（個人情報のおねがい・本数）は、キャラにしゃべらせず、まん中のお知らせ枠で出す
   ===================================================================== */
   :root{
     --bg:#f3e9e2; --bg-2:#ebded4; --card:#fff; --paper:#fbf7f3;
     --line:#e0d1c6; --line-2:#efe5de;
-    --ink:#2b211d; --ink-2:#5c4b43; --dim:#75675e;
+    --ink:#2b211d; --ink-2:#5c4b43; --dim:#6b5d55;
     --brown:#4e3b38; --brown-2:#665049; --brown-soft:#efe5df;
     --g1:#f08c4e; --g2:#ec8fb1; --g3:#f2c64a; --g4:#4fbcd4; --g5:#72ad48; --gold:#e3a92b;
     --ok:#2f6b4a; --warn:#8a5f00; --err:#b3372a;
@@ -58,6 +58,13 @@
   .menu{position:absolute;right:12px;top:56px;z-index:40;background:#fff;border-radius:20px;box-shadow:0 14px 40px rgba(60,40,30,.22);padding:6px;display:flex;flex-direction:column;min-width:240px}
   .menu button{border:none;background:none;text-align:left;padding:13px 14px;border-radius:12px;font-size:15px;font-weight:700;color:var(--ink)}
   .menu button:hover{background:var(--brown-soft)}
+  /* 関西弁ボタン（ワンタップで切りかえ） */
+  .voice-btn{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 12px 0 8px;border-radius:999px;border:1.5px solid var(--line);background:#fff;font-size:13px;font-weight:800;color:var(--ink-2);white-space:nowrap}
+  .voice-btn .vd{position:relative;width:28px;height:16px;border-radius:999px;background:#cbbcb1;transition:background .2s;flex:none}
+  .voice-btn .vd::after{content:"";position:absolute;left:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:transform .2s}
+  .voice-btn.on{border-color:var(--brown);color:var(--ink)}
+  .voice-btn.on .vd{background:var(--brown)}
+  .voice-btn.on .vd::after{transform:translateX(12px)}
   .staff-flag{font-size:10px;font-weight:800;letter-spacing:1px;color:#fff;background:var(--warn);padding:3px 7px;border-radius:4px}
   /* かけらの地図：5 つの部屋（宝石）を道でつなぐ。最後に DROP（宝箱）。押すと、いまの投稿イメージ */
   .quest{display:block;width:100%;border:none;background:none;padding:0 10px 8px;text-align:left}
@@ -68,12 +75,12 @@
   .node{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
   .node .gem{width:28px;height:28px;display:block;position:relative;z-index:1}
   .node .gem svg{width:28px;height:28px;display:block}
-  .node i{font-style:normal;font-size:10.5px;font-weight:800;color:var(--dim);white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis}
+  .node i{font-style:normal;font-size:11px;font-weight:800;color:var(--ink-2);white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis}
   .node.got i{color:var(--ink)}
   .node.now i{color:var(--ink)}
   .node.now .gem::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--brown);animation:nowring 1.6s ease-in-out infinite}
   @keyframes nowring{50%{transform:scale(1.12);opacity:.45}}
-  .node .kira{position:absolute;right:calc(50% - 20px);top:-3px;font-size:11px;color:var(--gold);font-weight:900;z-index:2;text-shadow:0 0 3px #fff}
+  .node .kira{position:absolute;right:calc(50% - 21px);top:-4px;font-size:12.5px;color:#c98a00;font-weight:900;z-index:2;text-shadow:0 0 3px #fff,0 0 3px #fff}
   .node.pop .gem{animation:gempop .7s cubic-bezier(.2,1.6,.4,1)}
   @keyframes gempop{0%{transform:scale(.3) rotate(-30deg)}60%{transform:scale(1.35) rotate(8deg)}100%{transform:none}}
   .node.pop .gem::before{content:"";position:absolute;inset:-10px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,120,.9) 0 18%,transparent 19% 100%),conic-gradient(from 0deg,transparent 0 10%,rgba(240,140,78,.6) 10% 13%,transparent 13% 35%,rgba(79,188,212,.6) 35% 38%,transparent 38% 60%,rgba(236,143,177,.6) 60% 63%,transparent 63% 85%,rgba(114,173,72,.6) 85% 88%,transparent 88%);animation:burst .8s ease-out forwards;z-index:-1}
@@ -121,8 +128,8 @@
   .room::before,.room::after{content:"";flex:1;height:0;border-top:1.5px dashed var(--line)}
   .room span{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:900;letter-spacing:.5px;white-space:nowrap}
   .room span svg{width:20px;height:20px}
-  .room small{font-size:11.5px;font-weight:700;color:var(--dim)}
-  .room.secret span{color:var(--gold)}
+  .room small{font-size:12px;font-weight:700;color:var(--dim)}
+  .room.secret span{color:#8a5f00}
   /* かけらゲット */
   .get{display:flex;justify-content:center;margin:8px 0 4px}
   .get-in{display:inline-flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:6px 14px 6px 8px;box-shadow:var(--sh-1);font-size:14px;font-weight:900;color:var(--ink)}
@@ -130,7 +137,7 @@
   .get.new .get-in svg{animation:gempop .8s cubic-bezier(.2,1.6,.4,1)}
   .get.new .get-in{animation:getin .5s ease}
   @keyframes getin{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
-  .get-in em{font-style:normal;font-size:11.5px;font-weight:900;color:#fff;background:var(--gold);border-radius:999px;padding:2px 8px}
+  .get-in em{font-style:normal;font-size:12px;font-weight:900;color:#7a5200;background:#fdecc1;border-radius:999px;padding:2px 9px}
   .get.miss .get-in{background:transparent;box-shadow:none;color:var(--dim);font-size:12.5px;font-weight:700}
   .get.miss .get-in svg{width:20px;height:20px;opacity:.6}
   /* DROP の原石が完成 */
@@ -216,7 +223,7 @@
   .rec{position:relative;border-radius:18px;border:1.5px solid var(--line-2);background:var(--paper);padding:12px 12px 10px 14px;overflow:hidden;animation:pop .45s ease both}
   .rec:nth-child(2){animation-delay:.12s}.rec:nth-child(3){animation-delay:.24s}
   .rec::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--k,var(--g1))}
-  .rec .kind{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:900;color:#fff;background:var(--k,var(--g1));border-radius:999px;padding:2px 10px}
+  .rec .kind{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:900;color:#fff;background:var(--kd,#b9531c);border-radius:999px;padding:2px 10px}
   .rec h4{margin:6px 0 0;font-size:16.5px;font-weight:900;line-height:1.45}
   .rec .who{font-size:12.5px;color:var(--dim);font-weight:700;margin-top:1px}
   .rec .place{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--ink);margin-top:6px}
@@ -240,6 +247,7 @@
   .rate-btns button.on,.pulse-btns button.on{background:var(--brown);border-color:var(--brown);color:#fff}
   .rate-lab{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-top:4px}
   .rate-sel{margin:8px 0 6px;font-size:13.5px;color:var(--ink);font-weight:800}
+  .rate textarea::placeholder{color:#8f8177}
   .rate textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:8px 10px;font-size:16px;resize:none;background:#fff;min-height:0;line-height:1.5}
   .pulse-btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
   .pulse-btns button{font-size:15px}
@@ -269,8 +277,8 @@
   .q-sub{font-size:13px;color:var(--ink-2);line-height:1.55;margin-top:2px}
   .q-step{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:900;color:var(--ink);white-space:nowrap}
   .q-step svg{width:18px;height:18px}
-  .q-step.opt{color:var(--gold)}
-  .q-ins{font-size:12px;color:var(--dim);font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .q-step.opt{color:#8a5f00}
+  .q-ins{font-size:12.5px;color:var(--dim);font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .dock-head .lnk{padding:2px 0;min-height:28px;font-size:12.5px;color:var(--ink-2)}
   .dock-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 1px 4px}
   .dock-act{flex:none;padding-top:10px}
@@ -283,11 +291,12 @@
   .chip.on{border-color:var(--brown);background:var(--brown);color:#fff}
   .chip .ord,.chip .ck{margin-left:auto;order:2;display:inline-flex;width:24px;height:24px;border-radius:50%;background:#fff;color:var(--brown);font-size:12.5px;font-weight:900;align-items:center;justify-content:center;flex:none}
   .chip.ai{border-style:dashed;border-color:#d9c4b4}
-  .chip.ai small{display:block;width:max-content;font-size:10.5px;font-weight:900;color:#fff;background:var(--g1);border-radius:999px;padding:1px 7px;margin-bottom:3px}
+  .chip.ai small{display:block;width:max-content;font-size:11px;font-weight:900;color:#a8481a;background:#fde3d2;border-radius:999px;padding:1px 8px;margin-bottom:3px}
+  .chip.ai.on small{color:#fff;background:rgba(255,255,255,.18)}
   .chip.ai.on{border-style:solid}
   .chip.shake{animation:shake .3s}
   @keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
-  .pii{font-size:12px;color:var(--dim);margin:6px 4px 0;line-height:1.5}
+  .pii{font-size:12.5px;color:var(--dim);margin:6px 4px 0;line-height:1.5}
   .hint-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:8px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-weight:800;font-size:14.5px}
   .hint-btn svg{width:18px;height:18px;color:var(--gold)}
   .hint-btn.open{background:var(--paper)}
@@ -307,8 +316,8 @@
   .btn svg{width:20px;height:20px}
   .btn .go{display:inline-flex;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--brown);align-items:center;justify-content:center;margin-right:-10px;margin-left:4px}
   .btn .go svg{width:16px;height:16px}
-  .btn:disabled{background:#d8cbc2;color:#fff;cursor:default}
-  .btn:disabled .go{color:#d8cbc2}
+  .btn:disabled{background:#e7ddd5;color:#7a6b62;cursor:default}
+  .btn:disabled .go{color:#e7ddd5;background:#a3938a}
   .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
   .btn.plain{background:var(--paper);color:var(--ink-2)}
   .btn.sm{min-height:46px;padding:0 16px;font-size:14.5px}
@@ -319,9 +328,9 @@
   .inrow{position:relative}
   .input{display:block;width:100%;min-height:52px;max-height:160px;border:1.5px solid var(--line);border-radius:22px;padding:13px 60px 13px 16px;font-size:17px;line-height:1.5;outline:none;resize:none;background:#fff;color:var(--ink)}
   .input:focus{border-color:var(--brown);box-shadow:0 0 0 4px rgba(78,59,56,.1)}
-  .input::placeholder{color:#b3a59b;font-weight:500}
+  .input::placeholder{color:#8f8177;font-weight:500}
   .send{position:absolute;right:6px;bottom:6px;width:42px;height:42px;border-radius:50%;border:none;background:var(--brown);color:#fff;display:flex;align-items:center;justify-content:center}
-  .send:disabled{background:#d8cbc2}
+  .send:disabled{background:#e7ddd5;color:#a3938a}
   .send svg{width:20px;height:20px}
   .lab{font-size:13px;font-weight:800;color:var(--ink-2);margin:12px 0 6px}
   .cnt-sm{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;margin-left:auto}
@@ -378,6 +387,7 @@
     <div class="brand"><span class="mark" id="brandMark" aria-hidden="true"></span><span class="brand-t"><b>DROP. Coach</b><small>ことばのかけら集め</small></span></div>
     <div class="top-r">
     <span class="staff-flag" id="staffFlag" hidden>STAFF</span>
+    <button type="button" class="voice-btn" id="voiceBtn" aria-pressed="false" title="ぽとりの話し方を関西弁にする／もどす" hidden><span class="vd" aria-hidden="true"></span>関西弁</button>
     <button type="button" class="icon-btn" id="menuBtn" aria-label="メニュー" aria-expanded="false"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
     </div>
   </div>
@@ -424,6 +434,14 @@
 /* =====================================================================
    DROP. Coach — 投稿づくりチャット v5（drop_coach_chat.html）  2026/11/16
    ---------------------------------------------------------------------
+   v5.2（2026/11/17）
+   - 投稿文の下に「コピーしないで次へ →」：コピーしない人（前の回にコピーした人も）も、おまけの宝箱と運営からの質問まで進める。本数には数えない（お知らせで伝える）
+     あとから「やっぱりコピーする」でコピーすると、そこで本数に数える。記録の終了は「nocopy」（記録用 GAS v9.1 では「コピーせず」）
+   v5.1（2026/11/16 夕方）
+   - ぽとりの話し方を「〜だよ」に。右上の「関西弁」ボタンでワンタップ切りかえ（この端末に保存。いまの問いから新しい話し方）
+   - ひみつの部屋（任意の問い）を、投稿文のあと・コピーのあとからでも答えられる（答えたら AI の案をもう 1 つ。前の案は残る）
+   - 2 本目以降のあいさつに「○本目は、この端末でコピーした数から数えている」ことを書いた
+   - 見やすさ：小さい文字・バッジ・注釈・無効ボタン・宝石のふちの色を濃く（コントラスト 4.5:1 前後）
    v5（2026/11/16 午後）
    - 見た目をみんまちDROP の雰囲気に（生成り・白い角丸カード・こげ茶のボタン・しずくの 5 色）。案内役「ぽとり」を色ガラスのしずくに描き直した
    - チャットは LINE のように：あなた＝こげ茶の吹き出し／ぽとり＝白。下の答える欄も同じ（ぽとりの問い・確かめ＝白、選んだもの・送る＝こげ茶）
@@ -436,7 +454,7 @@
    （以下は v4）
    V3 リポジトリ（DROP_Dashboard_Shinagawa3.0）。2026/11/16 の要件で作り直した
    - ことばのワークショップ：写真 1 枚から、5 つの「ことばのかけら」（できごと・気持ち・どこが・だれと・しめ）を集めて投稿文をつくる
-   - 案内役は色ガラスのしずくのキャラクター「ぽとり」（関西弁。CONFIG.VOICE を "standard" にすると標準語）。投稿文は本人の口調のまま
+   - 案内役は色ガラスのしずくのキャラクター「ぽとり」（v5.1 から「〜だよ」。右上の「関西弁」で切りかえ。CONFIG.VOICE を "standard" にすると です・ます）。投稿文は本人の口調のまま
    - 答えは自分のことばが先。迷った人は「迷ったらヒント」で候補（運営の選択肢＋AI が写真とひとことから作った候補）がぜんぶ出る
      ひとことだけは候補を出さない。「だれと」「しめ」は、書いたことばを画面がすぐ区分に当てはめ、本人が 1 タップで確かめる（KPI を本人の答えで測るため）
    - 「そうそう！」：気持ちとどこがのあと、本人のことばだけから AI が「言いたかったのは、こういうこと？」を 3 通り。選ぶと投稿文の 1 行になる
@@ -451,12 +469,13 @@
    - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v9）の /exec URL（★ 同上）。記録と「チャットの設定」の配布
    - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
 ===================================================================== */
-const APP_VERSION = "chat-v5.0 (2026-11-16)";
+const APP_VERSION = "chat-v5.2 (2026-11-17)";
 const CONFIG = {
   // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
   GAS_URL: "https://script.google.com/macros/s/AKfycbzdkIa8xnE0useu-5tuXMfLTBXCU80_9yhhpN0C6pcxnkePNdfR2jtVZ51PqyAb3XRe/exec",   // 仕上げ用 GAS（DROP_COACH_GPT v10）
   LOG_URL: "https://script.google.com/macros/s/AKfycbzInJasVfcMk61ud2I7Qi8viHEj-lnZ10p7kgKpi_VMzlH7qW8OI3h-MOvmYE9-epd_vw/exec",   // 記録用 GAS（DROP_COACH_LOG v9）
-  VOICE: "kansai",            // キャラクター「ぽとり」の話し方：kansai（関西弁）／standard（標準語）
+  VOICE: "casual",            // ぽとりの話し方（既定）：casual（〜だよ）／standard（です・ます）／kansai（関西弁）
+  VOICE_TOGGLE: true,         // 右上に「関西弁」ボタンを出す（ワンタップで関西弁 ⇄ 既定の話し方。この端末に保存）
   DATA_SOURCES: ["json/sample_drop.json"],
   EVENT: "culture-snack-2026",
   LOGIN_AT_START: true,       // GAS 設定済み・未ログインなら最初に 1 回だけ名前とパスワードを聞く
@@ -482,7 +501,7 @@ const CONFIG = {
   // V2 と同じ GitHub Pages のドメインで動くので、保存の名前は V4 専用にする（V2 の保存とまざらない）
   KEYS: { SESSION: "dropChatV4Session", PHOTO: "dropChatV4Photo", BIG: "dropChatV4Big", HISTORY: "dropChatV4History", SETTINGS: "dropChatV4Settings", POSTS: "dropChatV4Posts",
           TOKEN: "dropChatV4Token", LOG_TOKEN: "dropChatV4LogToken", NAME: "dropChatV4Name", PW: "dropChatV4Pw", PROFILE: "dropChatV4Profile",
-          DEVICE: "dropChatV4Device", PULSE: "dropChatV4Pulse", IAB: "dropChatV4IabClosed", WANT: "dropChatV4Want" }
+          DEVICE: "dropChatV4Device", PULSE: "dropChatV4Pulse", IAB: "dropChatV4IabClosed", WANT: "dropChatV4Want", VOICE: "dropChatV4Voice" }
 };
 
 /* =====================================================================
@@ -663,7 +682,8 @@ function gemSvg(i, st) {
   const oct = "M8.2 2h7.6L22 8.2v7.6L15.8 22H8.2L2 15.8V8.2z", inner = "M9.6 6h4.8L18 9.6v4.8L14.4 18H9.6L6 14.4V9.6z";
   if (st === "got" || st === "rare") return `<svg width="100%" height="100%" viewBox="0 0 24 24" aria-hidden="true"><path d="${oct}" fill="${c}"/><path d="${inner}" fill="#fff" opacity=".28"/><path d="M8.2 2h7.6L14.4 6H9.6z" fill="#fff" opacity=".45"/><path d="M2 15.8 6 14.4 9.6 18 8.2 22z" fill="#000" opacity=".1"/>${st === "rare" ? '<path d="M12 7.2l1.2 3.6 3.6 1.2-3.6 1.2L12 16.8l-1.2-3.6L7.2 12l3.6-1.2z" fill="#fff"/>' : ""}</svg>`;
   if (st === "miss") return `<svg width="100%" height="100%" viewBox="0 0 24 24" aria-hidden="true"><path d="${oct}" fill="#e7ddd5"/><path d="M7 12h10" stroke="#b9aaa0" stroke-width="1.6" stroke-linecap="round"/></svg>`;
-  return `<svg width="100%" height="100%" viewBox="0 0 24 24" aria-hidden="true"><path d="${oct}" fill="#fff" stroke="${st === "now" ? c : "#d9c9bd"}" stroke-width="1.6" stroke-dasharray="${st === "now" ? "0" : "2.4 2"}"/><path d="${inner}" fill="${st === "now" ? c : "#efe5de"}" opacity="${st === "now" ? .25 : 1}"/></svg>`;
+  const line = ["#e0743a", "#dc6f98", "#c9961a", "#2a9fbb", "#5a9a34"][i] || "#9e8c7f";
+  return `<svg width="100%" height="100%" viewBox="0 0 24 24" aria-hidden="true"><path d="${oct}" fill="#fff" stroke="${st === "now" ? line : "#a8968a"}" stroke-width="${st === "now" ? 2 : 1.5}" stroke-dasharray="${st === "now" ? "0" : "2.4 2"}"/><path d="${inner}" fill="${st === "now" ? c : "#efe5de"}" opacity="${st === "now" ? .3 : 1}"/></svg>`;
 }
 function chestSvg(open) {
   return open
@@ -677,94 +697,106 @@ ICON.swap = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-w
 
 /* ---------- セリフ（[関西弁, 標準語]。{名前} は差し込み） ---------- */
 const TXT = {
-  hello1: ["まいど！ 案内役の「ぽとり」やで。写真1枚から、DROP の投稿文を一緒につくろ", "こんにちは！ 案内役の「ぽとり」です。写真1枚から、DROP の投稿文を一緒につくりましょう"],
-  hello1sub: ["5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成や。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光るで✦", "5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成です。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光ります✦"],
-  hello2: ["おかえり！ {n}本目の冒険、いってみよか", "おかえりなさい！ {n}本目の冒険、いってみましょう"],
-  hello2sub: ["写真えらんで、ひとこと書いたら、また5つのかけらを集めにいこ", "写真をえらんで、ひとことを書いたら、また5つのかけらを集めにいきましょう"],
-  hello_want: ["☆行ってみるリストに{n}か所あるで。行った先の写真でもつくれるで（右上のメニューから見られる）", "☆行ってみるリストに{n}か所あります。行った先の写真でもつくれます（右上のメニューから見られます）"],
-  login_q: ["はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてな。この端末では1回だけやで", "はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてください。この端末では1回だけです"],
-  login_sub: ["本名ではなく、ニックネーム（ひらがな）を入れてください。答えは、イベントの効果を確かめる分析にだけ使います", "本名ではなく、ニックネーム（ひらがな）を入れてください。答えは、イベントの効果を確かめる分析にだけ使います"],
-  photo_q: ["まずは、投稿する写真を1枚えらんでな（写真なしでもOKやで）", "まずは、投稿する写真を1枚えらんでください（写真なしでも大丈夫です）"],
-  photo_sub: ["人の顔や名札が写った写真はさけてください", "人の顔や名札が写った写真はさけてください"],
-  text1_q_photo: ["ええ写真やん！ この写真のこと、ひとことでいうと？ 思ったまんまでええで", "この写真のこと、ひとことでいうと？ 思ったままで大丈夫です"],
-  text1_q: ["今日のこと、ひとことでいうと？ 思ったまんまでええで", "今日のこと、ひとことでいうと？ 思ったままで大丈夫です"],
-  text1_sub: ["これが投稿文のもとになるで。マイクで話してもOK", "これが投稿文のもとになります。マイクで話してもOKです"],
-  text1_ph: ["例：焼き芋あったまる〜", "例：焼き芋あったまる〜"],
-  react_neg: ["「{t}」、正直に教えてくれておおきに。", "「{t}」、正直に教えてくれてありがとうございます。"],
-  react_pos: ["「{t}」、ええやん！", "「{t}」、いいですね！"],
-  react_neu: ["「{t}」、なるほどな。", "「{t}」、ありがとうございます。"],
-  react_tail: ["ほな、のこり{n}つのかけらを集めにいこか", "では、のこり{n}つのかけらを集めにいきましょう"],
-  react_sub: ["上の地図で、いまどの部屋にいるか見られるで", "上の地図で、いまどの部屋にいるか見られます"],
-  feel_q: ["そのとき、どんな気持ちやった？", "そのとき、どんな気持ちでしたか？"],
-  feel_q2: ["「{f}」のほかにも、どんな気持ちやった？", "「{f}」のほかにも、どんな気持ちでしたか？"],
-  feel_sub: ["思ったまんまのことばでええで。迷ったら「ヒント」から選んでもOK", "思ったままのことばで大丈夫です。迷ったら「ヒント」から選んでもOKです"],
-  feel_ph: ["例：ぽかぽかした、ちょっと緊張した", "例：ぽかぽかした、ちょっと緊張した"],
-  why_qx: ["「{x}」って思ったのは、どこやった？", "「{x}」と思ったのは、どこでしたか？"],
-  why_qs: ["{s}の、とくに心に残ったのはどこやった？", "{s}の、とくに心に残ったのはどこでしたか？"],
-  why_q: ["とくに心に残ったのは、どこやった？", "とくに心に残ったのは、どこでしたか？"],
-  why_sub: ["見た目・味・人・場所…なんでもええで", "見た目・味・人・場所…なんでも大丈夫です"],
-  why_ph: ["例：湯気と香り、手描きのラベル", "例：湯気と香り、手描きのラベル"],
-  who_q: ["そのとき、だれと一緒やった？", "そのとき、だれと一緒でしたか？"],
-  who_sub: ["会社・部署・立場で教えてな（名前はなしで）", "会社・部署・立場で教えてください（名前は入れないでください）"],
-  who_ph: ["例：ちがう部署の先輩、近所の大学生、ひとりで", "例：ちがう部署の先輩、近所の大学生、ひとりで"],
-  who_confirm: ["「{t}」やね！ ほな「{l}」で入れとくで", "「{t}」ですね。「{l}」として入れておきます"],
-  next_confirm: ["「{t}」やね！ ほな「{l}」の気持ちで入れとくで", "「{t}」ですね。「{l}」として入れておきます"],
-  pick_q: ["どれがいちばん近い？", "どれがいちばん近いですか？"],
-  reflect_q: ["ここまでのかけらを、1行にみがいてみたで。言いたかったんって、こういうことちゃう？", "ここまでのかけらを、1行にみがいてみました。言いたかったのは、こういうことですか？"],
-  reflect_sub: ["えらぶと、投稿文の1行になるで。直してから使ってもええよ", "えらぶと、投稿文の1行になります。直してから使ってもOKです"],
-  reflect_wait: ["かけらをみがいてるで…", "かけらをみがいています…"],
-  reflect_ph: ["自分のことばで1行", "自分のことばで1行"],
-  next_qp: ["{p}と話して、なんか残ったことある？ この先につながりそうなことでも、今の気持ちでもええで。それで最後の1行つくろか", "{p}と話して、何か残ったことはありますか？ この先につながりそうなことでも、今の気持ちでも大丈夫です。それで最後の1行をつくりましょう"],
-  next_qp2: ["{p}と一緒にいて、なんか残ったことある？ この先につながりそうなことでも、今の気持ちでもええで。それで最後の1行つくろか", "{p}と一緒にいて、何か残ったことはありますか？ この先につながりそうなことでも、今の気持ちでも大丈夫です。それで最後の1行をつくりましょう"],
-  next_q: ["ほな、しめの1行いこか。今日のこと、このあとどうなったらええなって思う？ 思いつかんかったら、今の気持ちでしめてもええで", "では、しめの1行です。今日のこと、このあとどうなったらいいなと思いますか？ 思いつかなければ、今の気持ちでしめても大丈夫です"],
-  next_ph: ["例：次は自分も焼いてみたい、今日はいい日だった", "例：次は自分も焼いてみたい、今日はいい日だった"],
-  opt_intro: ["もう投稿文つくれるで。よかったら、ひみつの部屋にも寄ってみる？ レアかけらがあると、投稿がもっと光るで（任意）", "もう投稿文をつくれます。よければ、ひみつの部屋にも寄ってみますか？ レアかけらがあると、投稿がもっと光ります（任意）"],
-  opt_intro_sub: ["いつでも「投稿文をつくる」で終われるで", "いつでも「投稿文をつくる」で終われます"],
-  get: ["{p}のかけら、ゲット！", "{p}のかけらをゲット！"],
-  get_rare: ["レアかけら「{p}」、ゲット！", "レアかけら「{p}」をゲット！"],
-  get_miss: ["{p}のかけらは見送り", "{p}のかけらは見送り"],
-  done_p: ["5つのかけらがそろったで。あとは投稿文にみがくだけや", "5つのかけらがそろいました。あとは投稿文にみがくだけです"],
-  done_part: ["{n}色のかけらで、原石ができたで。このままでも投稿文はつくれるで", "{n}色のかけらで、原石ができました。このままでも投稿文はつくれます"],
-  tr_p: ["DROP 完成のおまけや。あなたの答えから、このあとカルチャースナックで楽しめそうなところを選んだで", "DROP 完成のおまけです。あなたの答えから、このあとカルチャースナックで楽しめそうなところを選びました"],
-  tr_sub: ["気になったら行ってみてな。行った先の写真で、もう1本つくれるで", "気になったら行ってみてください。行った先の写真で、もう1本つくれます"],
-  why_kw: ["「{w}」が気になってたあなたに", "「{w}」が気になっていたあなたに"],
-  why_tag: ["「{s}」って答えたあなたに。{t}つながりで", "「{s}」と答えたあなたに。{t}つながりで"],
-  why_tag0: ["{t}が好きそうなあなたに", "{t}が好きそうなあなたに"],
-  why_detour: ["いつもとちがうジャンルに、ちょっと寄り道してみいひん？", "いつもとちがうジャンルに、ちょっと寄り道してみませんか？"],
-  rally: ["みんまちDROP では「{t}」（{p}）もやってるで", "みんまちDROP では「{t}」（{p}）もやっています"],
-  find_q: ["今日、なんか発見はあった？", "今日、なにか発見はありましたか？"],
-  find_sub: ["投稿の見どころになるで", "投稿の見どころになります"],
-  find_ph: ["例：こんな作り方があるんだ", "例：こんな作り方があるんだ"],
-  face_q: ["その人、ふだん（平日）は何してる人やった？（わかる範囲で）", "その人は、ふだん（平日）は何をしている人でしたか？（わかる範囲で）"],
-  face_sub: ["「平日は〇〇、今日は〇〇！」みたいなギャップが、いちばんの見どころになるで", "「平日は〇〇、今日は〇〇！」のようなギャップが、いちばんの見どころになります"],
-  face_ph: ["例：平日は隣のビルの経理さん", "例：平日は隣のビルの経理さん"],
-  profile_q: ["さいごに、あなたについて教えてな（この端末では1回だけ聞くで）", "さいごに、あなたについて教えてください（この端末では1回だけ聞きます）"],
-  compose_lead: ["おおきに！ 集めたかけらで、投稿文にみがくで", "ありがとうございます！ 集めたかけらで、投稿文にみがきます"],
-  compose_lead_early: ["ここまでの答えで、投稿文つくるで", "ここまでの答えで、投稿文をつくります"],
-  compose_ok: ["投稿文できたで！", "投稿文ができました"],
-  compose_ok_sub: ["行を押すと、言いかえの案が出るで。「自分の言葉の文」に切りかえたり、直接直したりもできるで", "行を押すと、言いかえの案が出ます。「自分の言葉の文」に切りかえたり、直接直したりもできます"],
-  compose_more_sub: ["案{n}ができたで。上のタブか「ならべて見る」で、ほかの案や自分の言葉の文と見比べてな", "案{n}ができました。上のタブか「ならべて見る」で、ほかの案や自分の言葉の文と見比べてください"],
-  compose_err: ["AI で整えられへんかったから、あなたのことばをつないだ文にしたで（{e}）。このまま使っても、直してもOKや", "AI で整えられなかったので、あなたのことばをつないだ文にしました（{e}）。このまま使っても、直してもOKです"],
-  compose_empty: ["まだ文がないで。下の枠に、ひとことだけでも書いてみてな", "まだ文がありません。下の枠に、ひとことだけでも書いてみてください"],
-  compose_edited: ["直してくれた文は、そのままにしとくで", "直してくれた文は、そのままにしています"],
-  compose_noai: ["投稿文できたで！ そのまま使っても、自由に直してもOKや", "投稿文ができました。そのまま使っても、自由に直してもOKです"],
-  login_compose: ["投稿文をつくるのに、ニックネームとパスワードを入れてな（この端末では1回だけ）", "投稿文をつくるために、ニックネームとパスワードを入れてください（この端末では1回だけ）"],
-  copied: ["コピーしたで！ DROP に貼りつけて、写真と一緒に投稿してな", "コピーしました！ DROP に貼りつけて、写真と一緒に投稿してください"],
-  stamp1: ["1本目、完成や！ ほかのブースや気づいたことでも、もう1本どう？", "1本目、完成です！ ほかのブースや気づいたことでも、もう1本どうですか？"],
-  stamp3: ["3本目！ もう DROP 名人やな。ほかに気になったとこある？", "3本目！ もう DROP 名人です。ほかに気になったところはありますか？"],
-  stamp5: ["スタンプそろったで！ たくさんの声、おおきに", "スタンプがそろいました！ たくさんの声をありがとうございます"],
-  stampN: ["完成や！ 気づいたことがあったら、もう1本どう？", "完成です！ 気づいたことがあれば、もう1本どうですか？"],
+  hello1: ["まいど！ 案内役の「ぽとり」やで。写真1枚から、DROP の投稿文を一緒につくろ", "こんにちは！ 案内役の「ぽとり」です。写真1枚から、DROP の投稿文を一緒につくりましょう", "やあ！ 案内役の「ぽとり」だよ。写真1枚から、DROP の投稿文を一緒につくろう"],
+  hello1sub: ["5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成や。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光るで✦", "5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成です。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光ります✦", "5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成だよ。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光るよ✦"],
+  hello2: ["おかえり！ {n}本目の冒険、いってみよか", "おかえりなさい！ {n}本目の冒険、いってみましょう", "おかえり！ 今日の{n}本目、いってみよう！"],
+  hello2sub: ["写真えらんで、ひとこと書いたら、また5つのかけらを集めにいこ", "写真をえらんで、ひとことを書いたら、また5つのかけらを集めにいきましょう", "写真をえらんで、ひとことを書いたら、また5つのかけらを集めにいこう"],
+  hello_want: ["☆行ってみるリストに{n}か所あるで。行った先の写真でもつくれるで（右上のメニューから見られる）", "☆行ってみるリストに{n}か所あります。行った先の写真でもつくれます（右上のメニューから見られます）", "☆行ってみるリストに{n}か所あるよ。行った先の写真でもつくれるよ（右上のメニューから見られるよ）"],
+  login_q: ["はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてな。この端末では1回だけやで", "はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてください。この端末では1回だけです", "はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてね。この端末では1回だけだよ"],
+  login_sub: ["本名ではなく、ニックネーム（ひらがな）を入れてください。答えは、イベントの効果を確かめる分析にだけ使います", "本名ではなく、ニックネーム（ひらがな）を入れてください。答えは、イベントの効果を確かめる分析にだけ使います", "本名ではなく、ニックネーム（ひらがな）を入れてください。答えは、イベントの効果を確かめる分析にだけ使います"],
+  photo_q: ["まずは、投稿する写真を1枚えらんでな（写真なしでもOKやで）", "まずは、投稿する写真を1枚えらんでください（写真なしでも大丈夫です）", "まずは、投稿する写真を1枚えらんでね（写真なしでもOKだよ）"],
+  photo_sub: ["人の顔や名札が写った写真はさけてください", "人の顔や名札が写った写真はさけてください", "人の顔や名札が写った写真はさけてください"],
+  text1_q_photo: ["ええ写真やん！ この写真のこと、ひとことでいうと？ 思ったまんまでええで", "この写真のこと、ひとことでいうと？ 思ったままで大丈夫です", "いい写真だね！ この写真のこと、ひとことでいうと？ 思ったままでいいよ"],
+  text1_q: ["今日のこと、ひとことでいうと？ 思ったまんまでええで", "今日のこと、ひとことでいうと？ 思ったままで大丈夫です", "今日のこと、ひとことでいうと？ 思ったままでいいよ"],
+  text1_sub: ["これが投稿文のもとになるで。マイクで話してもOK", "これが投稿文のもとになります。マイクで話してもOKです", "これが投稿文のもとになるよ。マイクで話してもOK"],
+  text1_ph: ["例：焼き芋あったまる〜", "例：焼き芋あったまる〜", "例：焼き芋あったまる〜"],
+  react_neg: ["「{t}」、正直に教えてくれておおきに。", "「{t}」、正直に教えてくれてありがとうございます。", "「{t}」、正直に教えてくれてありがとう。"],
+  react_pos: ["「{t}」、ええやん！", "「{t}」、いいですね！", "「{t}」、いいね！"],
+  react_neu: ["「{t}」、なるほどな。", "「{t}」、ありがとうございます。", "「{t}」、なるほど。"],
+  react_tail: ["ほな、のこり{n}つのかけらを集めにいこか", "では、のこり{n}つのかけらを集めにいきましょう", "じゃあ、のこり{n}つのかけらを集めにいこう"],
+  react_sub: ["上の地図で、いまどの部屋にいるか見られるで", "上の地図で、いまどの部屋にいるか見られます", "上の地図で、いまどの部屋にいるか見られるよ"],
+  feel_q: ["そのとき、どんな気持ちやった？", "そのとき、どんな気持ちでしたか？", "そのとき、どんな気持ちだった？"],
+  feel_q2: ["「{f}」のほかにも、どんな気持ちやった？", "「{f}」のほかにも、どんな気持ちでしたか？", "「{f}」のほかにも、どんな気持ちだった？"],
+  feel_sub: ["思ったまんまのことばでええで。迷ったら「ヒント」から選んでもOK", "思ったままのことばで大丈夫です。迷ったら「ヒント」から選んでもOKです", "思ったままのことばでいいよ。迷ったら「ヒント」から選んでもOK"],
+  feel_ph: ["例：ぽかぽかした、ちょっと緊張した", "例：ぽかぽかした、ちょっと緊張した", "例：ぽかぽかした、ちょっと緊張した"],
+  why_qx: ["「{x}」って思ったのは、どこやった？", "「{x}」と思ったのは、どこでしたか？", "「{x}」って思ったのは、どこだった？"],
+  why_qs: ["{s}の、とくに心に残ったのはどこやった？", "{s}の、とくに心に残ったのはどこでしたか？", "{s}の、とくに心に残ったのはどこだった？"],
+  why_q: ["とくに心に残ったのは、どこやった？", "とくに心に残ったのは、どこでしたか？", "とくに心に残ったのは、どこだった？"],
+  why_sub: ["見た目・味・人・場所…なんでもええで", "見た目・味・人・場所…なんでも大丈夫です", "見た目・味・人・場所…なんでもいいよ"],
+  why_ph: ["例：湯気と香り、手描きのラベル", "例：湯気と香り、手描きのラベル", "例：湯気と香り、手描きのラベル"],
+  who_q: ["そのとき、だれと一緒やった？", "そのとき、だれと一緒でしたか？", "そのとき、だれと一緒だった？"],
+  who_sub: ["会社・部署・立場で教えてな（名前はなしで）", "会社・部署・立場で教えてください（名前は入れないでください）", "会社・部署・立場で教えてね（名前はなしで）"],
+  who_ph: ["例：ちがう部署の先輩、近所の大学生、ひとりで", "例：ちがう部署の先輩、近所の大学生、ひとりで", "例：ちがう部署の先輩、近所の大学生、ひとりで"],
+  who_confirm: ["「{t}」やね！ ほな「{l}」で入れとくで", "「{t}」ですね。「{l}」として入れておきます", "「{t}」だね！ じゃあ「{l}」で入れておくね"],
+  next_confirm: ["「{t}」やね！ ほな「{l}」の気持ちで入れとくで", "「{t}」ですね。「{l}」として入れておきます", "「{t}」だね！ じゃあ「{l}」の気持ちで入れておくね"],
+  pick_q: ["どれがいちばん近い？", "どれがいちばん近いですか？", "どれがいちばん近い？"],
+  reflect_q: ["ここまでのかけらを、1行にみがいてみたで。言いたかったんって、こういうことちゃう？", "ここまでのかけらを、1行にみがいてみました。言いたかったのは、こういうことですか？", "ここまでのかけらを、1行にみがいてみたよ。言いたかったのって、こういうこと？"],
+  reflect_sub: ["えらぶと、投稿文の1行になるで。直してから使ってもええよ", "えらぶと、投稿文の1行になります。直してから使ってもOKです", "えらぶと、投稿文の1行になるよ。直してから使ってもいいよ"],
+  reflect_wait: ["かけらをみがいてるで…", "かけらをみがいています…", "かけらをみがいてるよ…"],
+  reflect_ph: ["自分のことばで1行", "自分のことばで1行", "自分のことばで1行"],
+  next_qp: ["{p}と話して、なんか残ったことある？ この先につながりそうなことでも、今の気持ちでもええで。それで最後の1行つくろか", "{p}と話して、何か残ったことはありますか？ この先につながりそうなことでも、今の気持ちでも大丈夫です。それで最後の1行をつくりましょう", "{p}と話して、なにか残ったことある？ この先につながりそうなことでも、今の気持ちでもいいよ。それで最後の1行をつくろう"],
+  next_qp2: ["{p}と一緒にいて、なんか残ったことある？ この先につながりそうなことでも、今の気持ちでもええで。それで最後の1行つくろか", "{p}と一緒にいて、何か残ったことはありますか？ この先につながりそうなことでも、今の気持ちでも大丈夫です。それで最後の1行をつくりましょう", "{p}と一緒にいて、なにか残ったことある？ この先につながりそうなことでも、今の気持ちでもいいよ。それで最後の1行をつくろう"],
+  next_q: ["ほな、しめの1行いこか。今日のこと、このあとどうなったらええなって思う？ 思いつかんかったら、今の気持ちでしめてもええで", "では、しめの1行です。今日のこと、このあとどうなったらいいなと思いますか？ 思いつかなければ、今の気持ちでしめても大丈夫です", "じゃあ、しめの1行いこう。今日のこと、このあとどうなったらいいなって思う？ 思いつかなかったら、今の気持ちでしめてもいいよ"],
+  next_ph: ["例：次は自分も焼いてみたい、今日はいい日だった", "例：次は自分も焼いてみたい、今日はいい日だった", "例：次は自分も焼いてみたい、今日はいい日だった"],
+  opt_intro: ["もう投稿文つくれるで。よかったら、ひみつの部屋にも寄ってみる？ レアかけらがあると、投稿がもっと光るで（任意）", "もう投稿文をつくれます。よければ、ひみつの部屋にも寄ってみますか？ レアかけらがあると、投稿がもっと光ります（任意）", "もう投稿文をつくれるよ。よかったら、ひみつの部屋にも寄ってみる？ レアかけらがあると、投稿がもっと光るよ（任意）"],
+  opt_intro_sub: ["いつでも「投稿文をつくる」で終われるで", "いつでも「投稿文をつくる」で終われます", "いつでも「投稿文をつくる」で終われるよ。あとから寄ることもできるよ"],
+  get: ["{p}のかけら、ゲット！", "{p}のかけらをゲット！", "{p}のかけら、ゲット！"],
+  get_rare: ["レアかけら「{p}」、ゲット！", "レアかけら「{p}」をゲット！", "レアかけら「{p}」、ゲット！"],
+  get_miss: ["{p}のかけらは見送り", "{p}のかけらは見送り", "{p}のかけらは見送り"],
+  done_p: ["5つのかけらがそろったで。あとは投稿文にみがくだけや", "5つのかけらがそろいました。あとは投稿文にみがくだけです", "5つのかけらがそろったよ。あとは投稿文にみがくだけ！"],
+  done_part: ["{n}色のかけらで、原石ができたで。このままでも投稿文はつくれるで", "{n}色のかけらで、原石ができました。このままでも投稿文はつくれます", "{n}色のかけらで、原石ができたよ。このままでも投稿文はつくれるよ"],
+  tr_p: ["DROP 完成のおまけや。あなたの答えから、このあとカルチャースナックで楽しめそうなところを選んだで", "DROP 完成のおまけです。あなたの答えから、このあとカルチャースナックで楽しめそうなところを選びました", "DROP 完成のおまけだよ。あなたの答えから、このあとカルチャースナックで楽しめそうなところを選んだよ"],
+  tr_sub: ["気になったら行ってみてな。行った先の写真で、もう1本つくれるで", "気になったら行ってみてください。行った先の写真で、もう1本つくれます", "気になったら行ってみてね。行った先の写真で、もう1本つくれるよ"],
+  why_kw: ["「{w}」が気になってたあなたに", "「{w}」が気になっていたあなたに", "「{w}」が気になってたあなたに"],
+  why_tag: ["「{s}」って答えたあなたに。{t}つながりで", "「{s}」と答えたあなたに。{t}つながりで", "「{s}」って答えたあなたに。{t}つながりで"],
+  why_tag0: ["{t}が好きそうなあなたに", "{t}が好きそうなあなたに", "{t}が好きそうなあなたに"],
+  why_detour: ["いつもとちがうジャンルに、ちょっと寄り道してみいひん？", "いつもとちがうジャンルに、ちょっと寄り道してみませんか？", "いつもとちがうジャンルに、ちょっと寄り道してみない？"],
+  rally: ["みんまちDROP では「{t}」（{p}）もやってるで", "みんまちDROP では「{t}」（{p}）もやっています", "みんまちDROP では「{t}」（{p}）もやってるよ"],
+  find_q: ["今日、なんか発見はあった？", "今日、なにか発見はありましたか？", "今日、なにか発見はあった？"],
+  find_sub: ["投稿の見どころになるで", "投稿の見どころになります", "投稿の見どころになるよ"],
+  find_ph: ["例：こんな作り方があるんだ", "例：こんな作り方があるんだ", "例：こんな作り方があるんだ"],
+  face_q: ["その人、ふだん（平日）は何してる人やった？（わかる範囲で）", "その人は、ふだん（平日）は何をしている人でしたか？（わかる範囲で）", "その人、ふだん（平日）は何してる人だった？（わかる範囲で）"],
+  face_sub: ["「平日は〇〇、今日は〇〇！」みたいなギャップが、いちばんの見どころになるで", "「平日は〇〇、今日は〇〇！」のようなギャップが、いちばんの見どころになります", "「平日は〇〇、今日は〇〇！」みたいなギャップが、いちばんの見どころになるよ"],
+  face_ph: ["例：平日は隣のビルの経理さん", "例：平日は隣のビルの経理さん", "例：平日は隣のビルの経理さん"],
+  profile_q: ["さいごに、あなたについて教えてな（この端末では1回だけ聞くで）", "さいごに、あなたについて教えてください（この端末では1回だけ聞きます）", "さいごに、あなたについて教えてね（この端末では1回だけ聞くよ）"],
+  compose_lead: ["おおきに！ 集めたかけらで、投稿文にみがくで", "ありがとうございます！ 集めたかけらで、投稿文にみがきます", "ありがとう！ 集めたかけらで、投稿文にみがくね"],
+  compose_lead_early: ["ここまでの答えで、投稿文つくるで", "ここまでの答えで、投稿文をつくります", "ここまでの答えで、投稿文をつくるね"],
+  compose_ok: ["投稿文できたで！", "投稿文ができました", "投稿文ができたよ！"],
+  compose_ok_sub: ["行を押すと、言いかえの案が出るで。「自分の言葉の文」に切りかえたり、直接直したりもできるで", "行を押すと、言いかえの案が出ます。「自分の言葉の文」に切りかえたり、直接直したりもできます", "行を押すと、言いかえの案が出るよ。「自分の言葉の文」に切りかえたり、直接直したりもできるよ"],
+  compose_more_sub: ["案{n}ができたで。上のタブか「ならべて見る」で、ほかの案や自分の言葉の文と見比べてな", "案{n}ができました。上のタブか「ならべて見る」で、ほかの案や自分の言葉の文と見比べてください", "案{n}ができたよ。上のタブか「ならべて見る」で、ほかの案や自分の言葉の文と見比べてね"],
+  compose_err: ["AI で整えられへんかったから、あなたのことばをつないだ文にしたで（{e}）。このまま使っても、直してもOKや", "AI で整えられなかったので、あなたのことばをつないだ文にしました（{e}）。このまま使っても、直してもOKです", "AI で整えられなかったから、あなたのことばをつないだ文にしたよ（{e}）。このまま使っても、直してもOKだよ"],
+  compose_empty: ["まだ文がないで。下の枠に、ひとことだけでも書いてみてな", "まだ文がありません。下の枠に、ひとことだけでも書いてみてください", "まだ文がないよ。下の枠に、ひとことだけでも書いてみてね"],
+  compose_edited: ["直してくれた文は、そのままにしとくで", "直してくれた文は、そのままにしています", "直してくれた文は、そのままにしておくね"],
+  compose_noai: ["投稿文できたで！ そのまま使っても、自由に直してもOKや", "投稿文ができました。そのまま使っても、自由に直してもOKです", "投稿文ができたよ！ そのまま使っても、自由に直してもOKだよ"],
+  login_compose: ["投稿文をつくるのに、ニックネームとパスワードを入れてな（この端末では1回だけ）", "投稿文をつくるために、ニックネームとパスワードを入れてください（この端末では1回だけ）", "投稿文をつくるのに、ニックネームとパスワードを入れてね（この端末では1回だけ）"],
+  copied: ["コピーしたで！ DROP に貼りつけて、写真と一緒に投稿してな", "コピーしました！ DROP に貼りつけて、写真と一緒に投稿してください", "コピーしたよ！ DROP に貼りつけて、写真と一緒に投稿してね"],
+  stamp1: ["1本目、完成や！ ほかのブースや気づいたことでも、もう1本どう？", "1本目、完成です！ ほかのブースや気づいたことでも、もう1本どうですか？", "1本目、完成！ ほかのブースや気づいたことでも、もう1本どう？"],
+  stamp3: ["3本目！ もう DROP 名人やな。ほかに気になったとこある？", "3本目！ もう DROP 名人です。ほかに気になったところはありますか？", "3本目！ もう DROP 名人だね。ほかに気になったところはある？"],
+  stamp5: ["スタンプそろったで！ たくさんの声、おおきに", "スタンプがそろいました！ たくさんの声をありがとうございます", "スタンプがそろったよ！ たくさんの声をありがとう"],
+  stampN: ["完成や！ 気づいたことがあったら、もう1本どう？", "完成です！ 気づいたことがあれば、もう1本どうですか？", "完成！ 気づいたことがあったら、もう1本どう？"],
   // 運営からの質問（KPI ③など）は、話し方の設定にかかわらず同じ文（答えを比べられるように）
-  pulse_q: ["今日のことで、会社や職場の見え方は変わりましたか？", "今日のことで、会社や職場の見え方は変わりましたか？"],
-  pulse_thanks: ["ありがとうございました。参考にします", "ありがとうございました。参考にします"],
-  pii_warn: ["「{w}」は人の名前かもしれへん。名前は入れんといてな", "「{w}」は人の名前かもしれません。名前は入れないでください"],
-  pii_copy: ["「{w}」は人の名前かもしれへん。名前やなかったら、もう一度押してな", "「{w}」は人の名前かもしれません。名前でなければ、もう一度押してください"],
-  hint_none: ["ヒントはまだ準備中やで。自分のことばで書いてみてな", "ヒントはまだ準備中です。自分のことばで書いてみてください"]
+  pulse_q: ["今日のことで、会社や職場の見え方は変わりましたか？", "今日のことで、会社や職場の見え方は変わりましたか？", "今日のことで、会社や職場の見え方は変わりましたか？"],
+  pulse_thanks: ["ありがとうございました。参考にします", "ありがとうございました。参考にします", "ありがとうございました。参考にします"],
+  pii_warn: ["「{w}」は人の名前かもしれへん。名前は入れんといてな", "「{w}」は人の名前かもしれません。名前は入れないでください", "「{w}」は人の名前かもしれないよ。名前は入れないでね"],
+  pii_copy: ["「{w}」は人の名前かもしれへん。名前やなかったら、もう一度押してな", "「{w}」は人の名前かもしれません。名前でなければ、もう一度押してください", "「{w}」は人の名前かもしれないよ。名前じゃなかったら、もう一度押してね"],
+  nocopy: ["了解！ 今回はコピーせんでも大丈夫やで。DROP 完成のおまけの宝箱は、あけられるで", "わかりました。今回はコピーしなくても大丈夫です。DROP 完成のおまけの宝箱は、あけられます", "OK！ 今回はコピーしなくても大丈夫だよ。DROP 完成のおまけの宝箱は、あけられるよ"],
+  preview_wait: ["ひとこと書いたら、投稿イメージが見られるで", "ひとことを書いたら、投稿イメージが見られます", "ひとことを書いたら、投稿イメージが見られるよ"],
+  secret_go: ["ほな、ひみつの部屋へ。答えたら、投稿文をつくり直すで（前の案も残るで）", "では、ひみつの部屋へ。答えたら、投稿文をつくり直します（前の案も残ります）", "じゃあ、ひみつの部屋へ。答えたら、投稿文をつくり直すね（前の案も残るよ）"],
+  compose_max: ["AI の案は{n}つまでやから、答えは「自分の言葉の文」に足しといたで", "AI の案は{n}つまでなので、答えは「自分の言葉の文」に足しました", "AI の案は{n}つまでだから、答えは「自分の言葉の文」に足しておいたよ"],
+  voice_on: ["関西弁にしたで", "関西弁にしました", "関西弁にしたで"],
+  voice_off: ["ふつうの話し方にしたよ", "ふつうの話し方にしました", "ふつうの話し方にしたよ"],
+  hint_none: ["ヒントはまだ準備中やで。自分のことばで書いてみてな", "ヒントはまだ準備中です。自分のことばで書いてみてください", "ヒントはまだ準備中だよ。自分のことばで書いてみてね"]
 };
-const T = (k, a = {}) => { const v = TXT[k]; const s = Array.isArray(v) ? v[CONFIG.VOICE === "standard" ? 1 : 0] : String(v || k); return s.replace(/\{(\w+)\}/g, (m, n) => (a[n] ?? "")); };
-/** 運営が設定した問い文（標準語）を、関西弁のときだけ語尾を変える */
+/* 話し方：casual＝だよ口調（既定）／kansai＝関西弁（右上の「関西弁」でワンタップ切りかえ。この端末に保存）／standard＝ていねい（運営が CONFIG.VOICE で選ぶ） */
+const VOICE_IX = { kansai: 0, standard: 1, casual: 2 };
+const baseVoice = () => (VOICE_IX[CONFIG.VOICE] != null && CONFIG.VOICE !== "kansai" ? CONFIG.VOICE : "casual");
+let VOICE = (() => { try { const v = JSON.parse(localStorage.getItem(CONFIG.KEYS.VOICE)); if (v === "kansai" || v === "base") return v === "kansai" ? "kansai" : baseVoice(); } catch (e) {} return CONFIG.VOICE === "kansai" ? "kansai" : baseVoice(); })();
+const aiVoice = () => (VOICE === "kansai" ? "kansai" : "standard");   // AI（ぽとりのひとこと）には kansai／standard（＝やさしい話しことば）で伝える
+const T = (k, a = {}) => { const v = TXT[k]; const s = Array.isArray(v) ? (v[VOICE_IX[VOICE]] ?? v[1]) : String(v || k); return s.replace(/\{(\w+)\}/g, (m, n) => (a[n] ?? "")); };
+/** 運営が設定した問い文（です・ます）を、話し方に合わせて語尾を変える（だよ口調・関西弁） */
 function kq(q) {
-  if (CONFIG.VOICE === "standard") return q;
+  if (VOICE === "standard") return q;
+  if (VOICE === "casual") return String(q).replace(/どこですか？$/, "どこだった？").replace(/かったですか？$/, "かった？").replace(/でしたか？$/, "だった？").replace(/ましたか？$/, "た？").replace(/ですか？$/, "？");
   return String(q).replace(/どこですか？$/, "どこやった？").replace(/かったですか？$/, "かった？").replace(/でしたか？$/, "やった？").replace(/ましたか？$/, "た？").replace(/ですか？$/, "？");
 }
 /* 個人情報の注意（どの画面でも同じ文。最初・「このチャットについて」・入力欄の下） */
@@ -1089,7 +1121,7 @@ const MATERIALS = [
   { key: "find",  label: "発見（任意）", done: () => S.ans.find.some(x => x.id !== "none") || S.ans.face.some(x => x.id !== "unknown") }
 ];
 function openPreview() {
-  if (!S || !S.done.includes("text1")) { toast(CONFIG.VOICE === "standard" ? "ひとことを書いたら、投稿イメージが見られます" : "ひとこと書いたら、投稿イメージが見られるで"); return; }
+  if (!S || !S.done.includes("text1")) { toast(T("preview_wait")); return; }
   S.previewOpens = (S.previewOpens || 0) + 1; save();
   const n = MATERIALS.filter(m => m.done()).length;
   openSheet("いまの投稿イメージ", `
@@ -1554,7 +1586,7 @@ async function fireHint() {
   S.hint = { status: "待ち" }; save();
   try {
     if (!getToken(CONFIG.KEYS.TOKEN) && !await autoLogin()) { S.hint = { status: "ログインなし" }; save(); return; }
-    const body = { action: "hint", variant: "chat", token: getToken(CONFIG.KEYS.TOKEN), context: { event: CONFIG.EVENT, sample_total: SAMPLES.length, voice: CONFIG.VOICE }, target: { text: S.ans.text1 } };
+    const body = { action: "hint", variant: "chat", token: getToken(CONFIG.KEYS.TOKEN), context: { event: CONFIG.EVENT, sample_total: SAMPLES.length, voice: aiVoice() }, target: { text: S.ans.text1 } };
     if (PHOTO.imgAi) body.target.image_data = PHOTO.imgAi;
     const res = await post(body, CONFIG.GAS_URL);
     if (g !== RT.gen || !S || S.sid !== sid) return;
@@ -1580,7 +1612,7 @@ async function fireReflect() {
   try {
     if (!getToken(CONFIG.KEYS.TOKEN) && !await autoLogin()) { S.reflect = { status: "none", code: "ログインなし" }; save(); return; }
     const answers = [{ q: "気持ち", a: ownAndPicks("feel") }, { q: "どこが", a: ownAndPicks("why") }].filter(x => x.a);
-    const res = await post({ action: "reflect", variant: "chat", token: getToken(CONFIG.KEYS.TOKEN), context: { event: CONFIG.EVENT, voice: CONFIG.VOICE }, target: { text: S.ans.text1 }, answers }, CONFIG.GAS_URL, 30000);
+    const res = await post({ action: "reflect", variant: "chat", token: getToken(CONFIG.KEYS.TOKEN), context: { event: CONFIG.EVENT, voice: aiVoice() }, target: { text: S.ans.text1 }, answers }, CONFIG.GAS_URL, 30000);
     if (g !== RT.gen || !S || S.sid !== sid) return;
     const opts = res.ok && res.result ? (res.result.options || []).filter(Boolean).slice(0, 3) : [];
     S.reflect = opts.length ? { status: "OK", options: opts, elapsed_sec: Math.round((now() - t0) / 100) / 10 } : { status: "none", code: res.code || "ERROR" };
@@ -1654,7 +1686,10 @@ async function toCompose(early) {
   S.composed = composeText();
   S.msgs = S.msgs.filter(m => m.card !== "compose");
   renderProgress();
-  const useAI = CONFIG.AUTO_AI && gasOn() && (S.drafts || []).length < CONFIG.AI_MAX && !isEdited() && (!S.drafts.length || S.aiStale);
+  if (RT.secretBase != null) { if (rareCount() === RT.secretBase) { S.aiStale = false; RT.forceNewDraft = false; } RT.secretBase = null; }   // ひみつの部屋で何も答えなければ作り直さない
+  const force = !!RT.forceNewDraft; RT.forceNewDraft = false;
+  if (S.aiStale && (S.drafts || []).length >= CONFIG.AI_MAX) { S.aiStale = false; S.chosen = "自分の言葉"; RT.maxNote = true; }   // AI の案が上限：自分の言葉の文に足す
+  const useAI = CONFIG.AUTO_AI && gasOn() && (S.drafts || []).length < CONFIG.AI_MAX && (force || !isEdited()) && (!S.drafts.length || S.aiStale);
   if (!useAI && draftIdx(S.chosen) >= 0 && !chosenDraft()) S.chosen = "自分の言葉";
   if (useAI && !await bot(T(early ? "compose_lead_early" : "compose_lead"))) return;
   await finishCompose(useAI, g);
@@ -1669,7 +1704,8 @@ async function finishCompose(useAI, g = RT.gen) {
       if (!await bot(n > 1 ? T("compose_more_sub", { n }) : ((d.result && d.result.headline) || T("compose_ok")), n > 1 ? {} : { sub: T("compose_ok_sub") })) return;
     } else { if (!S.drafts.length) S.chosen = "自分の言葉"; if (!await bot(T("compose_err", { e: S.aiError || "不明なエラー" }))) return; }
   } else {
-    if (!await bot(T(!String(bodyOf(S.chosen)).trim() ? "compose_empty" : isEdited() ? "compose_edited" : "compose_noai"))) return;
+    const k = RT.maxNote ? "compose_max" : !String(bodyOf(S.chosen)).trim() ? "compose_empty" : isEdited() ? "compose_edited" : "compose_noai"; RT.maxNote = false;
+    if (!await bot(T(k, { n: CONFIG.AI_MAX }))) return;
   }
   S.msgs.push({ who: "bot", card: "compose" });
   RT.busy = false; RT.compare = false; RT.lineOpen = -1; RT.editAI = false;
@@ -1737,11 +1773,13 @@ function renderComposeDock() {
   const canRedo = gasOn() && left > 0 && (S.aiOk === false || S.aiStale);
   const canMore = canMoreAI();   // AI の案ができたあと「もう一案」（前の案は残して見比べる。コピーしたあとも）
   const rest = remainingSteps().filter(st => st.id !== "profile");
-  if (S.copied) {   // コピーしたあと：いちばん目立つボタンを「次の 1 本」に。AI の案はコピーのあとも足せる
+  if (S.copied || S.noCopy) {   // コピーしたあと（またはコピーしないで次へ進んだあと）：いちばん目立つボタンを「次の 1 本」に。AI の案はあとからも足せる
     const same = S.copiedText === finalText();
     dock(`<button type="button" class="btn full" id="dNext">${ICON.camera}次の写真で、もう1本つくる</button>
-      <div class="row"><button type="button" class="btn ghost wide sm" id="dCopy">${ICON.copy}${same ? "もう一度コピー" : "この文をコピー"}</button>${canMore ? `<button type="button" class="btn ghost wide sm" id="dAI2">${ICON.spark}AI でもう一案<small style="font-size:11.5px;color:var(--dim)">あと${left}</small></button>` : ""}${CONFIG.DROP_URL ? `<a class="btn ghost wide sm" href="${esc(CONFIG.DROP_URL)}" target="_blank" rel="noopener">${ICON.open}DROP を開く</a>` : ""}</div>`, "", "", `<span class="mq">次の1本・コピー・AI でもう一案</span><span class="mo">ひらく ▲</span>`);
+      <div class="row"><button type="button" class="btn ghost wide sm" id="dCopy">${ICON.copy}${!S.copied ? "やっぱりコピーする" : same ? "もう一度コピー" : "この文をコピー"}</button>${canMore ? `<button type="button" class="btn ghost wide sm" id="dAI2" title="AI の案は あと${left}回 作れます">${ICON.spark}AI でもう一案</button>` : ""}${CONFIG.DROP_URL ? `<a class="btn ghost wide sm" href="${esc(CONFIG.DROP_URL)}" target="_blank" rel="noopener">${ICON.open}DROP を開く</a>` : ""}</div>
+      ${secretLeft().length ? `<div class="row" style="margin-top:8px"><button type="button" class="btn ghost full sm" id="dSecret">${gemSvg(0, "rare")}ひみつの部屋に寄って、つくり直す</button></div>` : ""}`, "", "", `<span class="mq">次の1本・コピー・AI でもう一案</span><span class="mo">ひらく ▲</span>`);
     $("dNext").addEventListener("click", () => restart());
+    const sc2 = $("dSecret"); if (sc2) sc2.addEventListener("click", visitSecret);
     $("dCopy").addEventListener("click", copyFinal);
     const m2 = $("dAI2"); if (m2) m2.addEventListener("click", () => redoAI(true));
     return;
@@ -1749,16 +1787,17 @@ function renderComposeDock() {
   dock(`<button type="button" class="btn full" id="dCopy">${ICON.copy}コピーして DROP に投稿へ</button>
     <div class="row">
       ${canRedo ? `<button type="button" class="btn ghost wide sm" id="dAI">${ICON.spark}AI で整え直す</button>` : ""}
-      ${canMore ? `<button type="button" class="btn ghost wide sm" id="dAI2">${ICON.spark}AI でもう一案（あと${left}回）</button>` : ""}
-      ${S.early && rest.length ? `<button type="button" class="btn ghost wide sm" id="dResume">つづきを答える（あと${rest.length}つ）</button>` : ""}
+      ${canMore ? `<button type="button" class="btn ghost wide sm" id="dAI2" title="AI の案は あと${left}回 作れます">${ICON.spark}AI でもう一案</button>` : ""}
+      ${S.early && rest.length ? `<button type="button" class="btn ghost wide sm" id="dResume">つづきを答える（あと${rest.length}つ）</button>` : secretLeft().length ? `<button type="button" class="btn ghost wide sm" id="dSecret">${gemSvg(0, "rare")}ひみつの部屋へ</button>` : ""}
     </div>
-    <div class="row center"><button type="button" class="lnk" id="dEx">ほかの人の例</button><button type="button" class="lnk" id="dRestart">最初から</button></div>`, "", "", mini);
+    <div class="row center"><button type="button" class="lnk" id="dEx">ほかの人の例</button><button type="button" class="lnk" id="dNoCopy" style="font-weight:900;color:var(--ink)">コピーしないで次へ →</button></div>`, "", "", mini);
   $("dCopy").addEventListener("click", copyFinal);
   const ai = $("dAI"); if (ai) ai.addEventListener("click", () => redoAI(false));
   const ai2 = $("dAI2"); if (ai2) ai2.addEventListener("click", () => redoAI(true));
   const rs = $("dResume"); if (rs) rs.addEventListener("click", resume);
+  const sc = $("dSecret"); if (sc) sc.addEventListener("click", visitSecret);
   $("dEx").addEventListener("click", openExamples);
-  $("dRestart").addEventListener("click", () => restart());
+  $("dNoCopy").addEventListener("click", skipCopy);
 }
 async function redoAI(another) {
   if (RT.busy || RT.aiWait) return;
@@ -1767,6 +1806,23 @@ async function redoAI(another) {
   RT.forceAI = !!another;   // 同じ答えでも別の案になるよう、GAS のキャッシュを使わない
   me(another ? "AI でもう一案" : "AI で整え直す", { muted: true }); lockDock();
   await finishCompose(true);
+}
+/** ひみつの部屋（任意の問い）で、まだ答えていないもの（とばした・「投稿文をつくる」で進んだ） */
+function secretLeft() {
+  if (!S || !S.optIntro && !S.done.includes("next")) return [];
+  return OPT_STEPS.filter(id => !(S.done.includes(id) && !S.skipped.includes(id)) && (id === "face" ? faceNeeded() : true));
+}
+/** 投稿文のあとから、ひみつの部屋に寄る（答えたら AI の案をもう 1 つ作る。前の案は残す。コピーしたあとも） */
+async function visitSecret() {
+  if (RT.busy || RT.aiWait) return;
+  S.declined = false; S.optIntro = true; S.secretVisits = (S.secretVisits || 0) + 1;
+  OPT_STEPS.forEach(id => { if (!(S.done.includes(id) && !S.skipped.includes(id))) { S.done = S.done.filter(x => x !== id); S.skipped = S.skipped.filter(x => x !== id); } });
+  if (S.aiOk) S.aiStale = true;
+  RT.forceNewDraft = true; RT.secretBase = rareCount();
+  me("ひみつの部屋に寄る", { muted: true }); lockDock();
+  if (!await bot(T("secret_go"))) return;
+  const n = nextStepAfter(null);
+  if (n) await ask(n); else await toCompose(false);
 }
 async function resume() {
   if (RT.busy) return;
@@ -1829,6 +1885,20 @@ function bindRate() {
   });
 }
 function refreshStamp() { const el = document.querySelector(".card.survey"); if (el) { el.outerHTML = surveyCardHtml(); bindRate(); } }
+/** コピーしないで次へ：本数には数えない。おまけの宝箱と運営からの質問は出す（コピーしない人・前にコピーした人も、おすすめに気づけるように） */
+async function skipCopy() {
+  if (RT.busy || RT.aiWait || S.copied || S.noCopy) return;
+  S.noCopy = true; S.pulseAsk = LS.get(CONFIG.KEYS.PULSE, "") !== jstDate();
+  S.msgs.push({ who: "me", text: "コピーしないで次へ", muted: true }); renderMsgs(); save();
+  lockDock();
+  await bot(T("nocopy"));
+  S.msgs.push({ who: "sys", ann: "今回はコピーしていないので、本数には数えません。", sub: "※本数は、この端末でコピーした投稿の数" });
+  if (CONFIG.RECOMMEND_ON && CS.items.length) { S.rec = S.rec || newRec(); if (!S.msgs.some(m => m.card === "treasure")) S.msgs.push({ who: "bot", card: "treasure" }); }
+  else addSurvey();
+  renderMsgs(); save();
+  RT.busy = false; renderComposeDock();
+  sendLog("nocopy");
+}
 async function copyFinal() {
   const text = finalText();
   if (!text) { toast("文が空です"); return; }
@@ -1843,7 +1913,7 @@ async function copyFinal() {
   S.copied++; S.copiedText = text;
   if (first) {
     const p = countPost(); S.postNo = p.n; S.postTotal = p.total;
-    S.pulseAsk = LS.get(CONFIG.KEYS.PULSE, "") !== jstDate();   // 会社の見え方は 1 日 1 回だけ聞く
+    if (!S.noCopy) S.pulseAsk = LS.get(CONFIG.KEYS.PULSE, "") !== jstDate();   // 会社の見え方は 1 日 1 回だけ聞く
   }
   save();
   if (first) {
@@ -1851,7 +1921,8 @@ async function copyFinal() {
     // 本数は運営からのお知らせ（キャラにしゃべらせない）。そのあと「本日の DROP」→ おまけの宝箱 →（開けたら）運営からの質問
     S.msgs.push({ who: "sys", ann: `本日${S.postNo}本目（通算${S.postTotal}本目）です。`, sub: "※この端末でコピーした投稿の数" });
     S.msgs.push({ who: "bot", card: "stamp" });
-    if (CONFIG.RECOMMEND_ON && CS.items.length) { S.rec = S.rec || newRec(); S.msgs.push({ who: "bot", card: "treasure" }); }
+    if (S.msgs.some(m => m.card === "treasure" || m.card === "survey")) { /* コピーしないで次へ のあとにコピーした：宝箱・質問はもう出ている */ }
+    else if (CONFIG.RECOMMEND_ON && CS.items.length) { S.rec = S.rec || newRec(); S.msgs.push({ who: "bot", card: "treasure" }); }
     else S.msgs.push({ who: "bot", card: "survey" });
     renderMsgs(); save();
   } else toast("コピーしました");
@@ -1869,7 +1940,7 @@ async function copyFinal() {
    - AI は呼ばない（すぐ出る・費用がかからない）。並びはセッションごとに決まる（開きなおしても同じ）。「ほかの宝もみる」は 2 回まで
 ===================================================================== */
 let CS = { items: [], stamp_rally: null };
-const REC_KIND = { fit: { label: "ど真ん中", color: "var(--g1)" }, detour: { label: "ちょい冒険", color: "var(--g4)" }, bmen: { label: "B面の人に会う", color: "var(--g2)" } };
+const REC_KIND = { fit: { label: "ど真ん中", color: "var(--g1)", dark: "#b9531c" }, detour: { label: "ちょい冒険", color: "var(--g4)", dark: "#1d7891" }, bmen: { label: "B面の人に会う", color: "var(--g2)", dark: "#b2426c" } };
 const SIG = {
   feel: { oishii: "eat sweets drink", tanoshii: "play make perform music", kawaii: "cute craft", sugoi: "craft perform art make", kirei: "art craft nature", hokkori: "sweets drink kids craft scent", igai: "bmen world play", shigeki: "make bmen words perform" },
   who: { samedept: "company bmen", otherdept: "company bmen talk", otherco: "company talk", maker: "bmen craft talk", local: "town local", family: "kids", work: "company bmen" },
@@ -1942,7 +2013,7 @@ function treasureCardHtml() {
   }
   const w = wantList().map(x => x.id), left = 2 - R.rerolls;
   const cards = R.picks.map(p => { const it = csItem(p.id); if (!it) return ""; const k = REC_KIND[p.kind] || REC_KIND.fit, saved = w.includes(it.id);
-    return `<div class="rec" style="--k:${k.color}"><span class="kind">${esc(k.label)}</span><h4>${esc(it.t)}</h4>${it.s ? `<div class="who">${esc(it.s)}</div>` : ""}
+    return `<div class="rec" style="--k:${k.color};--kd:${k.dark}"><span class="kind">${esc(k.label)}</span><h4>${esc(it.t)}</h4>${it.s ? `<div class="who">${esc(it.s)}</div>` : ""}
       ${it.p ? `<div class="place">${PIN_SVG}${esc(it.p)}</div>` : ""}<p class="desc">${esc(it.d)}</p>${p.why ? `<p class="why">${esc(p.why)}</p>` : ""}
       <div class="row">${it.url ? `<a class="btn ghost sm wide" href="${esc(it.url)}" target="_blank" rel="noopener" data-rec="${it.id}">${ICON.open}詳しく見る</a>` : ""}<button type="button" class="btn ghost sm wide${saved ? " saved" : ""}" data-want="${it.id}" aria-pressed="${saved}">${saved ? "★ 行ってみる" : "☆ 行ってみる"}</button></div></div>`; }).join("");
   const sr = CS.stamp_rally;
@@ -2087,7 +2158,7 @@ async function runAI() {
   const working = String(bodyOf("自分の言葉") || S.composed || "").trim();
   const body = {
     action: "coach", variant: "chat", force: !!RT.forceAI,
-    context: { event: CONFIG.EVENT, sample_total: SAMPLES.length, voice: CONFIG.VOICE },
+    context: { event: CONFIG.EVENT, sample_total: SAMPLES.length, voice: aiVoice() },
     target: { text: S.ans.text1 || working, source: S.ans.text1 ? "first" : "composed" },
     answers: qaList(), working_text: working, options: mapOptions(),
     references: CONFIG.SEND_SAMPLES ? SAMPLES.map(p => ({ text: p.s, name: p.n })) : []
@@ -2187,7 +2258,7 @@ function buildRecord(end) {
   const lastAsked = S.asked.filter(id => id !== "login").slice(-1)[0] || "";
   const h = S.hint || {}, cd = chosenDraft();
   return {
-    schema: "drop_chat_v4", app_version: APP_VERSION, session_id: S.sid, end, device_id: deviceId(), voice: CONFIG.VOICE,
+    schema: "drop_chat_v4", app_version: APP_VERSION, session_id: S.sid, end, device_id: deviceId(), voice: VOICE,
     started_at: S.started, ended_at: new Date().toISOString(), duration_sec: r2((now() - S.t0) / 1000),
     answered: answeredCount(),
     last_step: S.phase === "compose" ? (S.early ? "途中で投稿文へ（" + stepName(lastAsked) + "）" : "最後まで") : stepName(lastAsked),
@@ -2214,7 +2285,7 @@ function buildRecord(end) {
     hint: { status: h.status || "", elapsed_sec: h.elapsed_sec, cached: !!h.cached, subject: h.subject || "", feel_options: h.feel_options || [], why_options: h.why_options || [], find_options: h.find_options || [], shime_options: h.shime_options || [] },
     own: S.own || {}, src: S.src || {},
     reflect: S.reflect ? { status: S.reflect.status || "", options: S.reflect.options || [], text: S.reflect.text || "", how: S.reflect.how || (S.reflect.status === "none" ? "出なかった" : "") } : { status: "", text: "", how: "" },
-    line_swaps: S.lineSwaps || 0, company_view: S.companyView || "",
+    line_swaps: S.lineSwaps || 0, company_view: S.companyView || "", secret_visits: S.secretVisits || 0, no_copy: !!S.noCopy,
     // v5：かけら集め（自分のことば＝キラ・任意の問い＝レア）・おまけの宝箱（おすすめ）
     game: { kira: kiraCount(), rare: rareCount(), pieces: PIECES.filter(([id]) => pieceOn(id)).length },
     rec: S.rec ? { opened: !!S.rec.opened, skipped: !!S.rec.skipped, picks: (S.rec.picks || []).map(p => ({ id: p.id, kind: p.kind })), hist: S.rec.hist || [], shown: S.rec.shown || [], clicked: S.rec.clicked || [], saved: S.rec.saved || [], rerolls: S.rec.rerolls || 0, opened_at_sec: S.rec.openedAt ?? null } : null,
@@ -2310,6 +2381,20 @@ const closeMenu = () => { $("menu").hidden = true; $("menuBtn").setAttribute("ar
 document.addEventListener("click", e => { if (!$("menu").hidden && !e.target.closest("#menu") && !e.target.closest("#menuBtn")) closeMenu(); });
 $("mBig").addEventListener("click", () => { const b = !document.documentElement.classList.contains("big"); document.documentElement.classList.toggle("big", b); LS.set(CONFIG.KEYS.BIG, b); syncMenu(); syncDockH(); });
 $("mExamples").addEventListener("click", () => { closeMenu(); openExamples(); });
+/* 関西弁ボタン：ワンタップで ぽとりの話し方を切りかえる（この端末に保存）。いまの問いは新しい話し方で言いなおす（それまでの会話はそのまま） */
+function syncVoiceBtn() { const b = $("voiceBtn"); b.hidden = !CONFIG.VOICE_TOGGLE; b.classList.toggle("on", VOICE === "kansai"); b.setAttribute("aria-pressed", String(VOICE === "kansai")); }
+$("voiceBtn").addEventListener("click", () => {
+  VOICE = VOICE === "kansai" ? baseVoice() : "kansai";
+  LS.set(CONFIG.KEYS.VOICE, VOICE === "kansai" ? "kansai" : "base");
+  syncVoiceBtn(); toast(T(VOICE === "kansai" ? "voice_on" : "voice_off"));
+  if (!S) return;
+  if (S.phase === "ask" && S.cur) {
+    const st = stepOf(S.cur), m = [...S.msgs].reverse().find(x => x.qid === S.cur);
+    if (st && m) { m.text = st.q(); const sub = st.sub ? st.sub() : ""; if (sub) m.sub = sub; else delete m.sub; save(); }
+  }
+  RT.noScroll = true; renderMsgs(); RT.noScroll = false;
+  if (!RT.busy) { if (S.phase === "compose") renderComposeDock(); else renderDock(); }
+});
 $("mWant").addEventListener("click", () => { closeMenu(); openWant(); });
 $("mAbout").addEventListener("click", () => {
   closeMenu();
@@ -2362,7 +2447,8 @@ async function start() {
   const g = RT.gen;
   const ps = postStats();
   const wl = wantList().length;
-  const hello = ps.n > 0 ? [T("hello2", { n: ps.n + 1 }), { sub: T("hello2sub") + (wl ? "\n" + T("hello_want", { n: wl }) : "") }] : [T("hello1"), { sub: T("hello1sub") }];
+  const countNote = `※「${ps.n + 1}本目」は、この端末で投稿文をコピーした数から数えています（コピーしなかった投稿は数えません）`;
+  const hello = ps.n > 0 ? [T("hello2", { n: ps.n + 1 }), { sub: T("hello2sub") + (wl ? "\n" + T("hello_want", { n: wl }) : "") + "\n" + countNote }] : [T("hello1"), { sub: T("hello1sub") }];
   if (!await bot(hello[0], hello[1])) return;
   S.msgs.push({ who: "bot", notice: true }); renderMsgs(); save();   // 個人情報のおねがい（毎回はじめに）
   await advance(null, g);
@@ -2402,6 +2488,7 @@ function checkInAppBrowser() {
   deviceId();
   checkInAppBrowser();
   $("staffFlag").hidden = !STAFF;
+  syncVoiceBtn();
   if (LS.get(CONFIG.KEYS.BIG, false)) document.documentElement.classList.add("big");
   syncMenu();
   loadSettings();

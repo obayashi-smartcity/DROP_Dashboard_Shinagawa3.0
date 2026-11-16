@@ -550,7 +550,7 @@
             <div class="card c4"><h3>使いごこち（5 段階）</h3><p class="why">このチャット（投稿づくり）について。イベントの満足度ではありません。</p><div id="rating"></div></div>
             <div class="card c4"><h3>「そうそう！」の使われ方</h3><p class="why">本人のことばから AI が作った 1 行を、どう使ったか。</p><div id="reflectUse"></div></div>
             <div class="card c4"><h3>選んだ投稿文の案</h3><p class="why">AI の案（最大 4 つ）と自分の言葉の文のうち、コピーしたもの。</p><div id="draftPick"></div></div>
-            <div class="card c12"><h3>おまけ：ごほうびの宝箱（このあとのおすすめ）</h3><p class="why">投稿文をコピーしたあとに開ける宝箱。答えから、掲載コンテンツ一覧の 3 つ（ど真ん中／ちょい冒険／B面の人に会う）を選んで出します（AI は使っていません）。開けた・詳しく見た・☆行ってみる を数えます。</p><div id="recUse"></div></div>
+            <div class="card c12"><h3>おまけ：ごほうびの宝箱（このあとのおすすめ）</h3><p class="why">投稿文をコピーしたあと（または「コピーしないで次へ」で進んだあと）に開ける宝箱。答えから、掲載コンテンツ一覧の 3 つ（ど真ん中／ちょい冒険／B面の人に会う）を選んで出します（AI は使っていません）。開けた・詳しく見た・☆行ってみる を数えます。</p><div id="recUse"></div></div>
             <div class="card c12"><h3>運営へのコメント</h3><p class="why">使いごこちを答えた人が、任意で書いたひとこと（新しい順）。</p><div id="comments"></div></div>
           </div>
         </section>
@@ -589,7 +589,7 @@
     </div>
   </main>
   <section id="setPane" hidden></section>
-  <footer>DROP. Coach dashboard v2.1（2026-11-16）— 記録用 GAS（DROP_COACH_LOG v9.1）の chat_v4 シートの列名で読み込みます（v9 のままでも読めます。おまけの宝箱は CSV の記録JSON から）。同じセッション ID の行は、いちばん新しい行を使います（コピーした・投稿文まで行ったかは全行から判定）。端末 ID の無い記録（チャット v4 より前のテスト記録）は集計に入れません。</footer>
+  <footer>DROP. Coach dashboard v2.2（2026-11-17）— 記録用 GAS（DROP_COACH_LOG v9.1）の chat_v4 シートの列名で読み込みます（v9 のままでも読めます。おまけの宝箱は CSV の記録JSON から）。同じセッション ID の行は、いちばん新しい行を使います（コピーした・投稿文まで行ったかは全行から判定）。端末 ID の無い記録（チャット v4 より前のテスト記録）は集計に入れません。</footer>
 </div>
 <div id="tip" role="status"></div>
 <!-- チャットの選択肢と重みの初期値（json/coach_settings_default.json と同じ。チャットの HTML にも同じものが入っている） -->
@@ -787,7 +787,7 @@ function useData(header, rows, meta) {
     const reached = ends.some(e => e === "完了" || e === "コピー") || finals.length > 0;
     return {
       ts: new Date(g("タイムスタンプ")), started: isNaN(started) ? null : started, name: String(g("Name")), sid: String(g("セッションID")),
-      ends, end: ends[ends.length - 1], reached, copied: ends.includes("コピー"), dropped: !reached,
+      ends, end: ends[ends.length - 1], reached, copied: ends.includes("コピー"), noCopy: ends.some(e => e === "コピーせず" || e === "nocopy"), dropped: !reached,
       early: /^途中で投稿文へ/.test(lastStep), lastStep, duration: num(g("所要秒")), answered: num(g("回答数")), photo: g("写真") === "あり",
       text1: String(g("最初のひとこと")), detected: String(g("ひとことから読み取れたもの")), subject: String(g("話題")),
       who: String(g("だれと")), whoDetail: String(g("どんな人")), why: split(g("どこが"), "、"), whySrc: String(g("どこがの選び方")),
@@ -851,20 +851,20 @@ let CS_ITEMS = (() => { try { return JSON.parse(document.getElementById("csFallb
 fetch("json/cs_contents.json", { cache: "no-cache" }).then(r => (r.ok ? r.json() : null)).then(d => { if (d && Array.isArray(d.items)) { CS_ITEMS = d.items; if (SESS.length) renderRecUse(filtered()); } }).catch(() => {});
 const csName = id => { if (id === "rally") return "スタンプラリーの案内"; const it = CS_ITEMS.find(x => x.id === id); return it ? it.t : "No." + id; };
 function renderRecUse(F) {
-  const C = F.filter(s => s.copied), A = C.filter(s => s.rec), O = A.filter(s => s.rec.opened);
+  const C = F.filter(s => s.copied || s.noCopy), A = C.filter(s => s.rec), O = A.filter(s => s.rec.opened), NC = C.filter(s => s.noCopy && !s.copied);
   const clk = O.filter(s => s.rec.clicked.some(x => x !== "rally")).length, sav = O.filter(s => s.rec.saved.length).length, rr = O.filter(s => s.rec.rerolls > 0).length;
-  if (!A.length) { $("recUse").innerHTML = '<p class="note">まだデータがありません（チャット v5 で投稿文をコピーした人に出ます）</p>'; return; }
+  if (!A.length) { $("recUse").innerHTML = '<p class="note">まだデータがありません（チャット v5 で投稿文をコピーした人・「コピーしないで次へ」で進んだ人に出ます）</p>'; return; }
   const kinds = ["fit", "detour", "bmen"].map(k => { let shown = 0, c = 0, sv = 0;
     O.forEach(s => { const ids = s.rec.hist.filter(h => h.kind === k).map(h => h.id); shown += ids.length; c += ids.filter(id => s.rec.clicked.includes(id)).length; sv += ids.filter(id => s.rec.saved.includes(id)).length; });
     return { k, shown, c, sv }; });
   const items = new Map();
   O.forEach(s => s.rec.hist.forEach(h => { const x = items.get(h.id) || { id: h.id, shown: 0, c: 0, sv: 0, kinds: new Set() }; x.shown++; x.kinds.add(REC_KIND_N[h.kind] || "ほか"); if (s.rec.clicked.includes(h.id)) x.c++; if (s.rec.saved.includes(h.id)) x.sv++; items.set(h.id, x); }));
   const top = [...items.values()].sort((a, b) => (b.c + b.sv) - (a.c + a.sv) || b.shown - a.shown).slice(0, 10);
-  const steps = [["コピーした", C.length], ["宝箱を開けた", O.length], ["詳しく見た", clk], ["☆行ってみる", sav]];
+  const steps = [["宝箱が出た", C.length], ["宝箱を開けた", O.length], ["詳しく見た", clk], ["☆行ってみる", sav]];
   const mx = Math.max(1, ...steps.map(x => x[1]));
   $("recUse").innerHTML = `<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px">
     <div>${hbars(steps.map(([l, v], i) => ({ label: l, v, vText: `${v}件`, tv: `${v}件（${fmtP(v, C.length)}）`, tl: l })), { emph: 1, max: mx, cap: "宝箱を開けた", tcols: ["段階", "件数"] })}
-      <p class="note">コピーした人のうち、宝箱を開けた：<b>${fmtP(O.length, C.length)}</b>／開けた人のうち、詳しく見た：<b>${fmtP(clk, O.length)}</b>・☆を付けた：<b>${fmtP(sav, O.length)}</b>・引き直した：${fmtP(rr, O.length)}。あけずに進んだ：${A.filter(s => s.rec.skipped && !s.rec.opened).length}件</p></div>
+      <p class="note">宝箱が出た＝投稿文をコピーした、または「コピーしないで次へ」で進んだ（うちコピーしなかった ${NC.length} 件・開けた ${NC.filter(s => s.rec && s.rec.opened).length} 件）。宝箱が出た人のうち、開けた：<b>${fmtP(O.length, C.length)}</b>／開けた人のうち、詳しく見た：<b>${fmtP(clk, O.length)}</b>・☆を付けた：<b>${fmtP(sav, O.length)}</b>・引き直した：${fmtP(rr, O.length)}。あけずに進んだ：${A.filter(s => s.rec.skipped && !s.rec.opened).length}件</p></div>
     <div><table><thead><tr><th>種類</th><th class="n">出した</th><th class="n">詳しく見た</th><th class="n">☆行ってみる</th></tr></thead><tbody>
       ${kinds.map(x => `<tr><td>${esc(REC_KIND_N[x.k])}</td><td class="n">${x.shown}</td><td class="n">${x.shown ? fmtP(x.c, x.shown) : "−"}</td><td class="n">${x.shown ? fmtP(x.sv, x.shown) : "−"}</td></tr>`).join("")}</tbody></table>
       <p class="note">ちょい冒険＝いつもとちがうジャンル（①挑戦のきっかけ）、B面の人に会う＝ふだんは別の顔の人のお店・ステージ（②③のきっかけ）。率は出した数あたり。</p></div>
@@ -1412,7 +1412,7 @@ function renderPosts(F) {
   const L = F.filter(s => !q || [s.text1, s.final, s.name, s.subject, s.who, s.feels.join(" ")].join(" ").includes(q)).sort((a, b) => (b.started || 0) - (a.started || 0));
   const show = L.slice(0, 300);
   $("pCount").textContent = `${L.length} 件` + (L.length > 300 ? "（新しい 300 件を表示）" : "");
-  const state = s => (s.copied ? "コピー" : s.reached ? "投稿文まで" : "途中で終了");
+  const state = s => (s.copied ? "コピー" : s.noCopy ? "コピーせず次へ" : s.reached ? "投稿文まで" : "途中で終了");
   $("posts").innerHTML = `<table><thead><tr><th>開始</th><th>名前</th><th>ひとこと</th><th>投稿文</th><th>だれと</th><th>気持ち</th><th class="n">向き</th><th>関与</th><th>状態</th></tr></thead><tbody>
     ${show.map((s, i) => { const v = valStyle(s.valence == null ? null : s.valence >= .75 ? 1 : s.valence > .25 ? .5 : s.valence >= -.25 ? 0 : -1);
       return `<tr class="r" data-i="${i}" tabindex="0"><td style="white-space:nowrap">${s.started ? esc(ymd(s.started).slice(5) + " " + String(s.started.getHours()).padStart(2, "0") + ":" + String(s.started.getMinutes()).padStart(2, "0")) : ""}</td><td>${esc(s.name)}</td><td>${esc(s.text1)}</td><td>${esc(s.final || "")}</td><td>${esc(s.who)}${s.whoDetail ? `<br><span class="note">${esc(s.whoDetail)}</span>` : ""}</td><td>${esc(s.feels.join("・"))}</td>
@@ -1447,7 +1447,7 @@ function download(name, rows) {
 }
 $("csvBtn").addEventListener("click", () => {
   const F = filtered();
-  const cols = [["開始", s => (s.started ? s.started.toISOString() : "")], ["名前", s => s.name], ["セッションID", s => s.sid], ["状態", s => (s.copied ? "コピー" : s.reached ? "投稿文まで" : "途中で終了")], ["所要秒", s => s.duration], ["回答数", s => s.answered], ["写真", s => (s.photo ? "あり" : "なし")],
+  const cols = [["開始", s => (s.started ? s.started.toISOString() : "")], ["名前", s => s.name], ["セッションID", s => s.sid], ["状態", s => (s.copied ? "コピー" : s.noCopy ? "コピーせず次へ" : s.reached ? "投稿文まで" : "途中で終了")], ["所要秒", s => s.duration], ["回答数", s => s.answered], ["写真", s => (s.photo ? "あり" : "なし")],
     ["ひとこと", s => s.text1], ["話題", s => s.subject], ["だれと", s => s.who], ["どんな人", s => s.whoDetail], ["どこが", s => s.why.join("、")], ["気持ち", s => s.feels.join(" > ")], ["気持ちの向き", s => s.valence], ["しめ", s => s.next.join("、")], ["属性", s => s.profile],
     ["ソフト①", s => s.soft.c1], ["ソフト②", s => s.soft.c2], ["ソフト③", s => s.soft.c3], ["ソフト愛着", s => s.soft.att], ["AI分類", s => s.aiCat], ["AI感情の向き", s => s.aiSent], ["AI行動", s => s.aiAct],
     ["最終文面", s => s.final], ["採用", s => s.chosen], ["手で編集", s => (s.edited ? "あり" : "なし")], ["コーチ関与", s => s.level], ["ほかの人の例を見た", s => s.exViews], ["ノード", s => s.nodes.join("｜")],
@@ -1584,8 +1584,9 @@ function makeDemo() {
       "そうそう": reflect, "そうそうの選び方": reflectHow, "行の言いかえ": /^AI/.test(chosen) ? pick([0, 0, 1, 1, 2, 3]) : 0, "会社の見え方": "" };
     // おまけの宝箱（デモ）：コピーした人の 8 割が開ける。ちょい冒険は詳しく見られにくく、B面は☆が付きやすい（架空）
     let recS = "", recR = "";
-    if (copied) {
-      const open = rnd() < .8;
+    const noCopy = reached && !copied && rnd() < .45;
+    if (copied || noCopy) {
+      const open = rnd() < (copied ? .8 : .6);
       if (!open) recR = rnd() < .5 ? "あけずに進む" : "";
       else {
         const pool = CS_ITEMS.length ? CS_ITEMS : [{ id: 1 }], bm = pool.filter(x => x.note), pk = (a, k) => ({ id: a[Math.floor(rnd() * a.length)].id, kind: k });
@@ -1597,7 +1598,7 @@ function makeDemo() {
         recR = ["開けた", clicked.length ? "詳しく=" + clicked.join(",") : "", saved.length ? "行ってみる=" + saved.join(",") : "", rerolls ? "引き直し=" + rerolls : ""].filter(Boolean).join("／");
       }
     }
-    const ends = ["開始"].concat(drop ? ["途中離脱"] : copied ? ["完了", "コピー"].concat(recR ? ["おすすめ"] : []).concat(pulse ? ["会社の見え方"] : []).concat(rating ? ["感想"] : []) : ["完了"]);
+    const ends = ["開始"].concat(drop ? ["途中離脱"] : copied ? ["完了", "コピー"].concat(recR ? ["おすすめ"] : []).concat(pulse ? ["会社の見え方"] : []).concat(rating ? ["感想"] : []) : noCopy ? ["完了", "コピーせず"].concat(recR ? ["おすすめ"] : []) : ["完了"]);
     ends.forEach((e, n) => { const r = { ...base, "終了": e, "タイムスタンプ": new Date(t0.getTime() + (n ? dur + n * 30 : 2) * 1000).toISOString(), "最後の問い": e === "開始" ? "写真" : lastStep, "会社の見え方": e === "会社の見え方" || (pulse && n > ends.indexOf("会社の見え方")) ? pulse : "",
         "おすすめ（表示）": n >= ends.indexOf("おすすめ") && recR && ends.indexOf("おすすめ") > 0 ? recS : "", "おすすめ（反応）": n >= ends.indexOf("おすすめ") && recR && ends.indexOf("おすすめ") > 0 ? recR : "" };
       if (e === "開始") Object.assign(r, { "最初のひとこと": "", "最終文面": "", "採用": "", "所要秒": 2 });
