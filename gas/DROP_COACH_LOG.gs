@@ -1,10 +1,18 @@
 /**
- * DROP Coach V3 フォルダ — 記録用 Google Apps Script（Web アプリ）  v9（2026/11/16・チャット画面 v4 用）
+ * DROP Coach V3 フォルダ — 記録用 Google Apps Script（Web アプリ）  v9.1（2026/11/16・チャット画面 v5 用）
  * ------------------------------------------------------------
  * drop_coach_chat.html（チャット）から直接呼ばれ、チャット 1 回分（1 セッション）を
  * Google スプレッドシートに 1 行追記する。drop_coach_dashboard.html（分析画面）からは管理者だけが読み出せる。
  * もう 1 つの役割：運営が分析画面の「チャットの設定」で保存した「選択肢と重み」を settings シートにためて、チャットに配る。
  * ★ V1・V2 のログ用 GAS とは別のプロジェクトとして新しく作る（記録先のスプレッドシートも V3 用に新しく作る）
+ *
+ * ■ v9.1 の変更（2026/11/16 午後・チャット画面 v5 用）
+ *   - 終了に「おすすめ」を追加：コピーのあとの「ごほうびの宝箱」（このあとのおすすめ 3 つ）を開けた・詳しく見た・☆を付けたときに 1 行
+ *   - 列を 2 足した（会社の見え方の右）：おすすめ（表示）＝「ど真ん中=42,61／ちょい冒険=101,19／B面=16,12」（番号は掲載コンテンツ一覧の No.。引き直した分も出た順に）／
+ *     おすすめ（反応）＝「開けた／詳しく=42／行ってみる=42／引き直し=1」（開けなかったときは「あけずに進む」）
+ *   - 更新しなくてもチャット v5 は動く（そのときは終了に recommend と入り、おすすめは記録JSON にだけ残る）
+ *   - 更新：コードを貼りかえて保存 → デプロイを管理 → 編集 → バージョン「新バージョン」→ デプロイ（URL は変わらない）
+ *     次の記録のときに、chat_v4 シートの見出しが自動で 2 列書き足される
  *
  * ■ v9 の変更（2026/11/16・チャット画面 v4 用）
  *   - 既定のシート名を chat_v4 に（V3 用の新しいスプレッドシートに書く）
@@ -69,9 +77,12 @@ const LOG_HEADER = [
   // v9 で追加
   '端末ID', '通算何本目',
   '自分のことば：気持ち', '自分のことば：どこが', '自分のことば：だれと', '自分のことば：今日の発見', '自分のことば：その人のふだん', '自分のことば：しめ',
-  '答えの決め方', 'AIの当てはめ', 'そうそう', 'そうそうの選び方', '行の言いかえ', '会社の見え方'
+  '答えの決め方', 'AIの当てはめ', 'そうそう', 'そうそうの選び方', '行の言いかえ', '会社の見え方',
+  // v9.1 で追加
+  'おすすめ（表示）', 'おすすめ（反応）'
 ];
-const END_LABEL = { start: '開始', copy: 'コピー', finish: '完了', abandon: '途中離脱', reset: 'やり直し', feedback: '感想', pulse: '会社の見え方' };
+const END_LABEL = { start: '開始', copy: 'コピー', finish: '完了', abandon: '途中離脱', reset: 'やり直し', feedback: '感想', pulse: '会社の見え方', recommend: 'おすすめ' };
+const REC_KIND = { fit: 'ど真ん中', detour: 'ちょい冒険', bmen: 'B面' };
 // 分析に使える投稿か：5 つの要素（AI の読み取り 0＝無い／1＝あいまい／2＝具体的）
 const ELEMENTS = [['what', '何を'], ['who', '誰の立場'], ['why', 'なぜ'], ['change', '変化'], ['next', '次の一歩']];
 /** 「分析に使える」：何を・なぜ が具体的（2）で、誰の立場が書けていて（1 以上）、変化か次の一歩のどちらかがある（1 以上） */
@@ -84,7 +95,7 @@ const CACHE_MAX_SEC = 21600;
 const FAIL_WINDOW_SEC = 900;
 const MAX_LEN = { NAME: 40, ID: 64, TEXT: 400, SHORT: 120, FIELD: 1000, ITEMS: 12, MSG: 300, META: 80, JSON_CELL: 45000 };
 const KEY = { FAIL: 'chatlog_auth_fail', TOKEN: 'chatlogtok_', SETTINGS: 'chatlog_settings_cur' };
-const SERVICE_VERSION = 9;
+const SERVICE_VERSION = 9.1;
 
 class AppError extends Error {
   constructor(code, message) { super(message); this.code = code; }
@@ -316,8 +327,31 @@ function buildRow_(name, s) {
     t(rf.text, 60),
     t(rf.how, 20),
     num(s.line_swaps, 0, 99),
-    t(s.company_view, 20)
+    t(s.company_view, 20),
+    // v9.1：おまけの宝箱（おすすめ）
+    recShown_(o(s.rec)),
+    recReact_(o(s.rec))
   ];
+}
+
+/** おすすめ（表示）：出したもの（種類=掲載コンテンツの No.。「ほかの宝もみる」で引き直した分も、出た順に） */
+function recShown_(r) {
+  if (!r || (!r.opened && !r.skipped)) return '';
+  const list = (Array.isArray(r.hist) && r.hist.length ? r.hist : Array.isArray(r.picks) ? r.picks : []).slice(0, 12);
+  const by = {};
+  list.forEach(p => { const id = Number(p && p.id); if (!isFinite(id) || id <= 0 || id >= 10000) return; const k = p && REC_KIND[p.kind] ? REC_KIND[p.kind] : 'ほか'; (by[k] = by[k] || []).push(id); });
+  return Object.keys(by).map(k => k + '=' + by[k].join(',')).join('／');
+}
+/** おすすめ（反応）：開けた／詳しく=No.／行ってみる=No.／引き直し=回数（rally＝スタンプラリーの案内） */
+function recReact_(r) {
+  if (!r || (!r.opened && !r.skipped)) return '';
+  if (!r.opened) return 'あけずに進む';
+  const ids = x => (Array.isArray(x) ? x : []).map(v => (v === 'rally' ? 'rally' : Number(v))).filter(v => v === 'rally' || (isFinite(v) && v > 0 && v < 10000)).slice(0, 12);
+  const out = ['開けた'];
+  if (ids(r.clicked).length) out.push('詳しく=' + ids(r.clicked).join(','));
+  if (ids(r.saved).length) out.push('行ってみる=' + ids(r.saved).join(','));
+  const n = Number(r.rerolls); if (isFinite(n) && n > 0) out.push('引き直し=' + Math.min(9, Math.round(n)));
+  return out.join('／');
 }
 
 /**

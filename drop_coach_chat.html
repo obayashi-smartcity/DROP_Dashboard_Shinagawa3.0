@@ -3,296 +3,379 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<meta name="theme-color" content="#ffffff" />
+<meta name="theme-color" content="#f3e9e2" />
 <title>DROP. Coach — 投稿づくりチャット</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+JP:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet" />
 <style>
   /* =====================================================================
-     デザイン（v4）
-     - 案内役はインクのしずくのキャラクター「ぽとり」（関西弁。CONFIG.VOICE で標準語にも切りかえ）
-     - 上に 5 つの「ことばのかけら」（できごと・気持ち・どこが・だれと・しめ）。答えるたびにたまる
-     - 答えは自分のことばが先。迷ったら「ヒント」で候補がぜんぶ出る
-     - 答える欄は、灰色の線を押す／下へスワイプでたたむ → 会話の履歴が画面いっぱいに見える
-     （以下は v3.2 からのデザイン）
-     - 問いと答えを近くに：最後の問いはチャットに、答えは下の「回答シート」に。シートの頭に「何問目・どう答えるか」
-     - 選択肢はそろったタイル（2 列・左寄せ・大きな押す面積）。長いことばは 1 行まるごと
-     - 主ボタンは 1 つだけ色つき（次へ／投稿文をつくる）。とばす・終えるは同じ場所に控えめに
-     - 色：紫＝操作できるもの・選んだもの／黒＝文字／灰＝説明。背景はあたたかい白
+     デザイン（v5・2026/11/16）みんまちDROP の雰囲気に合わせた
+     - 色：生成りの背景・白い大きな角丸カード・こげ茶のボタン。差し色は DROP のしずくの 5 色（橙・桃・黄・水・緑）＝5 つの「ことばのかけら」
+     - チャットは LINE のように：あなた（利用者）＝こげ茶の吹き出し／ぽとり（案内役）＝白の吹き出し。下の答える欄も同じ
+       （ぽとりの問い・確かめ＝白／あなたが選んだもの・送るボタン＝こげ茶）
+     - かけら集めはダンジョン風：5 つの部屋をまわって、かけらを集める。上の地図で「いまどこか」「どれだけ集まったか」が見える
+       自分のことばで答えるとキラかけら✦、任意の問い（ひみつの部屋）はレアかけら。5 つそろうと DROP の原石が完成
+     - 案内役「ぽとり」：DROP の色ガラスのようなしずく（オリジナル）。関西弁（CONFIG.VOICE で標準語）
+     - 運営からのお知らせ（個人情報のおねがい・本数）は、キャラにしゃべらせず、まん中のお知らせ枠で出す
   ===================================================================== */
   :root{
-    --bg:#f7f6f3; --bg-b:#eeece8; --card:#fff;
-    --stroke:#dcd8e3; --stroke-soft:#ebe8ef;
-    --text:#1e1b24; --muted:#4f4b57; --dim:#8b8795;
-    --rich:#6d4bc3; --rich-2:#a68be0; --rich-soft:#f2edfc; --rich-ink:#4a2f93;
-    --ok:#2f6b4a; --ok-soft:#e7f4ec; --warn:#8a5f00; --err:#b3372a;
-    --sh-1:0 1px 2px rgba(40,25,80,.06),0 4px 14px rgba(40,25,80,.06);
-    --sh-2:0 -8px 30px -12px rgba(40,25,80,.28);
-    --font:"Inter","Noto Sans JP",system-ui,-apple-system,"Hiragino Sans",sans-serif;
+    --bg:#f3e9e2; --bg-2:#ebded4; --card:#fff; --paper:#fbf7f3;
+    --line:#e0d1c6; --line-2:#efe5de;
+    --ink:#2b211d; --ink-2:#5c4b43; --dim:#75675e;
+    --brown:#4e3b38; --brown-2:#665049; --brown-soft:#efe5df;
+    --g1:#f08c4e; --g2:#ec8fb1; --g3:#f2c64a; --g4:#4fbcd4; --g5:#72ad48; --gold:#e3a92b;
+    --ok:#2f6b4a; --warn:#8a5f00; --err:#b3372a;
+    --sh-1:0 1px 2px rgba(60,40,30,.05),0 6px 18px rgba(60,40,30,.06);
+    --sh-2:0 -10px 30px -14px rgba(60,40,30,.35);
+    --font:"Zen Kaku Gothic New","Noto Sans JP",system-ui,-apple-system,"Hiragino Sans",sans-serif;
+    --serif:"DM Serif Display",Georgia,"Times New Roman",serif;
     --dockH:220px;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;font-weight:500;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
   button,input,textarea{font-family:var(--font);color:inherit}
   button{cursor:pointer;-webkit-tap-highlight-color:transparent}
   [hidden]{display:none!important}
   svg{flex:none}
-  :focus-visible{outline:3px solid rgba(109,75,195,.45);outline-offset:2px}
-  html.big .chat, html.big .dock-head, html.big .dock-scroll, html.big .dock-act, html.big .sheet, html.big .pv-in{zoom:1.15}
+  :focus-visible{outline:3px solid rgba(78,59,56,.45);outline-offset:2px}
+  html.big .chat, html.big .dock-head, html.big .dock-scroll, html.big .dock-act, html.big .sheet{zoom:1.15}
+  @media (prefers-reduced-motion:reduce){ *,*::before,*::after{animation:none!important;transition:none!important} }
 
-  /* ---------- 上部 ---------- */
-  .top{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 1px 0 var(--stroke-soft)}
-  .appbar-in{max-width:640px;margin:0 auto;padding:8px 12px 8px 16px;display:flex;align-items:center;gap:12px;min-height:60px}
-  .brand{font-weight:900;font-size:18px;letter-spacing:-.4px;line-height:1;white-space:nowrap}
-  .brand b{font-weight:900}
-  .brand i{font-style:normal;color:var(--rich)}
-  .brand small{display:block;font-size:10.5px;font-weight:700;letter-spacing:1px;color:var(--dim);margin-top:4px}
-  .brand{display:flex;align-items:center;gap:8px}
+  /* ---------- 上部：ロゴと「かけらの地図」 ---------- */
+  .top{position:sticky;top:0;z-index:30;background:rgba(243,233,226,.94);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .appbar-in{max-width:640px;margin:0 auto;padding:6px 8px 2px 14px;display:flex;align-items:center;gap:10px;min-height:52px}
+  .brand{display:flex;align-items:center;gap:8px;white-space:nowrap;line-height:1}
   .brand .mark{width:30px;height:30px;flex:none}
+  .brand .mark svg{width:30px;height:30px;display:block}
   .brand-t{display:flex;flex-direction:column}
+  .brand-t b{font-family:var(--serif);font-weight:400;font-size:21px;letter-spacing:.2px;color:var(--ink)}
+  .brand-t small{display:block;font-size:10.5px;font-weight:700;letter-spacing:1px;color:var(--ink-2);margin-top:3px}
   .top-r{margin-left:auto;display:flex;align-items:center;gap:6px}
-  .icon-btn{width:44px;height:44px;border:none;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
-  .icon-btn:hover{background:var(--bg-b)}
+  .icon-btn{width:44px;height:44px;border:none;background:transparent;border-radius:999px;display:flex;align-items:center;justify-content:center;color:var(--ink-2)}
+  .icon-btn:hover{background:var(--bg-2)}
   .icon-btn svg{width:22px;height:22px}
-  /* メニュー：右上のポップオーバー */
-  .menu{position:absolute;right:12px;top:62px;z-index:40;background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(30,20,60,.22);padding:6px;display:flex;flex-direction:column;min-width:240px}
-  .menu button{border:none;background:none;text-align:left;padding:13px 14px;border-radius:10px;font-size:15px;font-weight:700;color:var(--text)}
-  .menu button:hover{background:var(--rich-soft)}
+  .menu{position:absolute;right:12px;top:56px;z-index:40;background:#fff;border-radius:20px;box-shadow:0 14px 40px rgba(60,40,30,.22);padding:6px;display:flex;flex-direction:column;min-width:240px}
+  .menu button{border:none;background:none;text-align:left;padding:13px 14px;border-radius:12px;font-size:15px;font-weight:700;color:var(--ink)}
+  .menu button:hover{background:var(--brown-soft)}
   .staff-flag{font-size:10px;font-weight:800;letter-spacing:1px;color:#fff;background:var(--warn);padding:3px 7px;border-radius:4px}
-  /* ことばのかけら（5 つ）。押すと、いまの投稿イメージ */
-  .pv{display:block;width:100%;border:none;border-top:1px solid var(--stroke-soft);background:#fff;padding:0;text-align:left}
-  .pv-in{max-width:640px;margin:0 auto;padding:7px 12px 8px;display:flex;align-items:center;gap:8px}
-  .pieces{flex:1;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;min-width:0}
-  .pieces i{font-style:normal;font-size:11.5px;font-weight:800;text-align:center;padding:5px 0;border-radius:8px;border:1.5px dashed var(--rich-2);color:var(--rich-ink);white-space:nowrap;overflow:hidden;transition:background .25s,color .25s}
-  .pieces i.on{background:var(--rich);border:1.5px solid var(--rich);color:#fff}
-  .pieces i.now{background:var(--rich-soft);border-style:solid}
-  .pieces i.pop{animation:ringpop .55s ease}
-  @keyframes ringpop{40%{transform:scale(1.12)}}
-  .pv-open{font-size:12.5px;font-weight:800;color:var(--rich-ink);white-space:nowrap;padding-left:2px}
-  .pv-open::after{content:" ›"}
-  .pv-open.off{color:var(--dim)}
-  /* アプリの中のブラウザで開いたときの案内 */
+  /* かけらの地図：5 つの部屋（宝石）を道でつなぐ。最後に DROP（宝箱）。押すと、いまの投稿イメージ */
+  .quest{display:block;width:100%;border:none;background:none;padding:0 10px 8px;text-align:left}
+  .quest-in{max-width:620px;margin:0 auto;background:#fff;border-radius:18px;box-shadow:var(--sh-1);padding:6px 8px 5px;display:flex;align-items:center;gap:4px}
+  .path{flex:1;min-width:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));position:relative}
+  .path::before{content:"";position:absolute;left:10%;right:10%;top:13px;border-top:2px dashed var(--line)}
+  .path .walk{position:absolute;left:10%;top:12px;height:4px;border-radius:2px;background:linear-gradient(90deg,var(--g1),var(--g2),var(--g3),var(--g4),var(--g5));transition:width .6s ease;max-width:80%}
+  .node{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;min-width:0}
+  .node .gem{width:28px;height:28px;display:block;position:relative;z-index:1}
+  .node .gem svg{width:28px;height:28px;display:block}
+  .node i{font-style:normal;font-size:10.5px;font-weight:800;color:var(--dim);white-space:nowrap;overflow:hidden;max-width:100%;text-overflow:ellipsis}
+  .node.got i{color:var(--ink)}
+  .node.now i{color:var(--ink)}
+  .node.now .gem::after{content:"";position:absolute;inset:-4px;border-radius:50%;border:2px solid var(--brown);animation:nowring 1.6s ease-in-out infinite}
+  @keyframes nowring{50%{transform:scale(1.12);opacity:.45}}
+  .node .kira{position:absolute;right:calc(50% - 20px);top:-3px;font-size:11px;color:var(--gold);font-weight:900;z-index:2;text-shadow:0 0 3px #fff}
+  .node.pop .gem{animation:gempop .7s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes gempop{0%{transform:scale(.3) rotate(-30deg)}60%{transform:scale(1.35) rotate(8deg)}100%{transform:none}}
+  .node.pop .gem::before{content:"";position:absolute;inset:-10px;border-radius:50%;background:radial-gradient(circle,rgba(255,215,120,.9) 0 18%,transparent 19% 100%),conic-gradient(from 0deg,transparent 0 10%,rgba(240,140,78,.6) 10% 13%,transparent 13% 35%,rgba(79,188,212,.6) 35% 38%,transparent 38% 60%,rgba(236,143,177,.6) 60% 63%,transparent 63% 85%,rgba(114,173,72,.6) 85% 88%,transparent 88%);animation:burst .8s ease-out forwards;z-index:-1}
+  @keyframes burst{0%{transform:scale(.2);opacity:1}100%{transform:scale(1.8);opacity:0}}
+  .chest{flex:none;width:52px;display:flex;flex-direction:column;align-items:center;gap:1px;border-left:1px dashed var(--line);padding-left:4px}
+  .chest svg{width:30px;height:28px;display:block}
+  .chest i{font-style:normal;font-family:var(--serif);font-size:11.5px;color:var(--ink-2);line-height:1.1}
+  .chest.full svg{animation:glow 1.8s ease-in-out infinite}
+  @keyframes glow{50%{filter:drop-shadow(0 0 6px rgba(227,169,43,.9))}}
   .iab{background:#fff8e6;border-top:1px solid #f0d58f;color:#5c4300;font-size:13.5px;line-height:1.55}
   .iab-in{max-width:640px;margin:0 auto;padding:8px 12px 8px 16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
   .iab-in span{flex:1;min-width:200px}
   .iab .btn{min-height:44px;font-size:14px;padding:0 14px}
-  .iab .icon-btn{width:44px;height:44px}
 
-  /* ---------- チャット ---------- */
-  .chat{max-width:640px;margin:0 auto;padding:16px 14px calc(var(--dockH) + 16px)}
-  .msg{display:flex;gap:8px;margin:10px 0;align-items:flex-end}
+  /* ---------- チャット（LINE のように：ぽとり＝白・あなた＝こげ茶） ---------- */
+  .chat{max-width:640px;margin:0 auto;padding:12px 12px calc(var(--dockH) + 16px)}
+  .msg{display:flex;gap:8px;margin:10px 0;align-items:flex-start}
   .msg.me{justify-content:flex-end}
   .msg.wide{display:block}
   .msg.new{animation:pop .3s ease}
   @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .avatar{width:34px;height:34px;flex:none;margin-bottom:2px}
-  .avatar svg{width:34px;height:34px;display:block}
-  .notice{display:flex;gap:8px;align-items:flex-start;margin:10px 0 12px;padding:10px 12px;border-radius:14px;background:#fff;border:1.5px solid var(--stroke);font-size:13.5px;line-height:1.6;color:var(--muted)}
-  .notice b{color:var(--text)}
-  .notice svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--rich-ink)}
-  .bubble{max-width:82%;padding:12px 15px;font-size:16.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;border-radius:20px 20px 20px 6px;background:#fff;box-shadow:var(--sh-1)}
-  .msg.me .bubble{background:var(--rich);color:#fff;border-radius:20px 20px 6px 20px;box-shadow:none}
-  .msg.me .bubble.muted{background:transparent;color:var(--dim);font-size:13.5px;padding:2px 4px;font-weight:700}
-  .msg.me .bubble.photo{padding:0;overflow:hidden;max-width:64%;background:var(--bg-b);border-radius:20px 20px 6px 20px}
+  .avatar{width:38px;height:38px;flex:none;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-1)}
+  .avatar svg{width:32px;height:32px;display:block}
+  .bubble{max-width:80%;padding:11px 15px;font-size:16px;line-height:1.7;white-space:pre-wrap;word-break:break-word;border-radius:4px 20px 20px 20px;background:#fff;color:var(--ink);box-shadow:var(--sh-1)}
+  .msg.me .bubble{background:var(--brown);color:#fff;border-radius:20px 4px 20px 20px;box-shadow:none}
+  .msg.me .bubble.muted{background:transparent;color:var(--dim);font-size:13px;padding:0 4px;font-weight:700}
+  .msg.me .bubble.photo{padding:0;overflow:hidden;max-width:64%;background:var(--bg-2);border-radius:20px 4px 20px 20px}
   .msg.me .bubble.photo img{display:block;width:100%;max-height:340px;object-fit:cover}
-  .msg.me .bubble.photo .nophoto{display:block;padding:16px 18px;color:var(--muted);font-size:14px}
-  .bubble .sub{display:block;margin-top:6px;font-size:13.5px;color:var(--muted);white-space:normal;line-height:1.6;font-weight:400}
+  .msg.me .bubble.photo .nophoto{display:block;padding:16px 18px;color:var(--ink-2);font-size:14px}
+  .bubble .sub{display:block;margin-top:6px;font-size:13.5px;color:var(--ink-2);white-space:normal;line-height:1.6;font-weight:500}
   .typing .bubble{display:flex;gap:4px;align-items:center;padding:14px 16px}
-  .typing .bubble i{width:7px;height:7px;border-radius:50%;background:var(--rich-2);animation:blink 1.1s infinite}
+  .typing .bubble i{width:7px;height:7px;border-radius:50%;background:var(--brown-2);animation:blink 1.1s infinite}
   .typing .bubble i:nth-child(2){animation-delay:.15s}.typing .bubble i:nth-child(3){animation-delay:.3s}
-  .typing .bubble em{font-style:normal;font-size:13.5px;color:var(--muted);margin-left:8px}
+  .typing .bubble em{font-style:normal;font-size:13.5px;color:var(--ink-2);margin-left:8px}
   @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+  /* 運営からのお知らせ（キャラにしゃべらせない）：まん中の枠 */
+  .notice{display:flex;gap:8px;align-items:flex-start;margin:12px auto;max-width:94%;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.55);border:1px solid var(--line);font-size:13.5px;line-height:1.65;color:var(--ink-2)}
+  .notice b{color:var(--ink)}
+  .notice svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--ink-2)}
+  .notice.ann{justify-content:center;text-align:center;flex-direction:column;align-items:center;gap:2px;max-width:86%}
+  .notice.ann b{font-size:15.5px;font-weight:900}
+  .notice.ann small{font-size:12px;color:var(--dim)}
+  /* 部屋に入る（ダンジョンの区切り） */
+  .room{display:flex;align-items:center;gap:10px;margin:18px 4px 6px;color:var(--ink-2)}
+  .room::before,.room::after{content:"";flex:1;height:0;border-top:1.5px dashed var(--line)}
+  .room span{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:900;letter-spacing:.5px;white-space:nowrap}
+  .room span svg{width:20px;height:20px}
+  .room small{font-size:11.5px;font-weight:700;color:var(--dim)}
+  .room.secret span{color:var(--gold)}
+  /* かけらゲット */
+  .get{display:flex;justify-content:center;margin:8px 0 4px}
+  .get-in{display:inline-flex;align-items:center;gap:8px;background:#fff;border-radius:999px;padding:6px 14px 6px 8px;box-shadow:var(--sh-1);font-size:14px;font-weight:900;color:var(--ink)}
+  .get-in svg{width:30px;height:30px}
+  .get.new .get-in svg{animation:gempop .8s cubic-bezier(.2,1.6,.4,1)}
+  .get.new .get-in{animation:getin .5s ease}
+  @keyframes getin{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:none}}
+  .get-in em{font-style:normal;font-size:11.5px;font-weight:900;color:#fff;background:var(--gold);border-radius:999px;padding:2px 8px}
+  .get.miss .get-in{background:transparent;box-shadow:none;color:var(--dim);font-size:12.5px;font-weight:700}
+  .get.miss .get-in svg{width:20px;height:20px;opacity:.6}
+  /* DROP の原石が完成 */
+  .done-card{background:#fff;border-radius:24px;box-shadow:var(--sh-1);padding:16px 16px 14px;text-align:center;margin:10px 0}
+  .done-card .big{width:92px;height:110px;margin:0 auto 4px;display:block}
+  .done-card.new .big{animation:rise 1s cubic-bezier(.2,1.4,.4,1)}
+  @keyframes rise{0%{transform:translateY(20px) scale(.5);opacity:0}60%{transform:translateY(-6px) scale(1.08);opacity:1}100%{transform:none}}
+  .done-card h3{margin:0;font-family:var(--serif);font-weight:400;font-size:24px;letter-spacing:.3px}
+  .done-card p{margin:4px 0 0;font-size:14.5px;line-height:1.6;color:var(--ink-2)}
+  .done-card .bag{display:flex;justify-content:center;gap:4px;margin-top:8px}
+  .done-card .bag svg{width:24px;height:24px}
 
-  /* ---------- 投稿文（投稿のプレビュー） ---------- */
-  .card{background:#fff;border-radius:20px;padding:14px;box-shadow:var(--sh-1)}
+  /* ---------- 投稿文 ---------- */
+  .card{background:#fff;border-radius:24px;padding:14px;box-shadow:var(--sh-1)}
   .card-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
-  .card-hd b{font-size:15px;color:var(--text)}
-  .post-label{font-size:12px;font-weight:900;letter-spacing:.5px;color:var(--rich-ink);background:var(--rich-soft);border-radius:999px;padding:4px 10px}
-  .post-photo{display:block;width:100%;max-height:260px;object-fit:cover;border-radius:14px;margin-bottom:10px;background:var(--bg-b)}
-  .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg-b);border-radius:12px;padding:3px;margin-bottom:10px}
-  .seg button{border:none;background:none;border-radius:10px;padding:10px 6px;font-size:14px;font-weight:800;color:var(--muted)}
-  .seg button.on{background:#fff;color:var(--rich-ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
-  .card textarea{display:block;width:100%;border:1.5px solid transparent;border-radius:12px;resize:none;font-size:17.5px;line-height:1.8;min-height:140px;outline:none;padding:6px 8px;color:var(--text);background:#fbfaf8}
-  .card textarea:focus{border-color:var(--rich);background:#fff}
-  .lines{display:flex;flex-direction:column;gap:6px;background:#fbfaf8;border-radius:12px;padding:6px}
-  .ln{display:flex;align-items:center;gap:8px;width:100%;min-height:46px;border:1.5px solid transparent;border-radius:10px;background:#fff;padding:8px 10px;font-size:17px;line-height:1.5;text-align:left;color:var(--text)}
-  .ln svg{width:18px;height:18px;margin-left:auto;color:var(--rich-2);flex:none}
-  .ln.open{border-color:var(--rich)}
+  .card-hd b{font-size:15.5px;color:var(--ink);font-weight:900}
+  .post-label{font-size:12px;font-weight:900;letter-spacing:.5px;color:#fff;background:var(--brown);border-radius:999px;padding:4px 12px}
+  .post-photo{display:block;width:100%;max-height:260px;object-fit:cover;border-radius:16px;margin-bottom:10px;background:var(--bg-2)}
+  .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg-2);border-radius:14px;padding:3px;margin-bottom:10px}
+  .seg button{border:none;background:none;border-radius:11px;padding:10px 6px;font-size:13.5px;font-weight:800;color:var(--ink-2)}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .card textarea{display:block;width:100%;border:1.5px solid transparent;border-radius:14px;resize:none;font-size:17.5px;line-height:1.8;min-height:140px;outline:none;padding:6px 8px;color:var(--ink);background:var(--paper)}
+  .card textarea:focus{border-color:var(--brown);background:#fff}
+  .lines{display:flex;flex-direction:column;gap:6px;background:var(--paper);border-radius:14px;padding:6px}
+  .ln{display:flex;align-items:center;gap:8px;width:100%;min-height:46px;border:1.5px solid transparent;border-radius:12px;background:#fff;padding:8px 10px;font-size:17px;line-height:1.5;text-align:left;color:var(--ink)}
+  .ln svg{width:18px;height:18px;margin-left:auto;color:var(--dim);flex:none}
+  .ln.open{border-color:var(--brown)}
   .alts{display:flex;flex-direction:column;gap:6px;padding:2px 0 6px 12px}
-  .alts button{min-height:44px;border:1.5px dashed var(--rich-2);border-radius:10px;background:#fff;padding:8px 10px;font-size:15.5px;text-align:left;color:var(--rich-ink);font-weight:700}
-  .alts button.on{border-style:solid;background:var(--rich-soft)}
+  .alts button{min-height:44px;border:1.5px dashed var(--line);border-radius:12px;background:#fff;padding:8px 10px;font-size:15.5px;text-align:left;color:var(--ink);font-weight:700}
+  .alts button.on{border-style:solid;border-color:var(--brown);background:var(--brown);color:#fff}
   .cmp{display:flex;flex-direction:column;gap:8px}
-  .cmp-item{border:1.5px solid var(--stroke);border-radius:14px;padding:10px 12px;background:#fff}
-  .cmp-item.on{border:2px solid var(--rich);background:var(--rich-soft)}
+  .cmp-item{border:1.5px solid var(--line);border-radius:16px;padding:10px 12px;background:#fff}
+  .cmp-item.on{border:2px solid var(--brown);background:var(--paper)}
   .cmp-h{display:flex;align-items:center;gap:8px;margin-bottom:6px}
   .cmp-h b{font-size:14px}
   .cmp-h .btn{margin-left:auto;min-height:40px}
-  .cmp-on{margin-left:auto;font-size:12.5px;font-weight:800;color:var(--rich-ink)}
-  .cmp-t{white-space:pre-wrap;font-size:15.5px;line-height:1.75;color:var(--text)}
-  .seg button{font-size:13.5px}
+  .cmp-on{margin-left:auto;font-size:12.5px;font-weight:800;color:var(--ink)}
+  .cmp-t{white-space:pre-wrap;font-size:15.5px;line-height:1.75;color:var(--ink)}
   .card-foot{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
   .card-foot .cnt{font-size:12.5px;color:var(--dim)}
-  .switch{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted);cursor:pointer;user-select:none;margin-left:auto}
-  .switch input{width:20px;height:20px;accent-color:var(--rich)}
+  .switch{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink-2);cursor:pointer;user-select:none;margin-left:auto}
+  .switch input{width:20px;height:20px;accent-color:var(--brown)}
   .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
-  .tag{border:1.5px solid var(--rich-2);background:var(--rich-soft);color:var(--rich-ink);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700}
-  .tag.off{background:#fff;border-color:var(--stroke);color:var(--dim);text-decoration:line-through}
-  .note{font-size:13.5px;color:var(--muted);line-height:1.6;margin-top:8px}
+  .tag{border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700}
+  .tag.off{background:#fff;color:var(--dim);text-decoration:line-through}
+  .note{font-size:13.5px;color:var(--ink-2);line-height:1.6;margin-top:8px}
   .note.warn{color:var(--warn)}
-  .card.staff{border:1.5px dashed var(--warn);box-shadow:none;max-width:100%}
+  .ai-more{display:flex;align-items:center;gap:8px;margin:2px 0 8px;flex-wrap:wrap}
+  .ai-more .lnk{padding:4px 2px;min-height:36px}
+  .card.staff{border:1.5px dashed var(--warn);box-shadow:none;max-width:100%;border-radius:16px}
   .card.staff b{color:var(--warn)}
   .card.staff table{width:100%;border-collapse:collapse;font-size:13px}
-  .card.staff td{border-top:1px solid var(--stroke-soft);padding:5px 4px;vertical-align:top}
+  .card.staff td{border-top:1px solid var(--line-2);padding:5px 4px;vertical-align:top}
   .card.staff td:first-child{color:var(--dim);white-space:nowrap;width:1%}
   .bars{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;font-size:12.5px}
-  .bars s{display:block;height:8px;background:var(--bg-b);border-radius:4px;overflow:hidden;text-decoration:none}
-  .bars s u{display:block;height:100%;background:var(--rich)}
+  .bars s{display:block;height:8px;background:var(--bg-2);border-radius:4px;overflow:hidden;text-decoration:none}
+  .bars s u{display:block;height:100%;background:var(--brown)}
   .card.staff pre{max-height:240px;overflow:auto;background:var(--bg);padding:8px;font-size:11px;border-radius:8px;white-space:pre-wrap;word-break:break-all}
-  /* 投稿スタンプ・使いごこち */
-  .card.stamp{background:linear-gradient(180deg,#fff,var(--rich-soft))}
-  .card.stamp .stamp-n{margin-left:auto;font-weight:900;color:var(--rich-ink);font-size:15px}
-  .stamps{display:flex;gap:8px;margin:6px 0 10px}
-  .stamps i{width:46px;height:46px;border-radius:50%;border:2px dashed var(--rich-2);display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900;color:#fff;font-size:15px}
-  .stamps i.on{background:var(--rich);border:2px solid var(--rich);transform:rotate(-8deg);box-shadow:0 2px 6px rgba(74,47,147,.35)}
-  .stamps i.on:last-of-type{animation:stamp .5s ease}
-  @keyframes stamp{0%{transform:scale(1.6) rotate(-8deg);opacity:0}100%{transform:scale(1) rotate(-8deg);opacity:1}}
+  /* 本日の DROP（コピーした本数） */
+  .card.stamp .stamp-n{margin-left:auto;font-weight:900;color:var(--ink-2);font-size:13.5px}
+  .stamps{display:flex;gap:8px;margin:4px 0 10px}
+  .stamps i{width:44px;height:52px;display:flex;align-items:center;justify-content:center;font-style:normal;border-radius:12px;border:1.5px dashed var(--line);background:var(--paper)}
+  .stamps i svg{width:34px;height:42px}
+  .stamps i.on{border:none;background:none}
+  .stamps i.on:last-of-type svg{animation:rise .9s cubic-bezier(.2,1.4,.4,1)}
   .stamp-msg{margin:0;font-size:15.5px;line-height:1.7;font-weight:700}
-  .stamp-ai{margin:8px 0 0;font-size:14px;color:var(--muted);line-height:1.6}
-  .stamp-ai span{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--rich);border-radius:4px;padding:1px 6px;margin-right:6px}
-  .rate{border-top:1px dashed var(--rich-2);margin-top:12px;padding-top:10px}
-  .rate-q{margin:0 0 8px;font-size:14.5px;font-weight:800;color:var(--text)}
+  .stamp-ai{margin:8px 0 0;font-size:14px;color:var(--ink-2);line-height:1.6;display:flex;gap:8px;align-items:flex-start}
+  .stamp-ai .avatar{width:28px;height:28px;box-shadow:none;background:var(--paper)}
+  .stamp-ai .avatar svg{width:24px;height:24px}
+  /* おまけ：宝箱（おすすめ） */
+  .treasure{text-align:center}
+  .treasure .chest-big{width:96px;height:84px;margin:4px auto 0;display:block}
+  .treasure.shake .chest-big{animation:wiggle 1.4s ease-in-out infinite}
+  @keyframes wiggle{0%,70%,100%{transform:none}75%{transform:rotate(-6deg)}85%{transform:rotate(6deg)}95%{transform:rotate(-3deg)}}
+  .treasure h3{margin:6px 0 0;font-size:17px;font-weight:900}
+  .treasure p{margin:4px 0 10px;font-size:14px;color:var(--ink-2);line-height:1.6}
+  .treasure.opened{text-align:left}
+  .treasure.opened .tr-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .treasure.opened .tr-hd svg{width:44px;height:40px;animation:rise .8s ease}
+  .treasure.opened .tr-hd b{font-size:15.5px;font-weight:900;display:block}
+  .treasure.opened .tr-hd small{font-size:12.5px;color:var(--ink-2)}
+  .recs{display:flex;flex-direction:column;gap:10px}
+  .rec{position:relative;border-radius:18px;border:1.5px solid var(--line-2);background:var(--paper);padding:12px 12px 10px 14px;overflow:hidden;animation:pop .45s ease both}
+  .rec:nth-child(2){animation-delay:.12s}.rec:nth-child(3){animation-delay:.24s}
+  .rec::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--k,var(--g1))}
+  .rec .kind{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:900;color:#fff;background:var(--k,var(--g1));border-radius:999px;padding:2px 10px}
+  .rec h4{margin:6px 0 0;font-size:16.5px;font-weight:900;line-height:1.45}
+  .rec .who{font-size:12.5px;color:var(--dim);font-weight:700;margin-top:1px}
+  .rec .place{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;color:var(--ink);margin-top:6px}
+  .rec .place svg{width:15px;height:15px;color:var(--ink-2)}
+  .rec .desc{font-size:13.5px;line-height:1.6;color:var(--ink-2);margin:4px 0 0}
+  .rec .why{font-size:13.5px;line-height:1.6;color:var(--ink);margin:6px 0 0;font-weight:700}
+  .rec .why::before{content:"✦ ";color:var(--gold)}
+  .rec .row{margin-top:8px}
+  .rec .btn{min-height:44px;font-size:14px}
+  .rec .btn.saved{background:var(--brown);color:#fff;border-color:var(--brown)}
+  .tr-foot{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin-top:8px}
+  .tr-note{font-size:12.5px;color:var(--ink-2);line-height:1.6;margin:8px 0 0}
+  .tr-note a{color:var(--ink);font-weight:800}
+  /* 運営からの 2 問（会社の見え方・使いごこち） */
+  .rate{border-top:1px dashed var(--line);margin-top:12px;padding-top:10px}
+  .rate:first-of-type{border-top:none;margin-top:0;padding-top:0}
+  .rate-q{margin:0 0 8px;font-size:14.5px;font-weight:800;color:var(--ink)}
   .rate-q small{display:inline-block;margin-left:6px;font-size:11.5px;color:var(--dim);font-weight:700}
   .rate-btns{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-  .rate-btns button{height:48px;border-radius:12px;border:1.5px solid var(--stroke);background:#fff;font-weight:900;font-size:17px}
-  .rate-btns button.on{background:var(--rich);border-color:var(--rich);color:#fff}
+  .rate-btns button,.pulse-btns button{height:48px;border-radius:14px;border:1.5px solid var(--line);background:#fff;font-weight:900;font-size:16px;color:var(--ink)}
+  .rate-btns button.on,.pulse-btns button.on{background:var(--brown);border-color:var(--brown);color:#fff}
   .rate-lab{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-top:4px}
-  .rate-sel{margin:8px 0 6px;font-size:13.5px;color:var(--rich-ink);font-weight:800}
-  .rate textarea{width:100%;border:1.5px solid var(--stroke);border-radius:12px;padding:8px 10px;font-size:16px;resize:none;background:#fff;min-height:0;line-height:1.5}
+  .rate-sel{margin:8px 0 6px;font-size:13.5px;color:var(--ink);font-weight:800}
+  .rate textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:8px 10px;font-size:16px;resize:none;background:#fff;min-height:0;line-height:1.5}
   .pulse-btns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
-  .pulse-btns button{min-height:48px;border-radius:12px;border:1.5px solid var(--stroke);background:#fff;font-weight:800;font-size:15px}
-  .pulse-btns button.on{background:var(--rich);border-color:var(--rich);color:#fff}
-  .stamp-cnt{margin:0;font-size:15.5px;font-weight:800;color:var(--text)}
-  .stamp-cnt small{display:block;font-size:12.5px;font-weight:700;color:var(--dim);margin-top:2px}
-  .rate-done{margin:0;font-size:14px;color:var(--rich-ink);font-weight:700}
+  .pulse-btns button{font-size:15px}
+  .rate-done{margin:0;font-size:14px;color:var(--ink);font-weight:700}
 
-  /* ---------- 回答シート（下） ---------- */
+  /* ---------- 答える欄（下）。ぽとりの問い＝白いカード／あなたが選んだもの・送る＝こげ茶 ---------- */
   .dock{position:fixed;left:0;right:0;bottom:0;z-index:20;pointer-events:none}
-  .dock-in{pointer-events:auto;max-width:640px;margin:0 auto;background:#fff;border-radius:24px 24px 0 0;box-shadow:var(--sh-2);padding:8px 16px calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px)}
-  .grab{display:flex;align-items:center;justify-content:center;width:100%;height:24px;margin:-4px 0 4px;border:none;background:none;padding:0;touch-action:none;cursor:grab}
-  .grab::before{content:"";display:block;width:44px;height:5px;border-radius:3px;background:var(--stroke)}
-  .grab:hover::before{background:var(--rich-2)}
-  .dock-mini{display:none;align-items:center;gap:8px;min-height:44px;cursor:pointer}
-  .dock-mini .mq{flex:1;min-width:0;font-size:15px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .dock-mini .mo{font-size:14px;font-weight:800;color:var(--rich-ink);white-space:nowrap}
+  .dock-in{pointer-events:auto;max-width:640px;margin:0 auto;background:var(--bg-2);border-radius:26px 26px 0 0;box-shadow:var(--sh-2);padding:6px 12px calc(12px + env(safe-area-inset-bottom));display:flex;flex-direction:column;max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px)}
+  .grab{display:flex;align-items:center;justify-content:center;width:100%;height:22px;margin:-2px 0 4px;border:none;background:none;padding:0;touch-action:none;cursor:grab}
+  .grab::before{content:"";display:block;width:44px;height:5px;border-radius:3px;background:#cdbcb0}
+  .grab:hover::before{background:var(--brown-2)}
+  .dock-mini{display:none;align-items:center;gap:8px;min-height:44px;cursor:pointer;background:#fff;border-radius:16px;padding:4px 12px}
+  .dock-mini .mq{flex:1;min-width:0;font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dock-mini .mo{font-size:13.5px;font-weight:900;color:#fff;background:var(--brown);border-radius:999px;padding:6px 12px;white-space:nowrap}
+  .dock-mini svg{width:22px;height:22px}
   .dock-in.collapsed .dock-head,.dock-in.collapsed .dock-scroll,.dock-in.collapsed .dock-act{display:none}
   .dock-in.collapsed .dock-mini{display:flex}
   .dock-in.collapsed{padding-bottom:calc(10px + env(safe-area-inset-bottom))}
   body.editing .dock{display:none}
-  .dock-head{flex:none;margin:0 0 10px}
-  .q-meta{display:flex;align-items:center;gap:8px;min-height:28px}
-  .q-title{font-size:18px;font-weight:800;line-height:1.5;margin-top:6px;color:var(--text);animation:pop .3s ease}
-  .q-sub{font-size:13.5px;color:var(--muted);line-height:1.55;margin-top:2px}
-  .q-step{font-size:12px;font-weight:900;color:var(--rich-ink);background:var(--rich-soft);border-radius:999px;padding:4px 10px;white-space:nowrap}
-  .q-step.opt{background:var(--bg-b);color:var(--muted)}
-  .q-ins{font-size:13.5px;color:var(--muted);font-weight:700;flex:1;min-width:0}
-  .dock-head .lnk{padding:4px 0;min-height:32px;font-size:13px;color:var(--rich-ink)}
+  .dock-head{flex:none;margin:0 0 8px}
+  .q-card{background:#fff;border-radius:6px 18px 18px 18px;padding:9px 12px 10px;box-shadow:var(--sh-1);display:flex;gap:8px;align-items:flex-start}
+  .q-card .avatar{width:30px;height:30px;box-shadow:none;background:var(--paper)}
+  .q-card .avatar svg{width:26px;height:26px}
+  .q-card .qc{flex:1;min-width:0}
+  .q-meta{display:flex;align-items:center;gap:8px;min-height:24px}
+  .q-title{font-size:17px;font-weight:900;line-height:1.5;margin-top:2px;color:var(--ink);animation:pop .3s ease}
+  .q-sub{font-size:13px;color:var(--ink-2);line-height:1.55;margin-top:2px}
+  .q-step{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:900;color:var(--ink);white-space:nowrap}
+  .q-step svg{width:18px;height:18px}
+  .q-step.opt{color:var(--gold)}
+  .q-ins{font-size:12px;color:var(--dim);font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .dock-head .lnk{padding:2px 0;min-height:28px;font-size:12.5px;color:var(--ink-2)}
   .dock-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 1px 4px}
-  .dock-act{flex:none;padding-top:12px}
+  .dock-act{flex:none;padding-top:10px}
   .dock-act .row{margin-top:0}
-  /* 選択肢：そろったタイル */
+  /* 選択肢：ぽとりが出した候補＝白／あなたが選んだもの＝こげ茶 */
   .chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense;gap:8px}
-  .chip{position:relative;min-height:54px;padding:10px 12px;border:1.5px solid var(--stroke);border-radius:14px;background:#fff;font-size:15.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;text-align:left;line-height:1.35;transition:background .12s,border-color .12s,box-shadow .12s}
+  .chip{position:relative;min-height:52px;padding:10px 12px;border:1.5px solid var(--line);border-radius:16px;background:#fff;font-size:15.5px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;text-align:left;line-height:1.35;transition:background .12s,border-color .12s}
   .chip.wide{grid-column:1 / -1}
   .chip:active{transform:scale(.98)}
-  .chip.on{border:2px solid var(--rich);background:var(--rich-soft);color:var(--rich-ink);padding:9.5px 11.5px;box-shadow:0 2px 8px rgba(109,75,195,.15)}
-  .chip .ord,.chip .ck{margin-left:auto;order:2;display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--rich);color:#fff;font-size:12.5px;font-weight:900;align-items:center;justify-content:center;flex:none}
-  .chip.sub{color:var(--muted);border-style:dashed}
-  .chip.ai{border-style:dashed;border-color:var(--rich-2)}
-  .chip.ai small{display:block;width:max-content;font-size:10.5px;font-weight:900;color:#fff;background:var(--rich-2);border-radius:999px;padding:1px 7px;margin-bottom:3px}
-  .chip.ai.on small{background:var(--rich)}
+  .chip.on{border-color:var(--brown);background:var(--brown);color:#fff}
+  .chip .ord,.chip .ck{margin-left:auto;order:2;display:inline-flex;width:24px;height:24px;border-radius:50%;background:#fff;color:var(--brown);font-size:12.5px;font-weight:900;align-items:center;justify-content:center;flex:none}
+  .chip.ai{border-style:dashed;border-color:#d9c4b4}
+  .chip.ai small{display:block;width:max-content;font-size:10.5px;font-weight:900;color:#fff;background:var(--g1);border-radius:999px;padding:1px 7px;margin-bottom:3px}
+  .chip.ai.on{border-style:solid}
   .chip.shake{animation:shake .3s}
   @keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
-  .free{display:block;width:100%;margin-top:8px;min-height:50px;border:1.5px dashed var(--stroke);border-radius:14px;padding:12px 14px;font-size:16px;background:#fff;outline:none}
-  .pii{font-size:12.5px;color:var(--dim);margin:6px 2px 0;line-height:1.5}
-  .hint-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:8px;padding:0 14px;border-radius:999px;border:1.5px solid var(--rich-2);background:var(--rich-soft);color:var(--rich-ink);font-weight:800;font-size:14.5px}
-  .hint-btn svg{width:18px;height:18px}
-  .hint-btn.open{background:#fff}
+  .pii{font-size:12px;color:var(--dim);margin:6px 4px 0;line-height:1.5}
+  .hint-btn{display:inline-flex;align-items:center;gap:6px;min-height:44px;margin-top:8px;padding:0 16px;border-radius:999px;border:1.5px solid var(--line);background:#fff;color:var(--ink);font-weight:800;font-size:14.5px}
+  .hint-btn svg{width:18px;height:18px;color:var(--gold)}
+  .hint-btn.open{background:var(--paper)}
   .hint-box{margin-top:10px}
   .hint-box .lab{margin-top:0}
-  .confirm{border-radius:16px;background:var(--rich-soft);padding:12px 14px;font-size:15.5px;line-height:1.6}
-  .confirm b{color:var(--rich-ink)}
+  /* ぽとりの確かめ（だれと・しめ）：白い吹き出し */
+  .say{display:flex;gap:8px;align-items:flex-start}
+  .say .avatar{width:30px;height:30px;box-shadow:none}
+  .say .avatar svg{width:26px;height:26px}
+  .say p{margin:0;flex:1;background:#fff;border-radius:4px 18px 18px 18px;padding:10px 14px;font-size:15.5px;line-height:1.6;box-shadow:var(--sh-1)}
+  .say p b{font-weight:900}
   .warnbox{border-radius:14px;background:#fff4e5;border:1.5px solid #f0c27a;padding:10px 12px;font-size:14.5px;line-height:1.6;color:#5c4300;margin-top:8px}
-  .free:focus{border-style:solid;border-color:var(--rich)}
-  .free::placeholder{color:var(--dim);font-weight:700}
   .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
   .row.center{justify-content:center}
-  .btn{min-height:54px;padding:0 20px;border:none;border-radius:16px;background:var(--rich);color:#fff;font-weight:800;font-size:16.5px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-shadow:0 4px 12px rgba(109,75,195,.28)}
+  /* ボタン：主ボタン＝こげ茶のまる（DROP のサイトと同じ）／ほか＝白 */
+  .btn{min-height:52px;padding:0 22px;border:none;border-radius:999px;background:var(--brown);color:#fff;font-weight:800;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none}
   .btn svg{width:20px;height:20px}
-  .btn:disabled{background:var(--rich-soft);color:var(--rich-2);box-shadow:none;cursor:default}
-  .btn.ghost{background:#fff;color:var(--rich-ink);border:1.5px solid var(--rich-2);box-shadow:none}
-  .btn.plain{background:var(--bg-b);color:var(--muted);box-shadow:none}
-  .btn.sm{min-height:46px;padding:0 16px;font-size:15px}
+  .btn .go{display:inline-flex;width:28px;height:28px;border-radius:50%;background:#fff;color:var(--brown);align-items:center;justify-content:center;margin-right:-10px;margin-left:4px}
+  .btn .go svg{width:16px;height:16px}
+  .btn:disabled{background:#d8cbc2;color:#fff;cursor:default}
+  .btn:disabled .go{color:#d8cbc2}
+  .btn.ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line)}
+  .btn.plain{background:var(--paper);color:var(--ink-2)}
+  .btn.sm{min-height:46px;padding:0 16px;font-size:14.5px}
   .btn.wide{flex:1}
   .btn.full{width:100%}
-  .btn.text{background:none;box-shadow:none;color:var(--muted);padding:0 12px;min-width:84px;font-size:15px}
-  .lnk{background:none;border:none;color:var(--muted);font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:10px 6px;min-height:44px}
+  .btn.text{background:none;color:var(--ink-2);padding:0 12px;min-width:84px;font-size:15px}
+  .lnk{background:none;border:none;color:var(--ink-2);font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:10px 6px;min-height:44px}
   .inrow{position:relative}
-  .input{display:block;width:100%;min-height:52px;max-height:160px;border:1.5px solid var(--stroke);border-radius:18px;padding:13px 60px 13px 16px;font-size:17px;line-height:1.5;outline:none;resize:none;background:#fff}
-  .input:focus{border-color:var(--rich);box-shadow:0 0 0 4px rgba(109,75,195,.12)}
-  .input.sm{min-height:48px;font-size:16px;padding:11px 14px;border-radius:14px}
-  .send{position:absolute;right:6px;bottom:6px;width:44px;height:44px;border-radius:14px;border:none;background:var(--rich);color:#fff;display:flex;align-items:center;justify-content:center}
-  .send:disabled{background:var(--rich-soft);color:var(--rich-2)}
-  .send svg{width:22px;height:22px}
-  .lab{font-size:13.5px;font-weight:800;color:var(--muted);margin:12px 0 6px}
-  .cnt-sm{font-size:12.5px;color:var(--dim);font-variant-numeric:tabular-nums;margin-left:auto}
+  .input{display:block;width:100%;min-height:52px;max-height:160px;border:1.5px solid var(--line);border-radius:22px;padding:13px 60px 13px 16px;font-size:17px;line-height:1.5;outline:none;resize:none;background:#fff;color:var(--ink)}
+  .input:focus{border-color:var(--brown);box-shadow:0 0 0 4px rgba(78,59,56,.1)}
+  .input::placeholder{color:#b3a59b;font-weight:500}
+  .send{position:absolute;right:6px;bottom:6px;width:42px;height:42px;border-radius:50%;border:none;background:var(--brown);color:#fff;display:flex;align-items:center;justify-content:center}
+  .send:disabled{background:#d8cbc2}
+  .send svg{width:20px;height:20px}
+  .lab{font-size:13px;font-weight:800;color:var(--ink-2);margin:12px 0 6px}
+  .cnt-sm{font-size:12px;color:var(--dim);font-variant-numeric:tabular-nums;margin-left:auto}
   .scale{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
-  .scale button{height:50px;border-radius:12px;border:1.5px solid var(--stroke);background:#fff;font-weight:800;font-size:16px;padding:0}
-  .scale button:active,.scale button.on{background:var(--rich);border-color:var(--rich);color:#fff}
+  .scale button{height:50px;border-radius:12px;border:1.5px solid var(--line);background:#fff;font-weight:800;font-size:16px;padding:0}
+  .scale button:active,.scale button.on{background:var(--brown);border-color:var(--brown);color:#fff}
   .scale-lab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--dim);margin-top:5px;padding:0 2px}
   .login{display:grid;gap:10px}
   .login .input{padding-right:16px}
   .err{font-size:14px;color:var(--err);min-height:1em}
-  .wait{display:flex;align-items:center;gap:10px;justify-content:center;font-size:15px;color:var(--muted);min-height:54px}
-  .spin{width:20px;height:20px;border:2.5px solid var(--rich-soft);border-top-color:var(--rich);border-radius:50%;animation:rot .8s linear infinite}
+  .wait{display:flex;align-items:center;gap:10px;justify-content:center;font-size:15px;color:var(--ink-2);min-height:54px}
+  .spin{width:20px;height:20px;border:2.5px solid #dccbbf;border-top-color:var(--brown);border-radius:50%;animation:rot .8s linear infinite}
   @keyframes rot{to{transform:rotate(360deg)}}
   .hint{font-size:12.5px;color:var(--dim);margin-top:6px}
-  /* 写真をえらぶタイル */
-  .photo-tile{width:100%;min-height:118px;border:2px dashed var(--rich-2);border-radius:18px;background:var(--rich-soft);color:var(--rich-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
-  .photo-tile svg{width:30px;height:30px}
-  .photo-tile b{font-size:17px}
-  .photo-tile small{font-size:12.5px;color:var(--muted);font-weight:700}
-  .photo-tile.over{background:#fff;border-style:solid}
+  .photo-tile{width:100%;min-height:118px;border:2px dashed #d3c1b4;border-radius:22px;background:#fff;color:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+  .photo-tile svg{width:30px;height:30px;color:var(--ink-2)}
+  .photo-tile b{font-size:17px;font-weight:900}
+  .photo-tile small{font-size:12.5px;color:var(--ink-2);font-weight:700}
+  .photo-tile.over{background:var(--paper);border-style:solid;border-color:var(--brown)}
 
   /* ---------- トースト・シート ---------- */
-  .toast{position:fixed;left:50%;top:84px;transform:translateX(-50%) translateY(-10px);background:var(--text);color:#fff;padding:11px 18px;border-radius:999px;font-size:14.5px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:60;max-width:90vw;text-align:center}
+  .toast{position:fixed;left:50%;top:84px;transform:translateX(-50%) translateY(-10px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:999px;font-size:14.5px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:60;max-width:90vw;text-align:center}
   .toast.show{opacity:1;transform:translateX(-50%)}
-  .modal{position:fixed;inset:0;z-index:50;background:rgba(20,16,30,.5);display:none;align-items:flex-end;justify-content:center}
+  .modal{position:fixed;inset:0;z-index:50;background:rgba(43,33,29,.5);display:none;align-items:flex-end;justify-content:center}
   .modal.show{display:flex}
-  .sheet{background:#fff;width:100%;max-width:640px;max-height:90vh;overflow:auto;border-radius:24px 24px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
+  .sheet{background:var(--bg);width:100%;max-width:640px;max-height:90vh;overflow:auto;border-radius:26px 26px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
   .sheet-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
-  .sheet-hd b{font-size:18px}
+  .sheet-hd b{font-size:18px;font-weight:900}
   .sheet-hd .icon-btn{margin-left:auto}
-  .sheet p{margin:0 0 12px;font-size:15px;color:var(--muted);line-height:1.7}
-  .draft{border-radius:16px;padding:14px 16px;font-size:17px;line-height:1.85;white-space:pre-wrap;color:var(--text);background:var(--rich-soft)}
+  .sheet p{margin:0 0 12px;font-size:15px;color:var(--ink-2);line-height:1.7}
+  .draft{border-radius:18px;padding:14px 16px;font-size:17px;line-height:1.85;white-space:pre-wrap;color:var(--ink);background:#fff}
   .mat{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
-  .mat span{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;border-radius:999px;padding:6px 12px;background:var(--bg-b);color:var(--dim)}
-  .mat span.on{color:var(--rich-ink);background:var(--rich-soft)}
-  .mat span i{font-style:normal}
-  .sec-h{font-size:14px;font-weight:900;color:var(--rich-ink);margin:16px 0 8px}
-  .ex{display:flex;gap:12px;border-radius:16px;padding:10px;background:var(--bg);margin-top:8px}
-  .ex img{width:84px;height:84px;object-fit:cover;border-radius:12px;flex:none;background:var(--bg-b)}
-  .ex p{margin:0;font-size:15px;line-height:1.65;white-space:pre-wrap;color:var(--text)}
-  @media (min-width:700px){ .modal{align-items:center} .sheet{border-radius:24px;max-height:86vh} }
-  @media (max-height:640px){ .brand small{display:none} .appbar-in{min-height:52px;padding-top:4px;padding-bottom:4px} .pv-in{padding:5px 12px} .dock-in{max-height:calc(100vh - 120px);max-height:calc(100dvh - 120px)} }
-  @media (max-width:360px){ .brand small{display:none} .brand{font-size:16px} .pieces i{font-size:10.5px} .chips{grid-template-columns:1fr} }
-  @media (min-width:900px){ .chat{padding-top:24px} .bubble{font-size:16px} }
+  .mat span{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;border-radius:999px;padding:5px 12px 5px 6px;background:#fff;color:var(--dim)}
+  .mat span svg{width:20px;height:20px}
+  .mat span.on{color:var(--ink)}
+  .sec-h{font-size:14px;font-weight:900;color:var(--ink);margin:16px 0 8px}
+  .ex{display:flex;gap:12px;border-radius:18px;padding:10px;background:#fff;margin-top:8px}
+  .ex img{width:84px;height:84px;object-fit:cover;border-radius:12px;flex:none;background:var(--bg-2)}
+  .ex p{margin:0;font-size:15px;line-height:1.65;white-space:pre-wrap;color:var(--ink)}
+  .want{display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:16px;padding:10px 12px;margin-top:8px}
+  .want b{display:block;font-size:15px}
+  .want small{display:block;font-size:12.5px;color:var(--ink-2);margin-top:2px}
+  .want a{margin-left:auto;white-space:nowrap;font-size:13.5px;font-weight:800;color:var(--ink)}
+  @media (min-width:700px){ .modal{align-items:center} .sheet{border-radius:26px;max-height:86vh} }
+  @media (max-height:640px){ .brand-t small{display:none} .appbar-in{min-height:46px;padding-top:2px;padding-bottom:0} .node i,.chest i{display:none} .path::before,.path .walk{top:12px} .dock-in{max-height:calc(100vh - 110px);max-height:calc(100dvh - 110px)} }
+  @media (max-width:380px){ .btn{padding:0 14px} .btn.wide{font-size:15px} .btn.sm{padding:0 10px;font-size:14px} }
+  @media (max-width:360px){ .brand-t small{display:none} .brand-t b{font-size:19px} .node i{font-size:9.5px} .chips{grid-template-columns:1fr} .chest{width:44px} }
+  @media (min-width:900px){ .chat{padding-top:20px} }
 </style>
 </head>
 <body>
 <header class="top">
   <div class="appbar-in">
-    <div class="brand"><span class="mark" id="brandMark" aria-hidden="true"></span><span class="brand-t"><b>DROP<i>.</i> Coach</b><small>ことばのワークショップ</small></span></div>
+    <div class="brand"><span class="mark" id="brandMark" aria-hidden="true"></span><span class="brand-t"><b>DROP. Coach</b><small>ことばのかけら集め</small></span></div>
     <div class="top-r">
     <span class="staff-flag" id="staffFlag" hidden>STAFF</span>
     <button type="button" class="icon-btn" id="menuBtn" aria-label="メニュー" aria-expanded="false"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
@@ -301,13 +384,14 @@
   <nav class="menu" id="menu" hidden>
     <button type="button" id="mBig">文字を大きく</button>
     <button type="button" id="mExamples">ほかの人の例</button>
+    <button type="button" id="mWant">☆行ってみるリスト</button>
     <button type="button" id="mAbout">このチャットについて</button>
     <button type="button" id="mRestart">最初からやり直す</button>
     <button type="button" id="mProfile">「あなたについて」を答え直す</button>
     <button type="button" id="mLogout" hidden>ログアウト</button>
   </nav>
-  <button type="button" class="pv" id="pvBar" aria-label="ことばのかけら（押すと、いまの投稿イメージ）">
-    <span class="pv-in"><span class="pieces" id="pieces"></span><span class="pv-open" id="pvOpen">投稿を見る</span></span>
+  <button type="button" class="quest" id="pvBar" aria-label="ことばのかけらの地図（押すと、いまの投稿イメージ）">
+    <span class="quest-in"><span class="path" id="pieces"></span><span class="chest" id="pvOpen"></span></span>
   </button>
   <div class="iab" id="iab" hidden><div class="iab-in"><span id="iabText"></span><button type="button" class="btn ghost" id="iabCopy">URL をコピー</button><button type="button" class="icon-btn" id="iabX" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>
 </header>
@@ -333,14 +417,26 @@
 <script type="application/json" id="sampleFallback">{"mart":"sample_drop","source":"CULTURE_SNACK_DROP_投稿例集_v4（2026/11/12）","note":"運営作成の模範投稿（架空）。DROP.Coach（サンプル参照版）の比較材料。写真は json/sample_img/。line_roles は各行の役割（V2 チャット版の「完成イメージ」で表示。見たもの／誰と・きっかけ／心に残ったところ／気持ち／次にしたいこと）","record_count":8,"records":[{"artwork_id":"model-v4-1-1","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/1-1.jpg","image_file_path":"json/sample_img/1-1.jpg","sentence":"隣のビルの経理さん、週末は豆本作家！\nこんな人がいたなんて\n毎日通う品川を身近に感じる\n同僚にも教えたい！\n来年は私も出展してみたい","account_id":"","account_name":"運営作成 ①-1 豆本（来場者）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-1-2","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/1-2.jpg","image_file_path":"json/sample_img/1-2.jpg","sentence":"会社員バンド、ボーカルは平日SE！\n働きながらここまでやれるんだ\n刺激もらった〜\n押し入れのギター、また弾きたくなる\n帰ったら弦を張り替えよう","account_id":"","account_name":"運営作成 ①-2 会社員バンド（来場者）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-2-1","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/2-1.jpg","image_file_path":"json/sample_img/2-1.jpg","sentence":"平日は銀行員、今日はカレー屋さん！\n並んでくれた人と辛さの話で盛り上がる\n同じビルなのに初めて話した\n来週ランチ行く約束\nまた屋台出したくなる","account_id":"","account_name":"運営作成 ②-1 カレー屋台（出展した社員）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-2-2","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/2-2.jpg","image_file_path":"json/sample_img/2-2.jpg","sentence":"ランタンづくり、隣は近所の大学生\n不器用な私に教えてくれた\nひと回り下なのに意外と話が合う\n通勤中に会ったら声かけようかな\n品川に知り合いが増えた","account_id":"","account_name":"運営作成 ②-2 ランタンづくり（来場者）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-3-1","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/3-1.jpg","image_file_path":"json/sample_img/3-1.jpg","sentence":"部長がコーヒー淹れてた！\n「何が好き？」って聞かれた\n会社じゃ話したことなかった\n仕事以外の話、していいんだと思えた\nチームメンバーにも聞いてみたい","account_id":"","account_name":"運営作成 ③-1 部長のコーヒー（出展企業の社員）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-3-2","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/3-2.jpg","image_file_path":"json/sample_img/3-2.jpg","sentence":"企業ブースの社員さん、週末は落語家\n上司っぽい人が一番前で笑ってた\n趣味を応援しあえる職場っていいな\n私も社内で話してみたい\nまずは自分の趣味から","account_id":"","account_name":"運営作成 ③-2 社員の落語（来場者）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-p1","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/p1.jpg","image_file_path":"json/sample_img/p1.jpg","sentence":"すぐ帰るつもりの仕事帰り\n焼き芋につられて会場をひと回り\nベンチで隣の人と「寒いですね」\n聞けば同じ会社の人だった\n品川の夜、ちょっと好きになる","account_id":"","account_name":"運営作成 ＋1 焼き芋（仕事帰りにふらっと）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-p2","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/p2.jpg","image_file_path":"json/sample_img/p2.jpg","sentence":"子どもが手品に釘づけ！\nスタンプ集めそっちのけ\n演じてたのは近所の会社の人\n私にはとても無理だけど\n来年も家族で応援しに来たい","account_id":"","account_name":"運営作成 ＋2 手品（家族でスタンプラリー）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"}]}</script>
 <!-- 選択肢と重みの初期値（json/coach_settings_default.json と同じ）。運営が「チャットの設定」で保存した設定があれば、そちらを使う -->
 <script type="application/json" id="defaultSettings">{"schema":"drop_coach_settings_v1","note":"初期値。運営は分析画面（drop_coach_dashboard.html）の「チャットの設定」で変更・保存する。保存した設定は記録用 GAS に入り、全員のチャットに反映される","rank":{"feel":[1,0.6,0.45,0.35],"why":[1,0.75,0.5,0.25],"next":[1,0.8],"find":[1,0.8]},"why_q_default":"{話題}の、とくに印象に残ったのは、どこですか？","feel":[{"id":"oishii","label":"おいしい","val":1,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"{話題}の、どこがおいしかったですか？","targets":[{"label":"味","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"香り","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"見た目","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"作った人のこだわり","layer":"人","w":{"c1":0.2,"c2":0.3,"c3":0,"att":0}},{"label":"食べた場所の雰囲気","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.3}}]},{"id":"tanoshii","label":"たのしい","val":1,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"なにがたのしかったですか？","targets":[{"label":"体験・ワークショップ","layer":"コンテンツ","w":{"c1":0.3,"c2":0,"c3":0,"att":0}},{"label":"音楽・演奏","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"話したこと","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}},{"label":"いっしょに行った人","layer":"人","w":{"c1":0,"c2":0,"c3":0.3,"att":0}},{"label":"その場の雰囲気","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.3}}]},{"id":"kawaii","label":"かわいい","val":1,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"どこがかわいかったですか？","targets":[{"label":"商品","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"ショッパー（袋）","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"お店の飾りつけ","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.2}},{"label":"お店の人","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}}]},{"id":"sugoi","label":"すごい","val":1,"w":{"c1":0.3,"c2":0,"c3":0,"att":0},"q":"{話題}の、どこがすごかったですか？","targets":[{"label":"技・うまさ","layer":"コンテンツ","w":{"c1":0.3,"c2":0,"c3":0,"att":0}},{"label":"細かさ・作りこみ","layer":"コンテンツ","w":{"c1":0.2,"c2":0,"c3":0,"att":0}},{"label":"作った人・演じた人","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}},{"label":"平日とのギャップ","layer":"人","w":{"c1":0.2,"c2":0,"c3":0.2,"att":0}}]},{"id":"kirei","label":"きれい","val":1,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"どこがきれいでしたか？","targets":[{"label":"色","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"形・デザイン","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"飾りつけ・照明","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.2}},{"label":"品川の景色","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.5}}]},{"id":"hokkori","label":"ほっこり","val":1,"w":{"c1":0,"c2":0,"c3":0,"att":0.2},"q":"なにに、ほっこりしましたか？","targets":[{"label":"お店の人とのやりとり","layer":"人","w":{"c1":0,"c2":0.3,"c3":0.2,"att":0}},{"label":"子ども・家族づれ","layer":"人","w":{"c1":0,"c2":0,"c3":0,"att":0.2}},{"label":"味・あたたかさ","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"その場の雰囲気","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.3}}]},{"id":"igai","label":"意外","val":0.3,"w":{"c1":0,"c2":0.2,"c3":0.2,"att":0},"q":"なにが意外でしたか？","targets":[{"label":"作った人の本業","layer":"人","w":{"c1":0,"c2":0.5,"c3":0,"att":0}},{"label":"出会った人","layer":"人","w":{"c1":0,"c2":0.5,"c3":0,"att":0}},{"label":"品物・作品","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"品川にこんな場所","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.5}}]},{"id":"shigeki","label":"刺激をもらった","val":0.8,"w":{"c1":0.5,"c2":0,"c3":0,"att":0},"q":"なにに刺激をもらいましたか？","targets":[{"label":"挑戦している姿","layer":"人","w":{"c1":0.5,"c2":0,"c3":0,"att":0}},{"label":"作った人の生き方","layer":"人","w":{"c1":0.5,"c2":0,"c3":0,"att":0}},{"label":"技・発想","layer":"コンテンツ","w":{"c1":0.5,"c2":0,"c3":0,"att":0}},{"label":"話したこと","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}}]},{"id":"futsuu","label":"ふつう","val":0,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"","targets":[]},{"id":"zannen","label":"いまいち","val":-1,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"どこがいまいちでしたか？","targets":[{"label":"待ち時間・混雑","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"案内のわかりにくさ","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"値段","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"品ぞろえ","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}}]}],"why_default":[{"label":"味・香り","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"見た目・色・形","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"手づくり感・技","layer":"コンテンツ","w":{"c1":0.3,"c2":0,"c3":0,"att":0}},{"label":"作った人・演じた人","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}},{"label":"話したこと","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}},{"label":"平日とのギャップ","layer":"人","w":{"c1":0.2,"c2":0,"c3":0.2,"att":0}},{"label":"その場の雰囲気","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.3}},{"label":"品川の景色・街","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.5}}],"who":[{"id":"samedept","label":"同じ部署の人と","w":{"c1":0,"c2":0,"c3":0.7,"att":0}},{"id":"otherdept","label":"ちがう部署の人と","w":{"c1":0,"c2":0.7,"c3":0.5,"att":0}},{"id":"otherco","label":"ちがう会社の人と話した","w":{"c1":0,"c2":1,"c3":0,"att":0}},{"id":"maker","label":"作った人・お店の人と話した","w":{"c1":0.3,"c2":0.5,"c3":0,"att":0}},{"id":"local","label":"近所の人・学生と話した","w":{"c1":0,"c2":1,"c3":0,"att":0.3}},{"id":"family","label":"家族・友だちと","w":{"c1":0,"c2":0,"c3":0,"att":0.3}},{"id":"alone","label":"ひとりで","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"id":"other","label":"その他","w":{"c1":0,"c2":0,"c3":0,"att":0}}],"next":[{"id":"try","label":"自分もやってみたい","w":{"c1":1,"c2":0,"c3":0,"att":0}},{"id":"again","label":"あの人とまた話したい","w":{"c1":0,"c2":1,"c3":0,"att":0}},{"id":"work","label":"職場でも話してみたい","w":{"c1":0,"c2":0,"c3":1,"att":0}},{"id":"tell","label":"誰かに教えたい","w":{"c1":0,"c2":0,"c3":0,"att":0.7}},{"id":"revisit","label":"また来たい","w":{"c1":0,"c2":0,"c3":0,"att":1}},{"id":"walk","label":"品川をもっと歩きたい","w":{"c1":0,"c2":0,"c3":0,"att":1}},{"id":"feelclose","label":"今の気持ちでしめる","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"id":"none","label":"とくにない","w":{"c1":0,"c2":0,"c3":0,"att":0}}],"find":[{"id":"unexpected","label":"作った人・演じた人の意外な一面","w":{"c1":0.3,"c2":0.5,"c3":0,"att":0}},{"id":"newpeople","label":"ふだん話さない人と話せた","w":{"c1":0,"c2":1,"c3":0,"att":0}},{"id":"coworker","label":"職場の人の知らない一面","w":{"c1":0,"c2":0,"c3":1,"att":0}},{"id":"newlike","label":"新しい「好き」が見つかった","w":{"c1":0.7,"c2":0,"c3":0,"att":0}},{"id":"town","label":"品川がちょっと身近になった","w":{"c1":0,"c2":0,"c3":0,"att":1}},{"id":"companyview","label":"会社（職場）の見え方が少し変わった","w":{"c1":0,"c2":0,"c3":1,"att":0}},{"id":"none","label":"とくにない","w":{"c1":0,"c2":0,"c3":0,"att":0}}],"face":[{"id":"worker","label":"品川で働く会社員","w":{"c1":0,"c2":0.5,"c3":0,"att":0}},{"id":"shop","label":"近所のお店の人","w":{"c1":0,"c2":0.3,"c3":0,"att":0.3}},{"id":"student","label":"学生","w":{"c1":0,"c2":0.5,"c3":0,"att":0}},{"id":"pro","label":"作家・アーティストが本業","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"id":"unknown","label":"わからない","w":{"c1":0,"c2":0,"c3":0,"att":0}}],"profile":[{"id":"worker","label":"品川で働いている"},{"id":"resident","label":"品川の近くに住んでいる"},{"id":"exhibitor","label":"出展・出演している"},{"id":"staff","label":"運営・スタッフ"},{"id":"student","label":"学生"},{"id":"visitor","label":"遊びに来た（品川以外から）"},{"id":"other","label":"その他"}]}</script>
+<!-- おまけ（宝箱）のおすすめに使う掲載コンテンツ一覧の控え（json/cs_contents.json と同じ。読めないときに使う） -->
+<script type="application/json" id="csFallback">{"schema":"cs_contents_v1","source":"CULTURE SNACK'26 @SHINAGAWA THE CAMPUS 掲載コンテンツ一覧（2026-11-16 時点）","note":"チャットの「おまけ：おすすめ」に使う。tags は当てはめ用（README 参照）。note があるものは「B面の人に会う」に出る","stamp_rally":{"t":"CULTURE SNACK デジタルスタンプラリー by みんまちDROP","p":"ブース 308","url":"https://monokoto-market.com/content_show/1791429444294x733094367327158300"},"items":[{"id":2,"t":"スペシャルジャズコンサート by スガナミミュージックサロン","s":"","c":"special","p":"PARK B面カウンター横","d":"近隣のスガナミミュージックサロン講師4名によるジャズ生演奏。PARK B面カウンター横、参加無料・出入り自由。","tags":["music","perform","town"],"kw":["ジャズ","演奏"],"url":"https://monokoto-market.com/content_show/1794278969391x974900546282455000"},{"id":3,"t":"品川謎ラリー 2026","s":"","c":"special","p":"受付：INFORMATION@PARK","d":"品川港南エリアに散らばる謎を解きながら街を散策する謎解きラリー。受付はINFORMATION@PARK。","tags":["play","town","kids"],"kw":["謎","品川","港南"],"url":"https://monokoto-market.com/content_show/1793596047462x306670931676233700"},{"id":4,"t":"よくばりごちそうプレート","s":"","c":"special","p":"INFORMATION@PARK で販売","d":"1プレート1,500円（現金のみ）で対象飲食店から好きな料理を3品選べるイベント限定の盛り合わせ企画。INFORMATION@PARKで販売。","tags":["eat"],"kw":[],"url":"https://monokoto-market.com/content_show/1793340167829x392331584488603650"},{"id":5,"t":"オープニング特別企画（トーク）","s":"JAL × コクヨ ほか","c":"stage","p":"ステージ","d":"初日の特別企画。第1部はJAL×コクヨのトークセッション（社内ベンチャー「W-PIT」事例から個人のB面と組織のカルチャー変革を議論）、第2部は出展企業によるトーク。","tags":["talk","company","bmen"],"kw":[],"url":"https://monokoto-market.com/content_show/1793334590365x744828426511712300","note":"社内ベンチャーの事例から、個人の B 面と会社のカルチャーを語るトーク（初日のみ）","day":"2026-11-20"},{"id":6,"t":"TOKYO WAVE FM THE STORE","s":"TOKYO WAVE FM","c":"goods","p":"ブース 507","d":"クロスメディア放送局「TOKYO WAVE FM」のポップアップショップ。限定グッズや村下小粒グッズを販売。","tags":["music","cute"],"kw":[],"url":"https://monokoto-market.com/content_show/1792396413420x888369833935634400"},{"id":7,"t":"レトロゲームアイドル村下小粒","s":"TOKYO WAVE FM","c":"stage","p":"ステージ","d":"レトロゲームアイドル村下小粒によるゲームとパフォーマンスのステージ。","tags":["perform","play","music"],"kw":["ゲーム"],"url":"https://monokoto-market.com/content_show/1792396279859x263460687976071170"},{"id":8,"t":"アジアン料理ガンディジー町屋店 「GANDHIJI」","s":"博展・ニューアイティーヴェンチャー","c":"food","p":"ブース 115","d":"本格ネパールのおまつり料理。","tags":["eat","world","company"],"kw":["ネパール"],"url":"https://monokoto-market.com/content_show/1791449531227x116045385633366020"},{"id":9,"t":"Mo:take・onestop の体験","s":"Yuinchu","c":"food","p":"ブース 803","d":"食の背景を探求する「Mo:take」と蜂蜜開発の「onestop」による2つの体験。","tags":["eat","sweets","make","company"],"kw":["蜂蜜"],"url":"https://monokoto-market.com/content_show/1791449407678x827751961347752000"},{"id":10,"t":"ヨコク研究所","s":"コクヨ","c":"goods","p":"ブース 304","d":"ヨコク研究所員が『WORKSIGHT』などの発刊書籍を手売り販売。","tags":["words","company","bmen"],"kw":["書籍"],"url":"https://monokoto-market.com/content_show/1791449293911x925249295915679700","note":"研究所員さんが自分で本を手売り"},{"id":11,"t":"「働く」を体感！おしごとパーク","s":"コクヨKハート・JALサンライト","c":"ws","p":"ブース 601","d":"ゴミ分別や郵便配達などオフィス業務をゲーム感覚で体験。ネイル施術や水引細工も。","tags":["play","make","kids","company"],"kw":["ゲーム","ネイル"],"url":"https://monokoto-market.com/content_show/1791449189792x907507946146496500"},{"id":12,"t":"JR社員とつくる！手づくり小物","s":"東日本旅客鉄道","c":"ws","p":"ブース 605","d":"列車座席シートの端材（シートモケット）を使った小物作りや、オリジナル缶バッジ作成。","tags":["make","craft","eco","company","bmen"],"kw":["列車","缶バッジ"],"url":"https://monokoto-market.com/content_show/1791449074651x670599978889248800","note":"JR の社員さんと一緒につくる"},{"id":13,"t":"「みうらの森林」間伐材ワークショップ","s":"京浜急行電鉄","c":"ws","p":"ブース 604","d":"三浦半島の社有林「みうらの森林」の間伐材コースターにイラストを描いて作る。","tags":["make","nature","art","company","eco"],"kw":["三浦","間伐材","イラスト"],"url":"https://monokoto-market.com/content_show/1791448867199x488575421879681000"},{"id":14,"t":"シールを貼ってマイ京急つり革づくり","s":"京浜急行電鉄","c":"ws","p":"ブース 604","d":"京急2000形・800形で実際に使われていたつり革にシールを貼り、自分だけのつり革を作る。","tags":["make","play","company"],"kw":["つり革"],"url":"https://monokoto-market.com/content_show/1791448763866x272304218513604600"},{"id":15,"t":"みうらストアby「これも京急！？」","s":"京浜急行電鉄","c":"food","p":"ブース 305・306","d":"「みさきまぐろきっぷ」や三浦の特産品を販売。三浦エリアに詳しい社員が三浦半島を案内。","tags":["local","eat","company","talk"],"kw":["三浦"],"url":"https://monokoto-market.com/content_show/1791448603667x812258249180971000"},{"id":16,"t":"東京だしわりサービス","s":"東京住宅サービス","c":"food","p":"ブース 112","d":"元コーヒー焙煎士の社員が開発した「出汁割り」。飲み比べセットやノンアル用の「だしのみ」も。","tags":["drink","company","bmen"],"kw":["コーヒー"],"url":"https://monokoto-market.com/content_show/1791448453637x338116750876868600","note":"元コーヒー焙煎士の社員さんが開発した一杯"},{"id":17,"t":"東京ボルダリングサービス","s":"東京住宅サービス","c":"ws","p":"ブース 801","d":"コクヨ南館の外壁修繕で使ったタイルを取り入れた、子ども向けクライミング体験。","tags":["play","kids","company"],"kw":["ボルダリング","クライミング"],"url":"https://monokoto-market.com/content_show/1791448244177x919260822810394600"},{"id":18,"t":"WakuWaku Driven Workshop by Japan Airlin","s":"日本航空","c":"ws","p":"ブース 602・603","d":"コーヒー豆かす消臭剤＆フィルターアート（602）、ハンカチ染め体験・フライトブリーフィング体験・限定スタンプ（603）。","tags":["make","eco","art","company","bmen"],"kw":["コーヒー","アート","ハンカチ","染め"],"url":"https://monokoto-market.com/content_show/1791448069781x349967889433886700","note":"JAL の社内ベンチャーのメンバーが案内"},{"id":19,"t":"JAL プロテイン＆ウェルネスStand","s":"日本航空","c":"goods","p":"ブース 104","d":"JALのプロテイン「SORA-KARA」やお米由来タンパク「NiHPRO®」の紹介、ウェルネス展示。限定ノベルティ配布も。","tags":["body","company"],"kw":["プロテイン"],"url":"https://monokoto-market.com/content_show/1791447814756x393453054171807740"},{"id":20,"t":"JAL W-PIT × ARTIFICER JAPAN","s":"日本航空","c":"food","p":"ブース 105","d":"JALとシドニーのコーヒーショップ「ARTIFICER」のコラボコーヒーを販売。","tags":["drink","company","world"],"kw":["コーヒー"],"url":"https://monokoto-market.com/content_show/1791447718151x709277487603384300"},{"id":21,"t":"sakejumpの出張角打ち","s":"STABLES from ニュウマン高輪MIMURE","c":"food","p":"ブース 802","d":"sakejumpのキッチンカー角打ち。おむすび、おでん等のおつまみと、日本酒・クラフトサケの一杯売り。","tags":["alc","eat"],"kw":["日本酒","酒","おでん","おむすび"],"url":"https://monokoto-market.com/content_show/1791447528478x597099068538224600"},{"id":22,"t":"sakejump takanawa","s":"STABLES from ニュウマン高輪MIMURE","c":"food","p":"ブース 302","d":"若手蔵元・杜氏にフォーカスした厳選日本酒の販売。","tags":["alc","local"],"kw":["日本酒","酒"],"url":"https://monokoto-market.com/content_show/1791447437078x596449545857794000"},{"id":23,"t":"OGAWA COFFEE LABORATORY 高輪","s":"小川珈琲 from ニュウマン高輪MIMURE","c":"food","p":"ブース 301","d":"高輪の店舗で製造するBean to Barチョコレートとクラフトビールの販売。","tags":["sweets","alc"],"kw":["珈琲","チョコ","ビール"],"url":"https://monokoto-market.com/content_show/1791447189556x943974677513764900"},{"id":24,"t":"港南振興会プレゼンツ！シナガワ港南ウルトラクイズ","s":"港南振興会","c":"ws","p":"ブース 806","d":"港南の歴史・地理・企業などを題材にした100問以上のクイズ集から選りすぐりを出題。","tags":["play","town","local","talk"],"kw":["クイズ","港南"],"url":"https://monokoto-market.com/content_show/1791447058467x671848472918884400"},{"id":25,"t":"港南牛塩もつ煮込みとワインの店","s":"港南振興会","c":"food","p":"ブース 113","d":"芝浦市場の卸業者による水不使用の塩味牛もつ煮込みと、酒類卸業者が選んだ赤・白ワイン。","tags":["eat","alc","town"],"kw":["ワイン","酒","もつ","港南"],"url":"https://monokoto-market.com/content_show/1791446922703x718674187125784600"},{"id":26,"t":"MCCのクラムチャウダーと協創カレー","s":"エム・シーシー食品","c":"food","p":"ブース 116","d":"MCCのクラムチャウダーの飲食提供と、兵庫県警・神戸市消防局・海上保安庁第五管区とコラボした「協創シリーズ」カレー3品の販売。","tags":["eat","company"],"kw":["カレー","クラムチャウダー"],"url":"https://monokoto-market.com/content_show/1791438770725x820952434817630200"},{"id":29,"t":"色々な紙でオリジナルメモ帳作り","s":"日本新聞インキ","c":"ws","p":"ブース 601","d":"ヨシ紙・越前和紙・新聞用紙・すべらない紙など様々な紙でメモ帳を作り、紙の違いを学ぶ。","tags":["make","words","craft","company"],"kw":["メモ帳","紙"],"url":"https://monokoto-market.com/content_show/1791429308437x609313767056474100"},{"id":30,"t":"よしなに商店","s":"日本新聞インキ","c":"goods","p":"ブース 303","d":"葦（ヨシ）由来の糸「reed yarn®」のハンカチ・タオルや、葦エキス配合ハンドクリームを販売。","tags":["craft","eco","company"],"kw":["ハンカチ"],"url":"https://monokoto-market.com/content_show/1791429180140x570690892280627200"},{"id":31,"t":"トイオ・プレイグラウンド体験会","s":"ソニー・インタラクティブエンタテインメント","c":"ws","p":"ブース 602","d":"小型ロボット「toio」と専用カードで画面を使わないプログラミング体験。","tags":["play","kids","company"],"kw":["ロボット","プログラミング"],"url":"https://monokoto-market.com/content_show/1791429048477x611460398553759700"},{"id":32,"t":"品川で「つながる」地域の特産展","s":"金谷貴央","c":"food","p":"ブース 522","d":"新幹線・飛行機・船などで品川とつながる地域の特産品を味わい、その魅力を語り合う。","tags":["local","eat","talk","town"],"kw":["品川"],"url":"https://monokoto-market.com/content_show/1791426633362x486125473796980740"},{"id":33,"t":"Bar Cats matter","s":"","c":"food","p":"ブース 114","d":"世界五大ウイスキーから選べるハイボールバー。","tags":["alc"],"kw":["ウイスキー","ハイボール"],"url":"https://monokoto-market.com/content_show/1791264745552x286249341142433800"},{"id":34,"t":"Nanshan Cottage(南山の小さな庭)","s":"","c":"goods","p":"ブース 204","d":"宋錦の手工芸品（無形文化遺産）、モール工芸品、マグネット工芸品。","tags":["craft","world","art"],"kw":["庭"],"url":"https://monokoto-market.com/content_show/1791254927482x120200712224243710"},{"id":35,"t":"Vietnam with love","s":"","c":"goods","p":"ブース 203","d":"ベトナムのポストカード、ノンラー（菅笠）。","tags":["world","art"],"kw":["ベトナム"],"url":"https://monokoto-market.com/content_show/1791254837204x702720179688177700"},{"id":36,"t":"BATIK KNOT STUDIO","s":"","c":"goods","p":"ブース 202","d":"マレーシアのバティック生地を使ったノットバッグ、バッグチャーム、シュシュ、ヘアクリップ等。","tags":["world","craft","cute"],"kw":["マレーシア"],"url":"https://monokoto-market.com/content_show/1791254748924x208543086831206400"},{"id":37,"t":"iin Heritage Studio","s":"","c":"goods","p":"ブース 201","d":"中国・宜興の紫砂ミニチュア置物と伝統的な練り粉人形「面塑」の手作り一点もの展示。","tags":["world","craft","art"],"kw":["中国"],"url":"https://monokoto-market.com/content_show/1791254658590x443159907865722900"},{"id":38,"t":"信州岡谷","s":"","c":"food","p":"ブース 211","d":"長野県岡谷市の美味しい特産品の販売と、週末カメラマンとしての写真展示。","tags":["local","eat","art","bmen"],"kw":["長野"],"url":"https://monokoto-market.com/content_show/1791188683257x648078739800326100","note":"週末カメラマンの写真展示もあり"},{"id":39,"t":"NPO法人MOYA","s":"","c":"food","p":"ブース 210","d":"山形・最上地域の特産品（金山町のピーナッツ製品、「つや姫」を使った麺・お菓子など）。","tags":["local","sweets","eat"],"kw":["お菓子","山形"],"url":"https://monokoto-market.com/content_show/1791188605607x795195044566925300"},{"id":40,"t":"La capi et Le Lien","s":"","c":"food","p":"ブース 410","d":"Le Lienのカラフルなハンドメイドヘアゴムと、La capiの焼菓子。","tags":["sweets","craft","cute"],"kw":["焼菓子"],"url":"https://monokoto-market.com/content_show/1791188517926x515542046604525600"},{"id":41,"t":"cococaRa","s":"","c":"food","p":"ブース 411","d":"ヤシガラ培土で育てたトマトをたっぷり使った焼き菓子。","tags":["sweets","eco"],"kw":["焼き菓子"],"url":"https://monokoto-market.com/content_show/1791188421662x949465258799923200"},{"id":42,"t":"旅する茶屋","s":"","c":"food","p":"ブース 517","d":"日本各地のお茶の葉を、葉のかたち・香り・色から直感で選ぶ日本茶販売。","tags":["drink","local","scent"],"kw":["お茶","日本茶","香り"],"url":"https://monokoto-market.com/content_show/1791188308473x537451594013474800"},{"id":43,"t":"ローカルバイヤーズクラブ","s":"","c":"food","p":"ブース 212","d":"地域を巡って出会った作り手のおいしい商品をポップアップで紹介・販売。","tags":["local","eat","talk"],"kw":[],"url":"https://monokoto-market.com/content_show/1791188238899x326061366647455740"},{"id":44,"t":"おかしやのん","s":"","c":"food","p":"ブース 518","d":"「お酒とおかしのマリアージュ」がコンセプトのおつまみ焼菓子。","tags":["sweets","alc"],"kw":["焼菓子","お酒","酒"],"url":"https://monokoto-market.com/content_show/1791188157664x104992984263032830"},{"id":45,"t":"glutenfree365days","s":"","c":"food","p":"ブース 519","d":"グルテン・香料・着色料不使用のお菓子。","tags":["sweets","body"],"kw":["お菓子"],"url":"https://monokoto-market.com/content_show/1791188064183x910264551722188800"},{"id":46,"t":"駄菓子屋こども商店","s":"","c":"food","p":"ブース 520","d":"子どもたちが店員を務める、定番駄菓子とくじ引きの駄菓子屋さん。","tags":["sweets","kids","play"],"kw":["駄菓子"],"url":"https://monokoto-market.com/content_show/1791187978461x641204790578118700"},{"id":47,"t":"焼きドーナッツ専門店Smiley-Smiley","s":"","c":"food","p":"ブース 521","d":"北海道産小麦と平飼い卵を使った、しっとりもちもちの焼きドーナッツ。","tags":["sweets"],"kw":["ドーナッツ","北海道"],"url":"https://monokoto-market.com/content_show/1791187899742x598938697492070400"},{"id":48,"t":"さっぱいしー！を徳島神山から全国へ！","s":"","c":"food","p":"ブース 213","d":"城西高校神山校の高校生が耕作放棄地を再生した「まめのくぼ」で作った商品。","tags":["local","eat","bmen","eco"],"kw":["徳島"],"url":"https://monokoto-market.com/content_show/1791187573014x863369441277902800","note":"高校生が耕作放棄地を再生してつくった"},{"id":49,"t":"Mädchen","s":"","c":"goods","p":"ブース 408","d":"ビーズフラワーをメインにしたキラキラのビーズグッズ。","tags":["craft","cute"],"kw":["ビーズ"],"url":"https://monokoto-market.com/content_show/1791187476963x798092730770653200"},{"id":50,"t":"ざつだん と にがおえ","s":"人んちのカレーがたべたい","c":"ws","p":"ブース 713","d":"Podcast番組が参加者の悩みや雑談を聞き、そのイメージをもとにアーティスト添田奈那が似顔絵を描く。","tags":["talk","art","words"],"kw":["カレー","似顔絵"],"url":"https://monokoto-market.com/content_show/1791187281678x797513536957579300"},{"id":51,"t":"苔の庭ワークショップ","s":"C-Studio+MJDチーム","c":"ws","p":"ブース 712","d":"庭園デザイナーと苔・石・苗を選び、手のひらサイズの鉢に持ち帰れる「庭」をつくる。","tags":["make","nature","art"],"kw":["苔","庭"],"url":"https://monokoto-market.com/content_show/1791187185599x764007467732172800"},{"id":52,"t":"ショートエッセイを書こう","s":"EIDOS","c":"ws","p":"ブース 711","d":"神話学者が教える、ワークシートから書き始める「モノから始めるエッセイ」講座。初心者向け。","tags":["words","make"],"kw":["エッセイ"],"url":"https://monokoto-market.com/content_show/1791187080472x342034248102576100"},{"id":53,"t":"モルックであそぼう！","s":"コクヨモルックサークル","c":"ws","p":"ブース 710","d":"フィンランド発祥のスポーツ「モルック」の体験。","tags":["play","bmen","company"],"kw":["モルック"],"url":"https://monokoto-market.com/content_show/1791186973656x453537107265978400","note":"コクヨのモルックサークル"},{"id":54,"t":"わたしだけの、しるしをつくろう","s":"ぶらぶらBOOKS","c":"ws","p":"ブース 709","d":"気になる言葉やイメージを手がかりにオリジナルのしおりを作るワークショップ。","tags":["words","make","craft"],"kw":["しおり","言葉"],"url":"https://monokoto-market.com/content_show/1791186881703x955874977829617700"},{"id":55,"t":"陸のカヌー教室 ～水上散歩をはじめよう～","s":"中井信彦","c":"ws","p":"ブース 710","d":"カヌー実物やギアに触れる体験ブース。川旅映像とクイズ（全問正解で限定ステッカー）。","tags":["play","nature"],"kw":["クイズ","カヌー","ステッカー"],"url":"https://monokoto-market.com/content_show/1791186759156x943627489485783000"},{"id":56,"t":"駆け込み書き納め屋","s":"水田寛美","c":"ws","p":"ブース 707","d":"今年の振り返りや残りのやりきりたいことを言葉にして書道で書き、持ち帰る。","tags":["words","make","art"],"kw":["書道","言葉"],"url":"https://monokoto-market.com/content_show/1791186633338x666550039404347400"},{"id":57,"t":"キラキラディンプルアート","s":"Merry_Lupinus","c":"ws","p":"ブース 706","d":"自動車フロントガラスの絵の具で色を塗りながらSDGsを学ぶワークショップ。","tags":["make","art","eco","kids"],"kw":["アート"],"url":"https://monokoto-market.com/content_show/1791186503046x509436693116616700"},{"id":58,"t":"かわいいデコフレームを作ろう！","s":"みーはうす","c":"ws","p":"ブース 708","d":"レース・ホイップねんど・ビーズ等でオリジナルのフォトフレーム作り。子どもから大人まで。","tags":["make","cute","kids"],"kw":["ビーズ"],"url":"https://monokoto-market.com/content_show/1791186226135x345840520472821760"},{"id":59,"t":"ボディケア","s":"呼吸と香り","c":"ws","p":"ブース 702","d":"深い呼吸へ導く「呼吸のマッサージ」と「香りのボディケアマッサージ」。","tags":["body","scent"],"kw":["マッサージ","香り"],"url":"https://monokoto-market.com/content_show/1791186078564x800424871788544000"},{"id":60,"t":"だれでもヨガ","s":"オフィスヨガ部","c":"ws","p":"ブース 714","d":"未経験・体がかたい人でも気軽に試せるリフレッシュヨガ。","tags":["body","bmen"],"kw":["ヨガ"],"url":"https://monokoto-market.com/content_show/1791185937661x101978728319942660","note":"オフィスヨガ部のみなさん"},{"id":61,"t":"アロマストーン","s":"mama_life_flower","c":"ws","p":"ブース 706","d":"キラキラビーズで飾り、好きな香りをつけるアロマストーン作り。","tags":["make","scent","cute"],"kw":["香り","アロマ","ビーズ"],"url":"https://monokoto-market.com/content_show/1791185694100x764813926514556900"},{"id":62,"t":"天然香原料で匂い袋を作ろう！","s":"お香時間 空と風","c":"ws","p":"ブース 709","d":"天然香原料を嗅ぎ比べてオリジナルのお香を調香し、金襴袋の匂い袋に仕上げる和の香り体験。","tags":["make","scent"],"kw":["香り","お香","匂い"],"url":"https://monokoto-market.com/content_show/1791185479542x234601844299792400"},{"id":63,"t":"きせかえドレスメーカー","s":"クニカタミヤコ","c":"ws","p":"ブース 707","d":"貼るだけで作れる、きせかえ人形のオリジナルドレス作り。小さな子どもも参加可。","tags":["make","cute","kids"],"kw":[],"url":"https://monokoto-market.com/content_show/1791180488753x534662257380425700"},{"id":64,"t":"アートで彩るブックカバーづくり","s":"ナガノフォント","c":"ws","p":"ブース 708","d":"障がい者アートのフォント・柄をコラージュし、アイロンプリントでオリジナルのブックカバーを作成。","tags":["make","art","words"],"kw":["アート","フォント","ブックカバー"],"url":"https://monokoto-market.com/content_show/1791180339405x233542179390750720"},{"id":65,"t":"レジンでハーバリウム作り","s":"LABORIA","c":"ws","p":"ブース 702","d":"試験管で好きな花をレジンに封じるハーバリウム作り。親子参加歓迎、当日持ち帰り可。","tags":["make","nature","cute","kids"],"kw":["花","ハーバリウム","レジン"],"url":"https://monokoto-market.com/content_show/1791180208034x330041989844172800"},{"id":66,"t":"ワンダーマップ","s":"地球上の緑","c":"ws","p":"ブース 705","d":"身近な道具やさまざまな技法で偶然生まれる色や形から「夢の世界」をつくるアートWS。親子でも参加可。","tags":["make","art","kids"],"kw":["アート"],"url":"https://monokoto-market.com/content_show/1791179985546x270540679675904000"},{"id":67,"t":"座って美容鍼・お灸体験","s":"鍼灸サロンSOURIANT","c":"ws","p":"ブース 704","d":"お化粧をしたまま、座ったままで美容鍼・お灸を体験。","tags":["body"],"kw":["鍼","お灸"],"url":"https://monokoto-market.com/content_show/1791179862170x560164890035093500"},{"id":68,"t":"超描ける！？デッサン体験","s":"SHIKAKU workshop／小川千尋","c":"ws","p":"ブース 703","d":"3ステップで観察の面白さを体験するプチデッサン。最後に自分だけのデッサンZINEを作成。子どもから大人まで。","tags":["make","art","words"],"kw":["ZINE","デッサン"],"url":"https://monokoto-market.com/content_show/1791179731009x120826907786215420"},{"id":69,"t":"モダン金継ぎ・グルー継ぎワークショップ","s":"良々〜よしよし","c":"ws","p":"ブース 701","d":"材料一つで修復・アップサイクルできる「モダン金継ぎ・グルー継ぎ」を豆皿で体験。シーグラス等で干支のひつじチャーム作りも。","tags":["make","craft","eco"],"kw":["金継ぎ"],"url":"https://monokoto-market.com/content_show/1791179367826x554627459578855400"},{"id":70,"t":"よさこい踊り","s":"南海少年団 茜丸×明星","c":"stage","p":"ステージ","d":"「茜丸」と「明星」の合同チームによる、鳴子を鳴らす華やかなよさこい演舞。","tags":["perform","music","kids"],"kw":["よさこい"],"url":"https://monokoto-market.com/content_show/1791178309869x321147765110865900"},{"id":71,"t":"みんなで楽しむトラッドJAZZ","s":"MBB","c":"stage","p":"ステージ","d":"ニューオリンズスタイルのトラッドジャズ。ブラスバンドで会場を練り歩き、ステージで簡単なワークショップも。","tags":["music","perform"],"kw":["ジャズ","JAZZ","バンド"],"url":"https://monokoto-market.com/content_show/1791178204205x276557036946194430"},{"id":72,"t":"音楽ライブ","s":"SANDTOWN","c":"stage","p":"ステージ","d":"会社員シンガーソングライターによる、働く人の気持ちを歌ったオリジナル曲の30分ライブ。","tags":["music","bmen"],"kw":["ライブ","歌","音楽"],"url":"https://monokoto-market.com/content_show/1791178089932x466398691153412100","note":"会社員シンガーソングライターのライブ"},{"id":73,"t":"バンド演奏","s":"ありんこ理論","c":"stage","p":"ステージ","d":"相対性理論、RADWIMPS、東京事変、きのこ帝国など邦楽オルタナロックのカバー演奏。","tags":["music"],"kw":["バンド","演奏"],"url":"https://monokoto-market.com/content_show/1791177955479x749605336107188200"},{"id":74,"t":"バンド演奏","s":"SIX FLATS","c":"stage","p":"ステージ","d":"邦楽・洋楽のコピーバンド演奏。","tags":["music"],"kw":["バンド","演奏"],"url":"https://monokoto-market.com/content_show/1791177831528x393625558025240600"},{"id":75,"t":"バレエパフォーマンス","s":"Plume Ballet Arts","c":"stage","p":"ステージ","d":"コクヨ社員の生演奏にのせたバレエパフォーマンス。","tags":["perform","music","bmen","company"],"kw":["バレエ","演奏"],"url":"https://monokoto-market.com/content_show/1791177674459x396874977361264640","note":"コクヨ社員の生演奏にのせたバレエ"},{"id":76,"t":"合氣道演武・護身術体験会","s":"コクヨ文具3年目ーズ","c":"stage","p":"ステージ","d":"合気道の演武と護身術の体験会。","tags":["perform","play","bmen","company"],"kw":["合気道","合氣道"],"url":"https://monokoto-market.com/content_show/1791177556196x822245757990994000","note":"コクヨの3年目社員による演武と護身術体験"},{"id":77,"t":"沖縄民謡","s":"琉球パラダイス","c":"stage","p":"ステージ","d":"コクヨ社員と仲間による沖縄民謡バンド。三線・笛・太鼓の演奏。","tags":["music","bmen","company","local"],"kw":["バンド","民謡","演奏"],"url":"https://monokoto-market.com/content_show/1791177381307x404110035175604200","note":"コクヨ社員と仲間の沖縄民謡バンド"},{"id":78,"t":"Mexican food Vacacion","s":"","c":"food","p":"ブース 804","d":"自家製スパイスのオリジナルメキシカン（タコス、ナチョス、タコライス等）。","tags":["eat","world"],"kw":["タコス","メキシ"],"url":"https://monokoto-market.com/content_show/1791177171045x954003005343793200"},{"id":79,"t":"Identity","s":"","c":"goods","p":"ブース 425","d":"Tシャツヤーンで編んだ丈夫な小物入れ・ポーチ。","tags":["craft","eco"],"kw":[],"url":"https://monokoto-market.com/content_show/1791177048133x479214036611235840"},{"id":80,"t":"キリエラボ","s":"","c":"goods","p":"ブース 424","d":"飾る・贈る・普段使いの切り絵作品と消しゴムはんこ。","tags":["craft","art"],"kw":["切り絵","はんこ"],"url":"https://monokoto-market.com/content_show/1791176940386x800275465438494700"},{"id":81,"t":"謎のグラフィック","s":"","c":"goods","p":"ブース 423","d":"謎解き×グラフィックの実験をテーマにしたZINEを販売。","tags":["words","play","art"],"kw":["謎","ZINE"],"url":"https://monokoto-market.com/content_show/1791176835383x882917005991346200"},{"id":82,"t":"YUFOキャッチャー","s":"","c":"goods","p":"ブース 422","d":"UFOキャッチャーで取り過ぎたアニメ等のぬいぐるみを大放出。","tags":["play","cute"],"kw":["ぬいぐるみ"],"url":"https://monokoto-market.com/content_show/1791176724434x333538724885299200"},{"id":83,"t":"Graduation Coffee","s":"","c":"food","p":"ブース 103","d":"バリスタがタイで買い付けたレア豆を含むコーヒー数種、ディカフェ・紅茶系ドリンクも。","tags":["drink","world"],"kw":["コーヒー","紅茶","タイで"],"url":"https://monokoto-market.com/content_show/1791176580119x766569051570569200"},{"id":84,"t":"教育居酒屋わいわいわい","s":"","c":"food","p":"ブース 107","d":"日本酒を100円で提供、ベビースターもんじゃ付き。","tags":["alc","eat","talk"],"kw":["日本酒","酒"],"url":"https://monokoto-market.com/content_show/1791176413289x945839142792069100"},{"id":85,"t":"コクヨ東北連合会","s":"","c":"food","p":"ブース 109","d":"東北の美味しいお酒とおつまみ。","tags":["alc","eat","local","bmen","company"],"kw":["お酒","酒","東北"],"url":"https://monokoto-market.com/content_show/1791176330569x522876789818654700","note":"コクヨ東北連合会のみなさん"},{"id":86,"t":"星屑クラフト","s":"","c":"food","p":"ブース 110","d":"中高の同級生で仕込んだ限定クラフトビールと、ビールに合うおつまみ。","tags":["alc","bmen"],"kw":["ビール"],"url":"https://monokoto-market.com/content_show/1791176176863x819820110612529200","note":"中高の同級生で仕込んだクラフトビール"},{"id":87,"t":"二条の麦バー","s":"","c":"food","p":"ブース 117","d":"生ビール、麦焼酎、ビアカクテル、うすめの焼酎お湯割りなど、飲む人に合わせたお酒を提供。","tags":["alc","talk"],"kw":["ビール","焼酎","お酒","酒"],"url":"https://monokoto-market.com/content_show/1791176071798x665610291442090000"},{"id":88,"t":"PAD★THAI","s":"","c":"food","p":"ブース 118","d":"研修で繋がった1年目同期7人によるパッタイ屋さん。","tags":["eat","world","bmen","company"],"kw":["パッタイ"],"url":"https://monokoto-market.com/content_show/1791175973716x470708771263086600","note":"研修で出会った1年目同期7人のお店"},{"id":89,"t":"気ままに旅する 缶×酒","s":"","c":"food","p":"ブース 111","d":"全国の日本酒とアテ缶のペアリングを楽しめる角打ちスタンド。","tags":["alc","local"],"kw":["日本酒","酒"],"url":"https://monokoto-market.com/content_show/1791175855752x659427460516151300"},{"id":90,"t":"コクヨ道産子会のグルメ屋台","s":"","c":"food","p":"ブース 102","d":"ジンギスカンうどん、サッポロビール、スープなど北海道グルメ。","tags":["eat","alc","local","bmen","company"],"kw":["ビール","うどん","ジンギスカン","北海道"],"url":"https://monokoto-market.com/content_show/1791175767083x202994950419251200","note":"コクヨ道産子会のみなさん"},{"id":91,"t":"スギョ！！！","s":"","c":"food","p":"ブース 101","d":"昨年2日間で1,200個完売した水餃子が再登場。","tags":["eat"],"kw":["餃子"],"url":"https://monokoto-market.com/content_show/1791175374510x782905806284390400"},{"id":92,"t":"SMILE BURGER","s":"","c":"food","p":"ブース 108","d":"コクヨのY世代・Z世代メンバーによるミニバーガー。","tags":["eat","bmen","company"],"kw":["バーガー"],"url":"https://monokoto-market.com/content_show/1791175280995x228483359937396740","note":"コクヨの Y 世代・Z 世代メンバーのお店"},{"id":93,"t":"洗熊茶坊","s":"","c":"food","p":"ブース 106","d":"台湾茶の実演販売。店主厳選の茶葉を飲み比べ。","tags":["drink","world","scent"],"kw":["台湾茶","茶葉","台湾"],"url":"https://monokoto-market.com/content_show/1791175154448x483413791902793700"},{"id":94,"t":"ハリ書房","s":"","c":"goods","p":"ブース 805","d":"自動車の新刊移動書店。絵本・児童書からレシピ、人文、古典まで幅広く。","tags":["words","kids"],"kw":["書店","絵本"],"url":"https://monokoto-market.com/content_show/1791175048577x221541694566301700"},{"id":95,"t":"URAJI アクセサリーと雑貨","s":"","c":"goods","p":"ブース 514","d":"いろいろな素材で「小さなトキメキ」を表現したアクセサリー、イラスト、雑貨。","tags":["craft","cute","art"],"kw":["イラスト","アクセサリー","雑貨"],"url":"https://monokoto-market.com/content_show/1790675079459x669633288905424900"},{"id":96,"t":"Knuit","s":"","c":"goods","p":"ブース 508","d":"チクチクしにくい上質素材のハンドニット帽子・マフラー・ハンドウォーマー等。ユニセックスなアクセサリーも。","tags":["craft"],"kw":["ニット","アクセサリー"],"url":"https://monokoto-market.com/content_show/1790674992620x302540326720241660"},{"id":97,"t":"elama koris","s":"","c":"goods","p":"ブース 509","d":"動物や自然をモチーフにしたほっこりイラストの紙雑貨・文具。","tags":["cute","art","animal","words"],"kw":["紙","イラスト","雑貨"],"url":"https://monokoto-market.com/content_show/1790674911961x932781411347726300"},{"id":98,"t":"松浦家具工房","s":"","c":"goods","p":"ブース 510","d":"桜の玉手箱、秘密の小箱、折り畳み弁当箱、ミニベンチ、木のロボットなど驚きの木工作品。","tags":["craft","nature","play"],"kw":["ロボット","木"],"url":"https://monokoto-market.com/content_show/1790674706227x463545217712128000"},{"id":99,"t":"山形よしだ桐箱店","s":"","c":"goods","p":"ブース 208","d":"創業95年の桐箱店。お米・パン・コーヒー豆・茶葉など暮らしに寄り添う桐箱。","tags":["craft","local"],"kw":["コーヒー","茶葉","山形","桐"],"url":"https://monokoto-market.com/content_show/1790674596623x812850024533196800"},{"id":100,"t":"よもぎ蒸しサロンselect","s":"","c":"goods","p":"ブース 412","d":"身体が喜ぶオーガニック食品や日用雑貨のセレクト販売。","tags":["body"],"kw":["雑貨"],"url":"https://monokoto-market.com/content_show/1790674518676x153330976155500540"},{"id":101,"t":"spice ZIN","s":"","c":"goods","p":"ブース 503","d":"書籍・ZINEの販売、スパイスと茶葉セットの販売。","tags":["words","scent","drink"],"kw":["茶葉","書籍","ZINE"],"url":"https://monokoto-market.com/content_show/1790674442620x932989186573074400"},{"id":102,"t":"よりみちこみち","s":"","c":"goods","p":"ブース 421","d":"北品川の街歩きで見つけた文字や模様をモチーフにしたステッカー、キーホルダー、トートバッグ。","tags":["town","art","cute"],"kw":["ステッカー","キーホルダー","トート","街歩き","品川","北品川"],"url":"https://monokoto-market.com/content_show/1790674295428x384168244749795300"},{"id":103,"t":"my lovely escape","s":"","c":"goods","p":"ブース 525","d":"一粒ずつワイヤーに通して作るビーズフラワー。冬・クリスマス向けのお花も。","tags":["craft","cute"],"kw":["花","ビーズ"],"url":"https://monokoto-market.com/content_show/1790674224299x652161123866378200"},{"id":104,"t":"アトリエはっち","s":"","c":"goods","p":"ブース 511","d":"かわいくて少しリアルなミニチュアフード・ミニチュアスイーツ。","tags":["craft","cute","art"],"kw":[],"url":"https://monokoto-market.com/content_show/1790674137958x355399729359093760"},{"id":105,"t":"占い処天観屋","s":"","c":"goods","p":"ブース 505","d":"異業種の2人による占いユニット。自作の占い道具の頒布と占い鑑定。","tags":["fortune","bmen","talk"],"kw":["ニット","占い"],"url":"https://monokoto-market.com/content_show/1790674051567x227010754190245900","note":"異業種の2人の占いユニット"},{"id":106,"t":"JAM gravity","s":"","c":"goods","p":"ブース 501","d":"キーホルダー、トートバッグ、靴下など日常がちょっぴり豊かになるグッズ。","tags":["cute"],"kw":["キーホルダー","トート"],"url":"https://monokoto-market.com/content_show/1790673962263x169669485667549200"},{"id":107,"t":"chou chou chou!","s":"","c":"goods","p":"ブース 524","d":"「いつもの日々に、彩りを」がコンセプトのポップでキュートなアクセサリー・雑貨。","tags":["cute","craft"],"kw":["アクセサリー","雑貨"],"url":"https://monokoto-market.com/content_show/1790673624499x681838538700881900"},{"id":108,"t":"petit bonheur 7","s":"","c":"goods","p":"ブース 414","d":"ドラム仲間が作る、遊び心あるアクセサリーや小物（「小さな幸せ」がテーマ）。","tags":["craft","cute","bmen","music"],"kw":["アクセサリー"],"url":"https://monokoto-market.com/content_show/1790673540105x689251119172681700","note":"ドラム仲間がつくる小物"},{"id":109,"t":"アトリエパユル","s":"","c":"goods","p":"ブース 205","d":"チベット語を中心に「好き」を綴ったZINEと、チベットビーズ・陶ビーズの作品を展示販売。","tags":["words","world","craft"],"kw":["チベット","ZINE","ビーズ"],"url":"https://monokoto-market.com/content_show/1790673455879x113210193975705600"},{"id":110,"t":"『覗く』街を見るZINE","s":"","c":"goods","p":"ブース 417","d":"スイス、ロンドン、東陽町、豊洲など、街歩きで捉えた景色をまとめたZINEの展示・販売。","tags":["words","town","art"],"kw":["ZINE","街歩き"],"url":"https://monokoto-market.com/content_show/1790673369477x500344099914383360"},{"id":111,"t":"金春湯・すえひろ湯","s":"","c":"goods","p":"ブース 504","d":"大崎の銭湯「金春湯」と大井町の銭湯「すえひろ湯」によるスタッフ手作りのオリジナルグッズ。","tags":["town","local","bmen","body"],"kw":["銭湯"],"url":"https://monokoto-market.com/content_show/1790673279643x207730868451803140","note":"銭湯のスタッフさん手づくりのグッズ"},{"id":112,"t":"sawahara","s":"","c":"goods","p":"ブース 402","d":"動物保護団体への寄付を目的にしたチャリティー招き猫や器など、ハンドメイド陶器。","tags":["craft","animal","eco"],"kw":["陶器","器","猫"],"url":"https://monokoto-market.com/content_show/1790673098159x639461426414747600"},{"id":113,"t":"allmouve","s":"","c":"goods","p":"ブース 406","d":"世界のカルチャーと自然美に着想したアクセサリー。","tags":["craft","world","nature"],"kw":["アクセサリー"],"url":"https://monokoto-market.com/content_show/1790672992562x978046080613875700"},{"id":114,"t":"勝手にアーカイ部","s":"","c":"goods","p":"ブース 413","d":"社内の面白い情報を収集し、それをモチーフにしたグッズ・カードを販売。撮った写真をその場でアートにする企画も。","tags":["company","bmen","art","play"],"kw":["アート"],"url":"https://monokoto-market.com/content_show/1790672886331x756833735784792000","note":"社内のおもしろ情報を集める部活"},{"id":115,"t":"指咲 -yubisaki-","s":"","c":"goods","p":"ブース 407","d":"コクヨ若手5名が制作した多彩なデザインのネイルチップ。","tags":["cute","art","bmen","company"],"kw":["ネイル"],"url":"https://monokoto-market.com/content_show/1790672802665x336473956519247900","note":"コクヨの若手5人がデザインしたネイルチップ"},{"id":116,"t":"あみあみの会","s":"","c":"goods","p":"ブース 512","d":"丈夫な「パラコード」で編んだカラフルなスマホストラップ。","tags":["craft","cute"],"kw":["パラコード"],"url":"https://monokoto-market.com/content_show/1790672709904x912522254824243200"},{"id":117,"t":"占いの館・艶々館","s":"","c":"goods","p":"ブース 420","d":"タロットなどの占いを短時間・手頃な価格で体験。鑑定結果はお絵描きカードでプレゼント。","tags":["fortune","talk","art"],"kw":["占い","タロット"],"url":"https://monokoto-market.com/content_show/1790672615095x423927581545070600"},{"id":118,"t":"オクルコトバ","s":"","c":"goods","p":"ブース 416","d":"やさしい・たのしい・元気になる「ことば」にまつわる雑貨。","tags":["words","cute"],"kw":["ことば","雑貨"],"url":"https://monokoto-market.com/content_show/1790672540908x556407956280705000"},{"id":119,"t":"amiami ramune","s":"","c":"goods","p":"ブース 513","d":"ラムネのような淡い色の、小さな編み物雑貨。","tags":["craft","cute"],"kw":["編み","雑貨"],"url":"https://monokoto-market.com/content_show/1790671326409x384229222720471040"},{"id":120,"t":"インド刺繍リボン雑貨と上品アクセの店","s":"Petalimia","c":"goods","p":"ブース 523","d":"インド刺繍リボンのバッグ・ミラー・カチューシャ等の雑貨と、上品なフラワーアクセサリー。","tags":["world","craft","cute"],"kw":["インド","刺繍","アクセサリー","雑貨"],"url":"https://monokoto-market.com/content_show/1790671251080x560972575067865100"},{"id":121,"t":"PARERGO® | パレルゴ","s":"","c":"goods","p":"ブース 401","d":"スイッチ・画面・石ころなどをひとつにまとめた不思議なデバイス。カスタマイズ用キットやフレーム単体も販売。","tags":["play","art"],"kw":[],"url":"https://monokoto-market.com/content_show/1790671044279x946286815911608300"},{"id":122,"t":"インテリアショップ アンダイ","s":"","c":"goods","p":"ブース 506","d":"仙台のショップ「アンダイ」が日本＆東北産の厳選クラフト（木製雑貨・陶磁器・てぬぐい等）を販売。","tags":["craft","local"],"kw":["東北","仙台","木","器","雑貨"],"url":"https://monokoto-market.com/content_show/1790670946677x465789703791575000"},{"id":123,"t":"ねこだもん","s":"","c":"goods","p":"ブース 418","d":"猫モチーフのグッズ販売と、愛猫のイラスト描き。","tags":["animal","art","cute"],"kw":["イラスト","猫","ねこ"],"url":"https://monokoto-market.com/content_show/1790670800008x523255540225146900"},{"id":124,"t":"CRATEs","s":"","c":"goods","p":"ブース 405","d":"映画・音楽・ファッション・家具などのカルチャーから着想したステッカー、キーホルダー等のオリジナル雑貨。","tags":["art","music"],"kw":["音楽","雑貨","ステッカー","キーホルダー"],"url":"https://monokoto-market.com/content_show/1790670680994x850818995071221800"},{"id":125,"t":"港区エシカルコミュニティ","s":"","c":"goods","p":"ブース 207","d":"倫理的・人道的なライフスタイルを港区中心に広める団体の活動紹介。","tags":["eco","town","talk"],"kw":[],"url":"https://monokoto-market.com/content_show/1790326442508x196655966743691260"},{"id":126,"t":"harmonie","s":"","c":"goods","p":"ブース 516","d":"パラコードなど、カラフルでかわいいハンドメイド雑貨。","tags":["craft","cute"],"kw":["パラコード","雑貨"],"url":"https://monokoto-market.com/content_show/1790326380837x577738480699310100"},{"id":127,"t":"府中を盛り上げる濱口造園","s":"","c":"goods","p":"ブース 209","d":"伐採木を色鉛筆等に変えて保育園へ寄付する「木育」の作品展示。好きな文字を刻める焼印キーホルダーを無料プレゼント。","tags":["nature","eco","make","kids"],"kw":["木","キーホルダー"],"url":"https://monokoto-market.com/content_show/1790326142547x516358151308050400"},{"id":128,"t":"ココ、置クヨ。","s":"","c":"goods","p":"ブース 404","d":"会話が生まれる箸置き専門店。ツッコミたくなる不思議な形やクスッと笑えるデザインが勢揃い。","tags":["play","cute","talk"],"kw":["箸置き"],"url":"https://monokoto-market.com/content_show/1790325994247x550705430185115650"},{"id":129,"t":"DOG CAT FISH","s":"","c":"goods","p":"ブース 419","d":"犬・猫・魚をテーマにしたステッカー、キーホルダー、トートバッグ、置物、マグネットなどの雑貨。","tags":["animal","cute"],"kw":["雑貨","ステッカー","キーホルダー","トート","猫","犬","魚"],"url":"https://monokoto-market.com/content_show/1790325530774x153133874172919800"},{"id":130,"t":"HAND a MADE","s":"","c":"goods","p":"ブース 515","d":"手作りの作品を複数販売・展示。","tags":["craft"],"kw":[],"url":"https://monokoto-market.com/content_show/1790325419343x192743057027498000"},{"id":131,"t":"ナガノフォント","s":"","c":"goods","p":"ブース 415","d":"障がい者アートのフォント・デザインを使ったTシャツ・水筒・和漢茶・トートバッグ等を販売。","tags":["art","words"],"kw":["アート","フォント","トート"],"url":"https://monokoto-market.com/content_show/1790325310538x793040951904829400"},{"id":132,"t":"マサノノザッカ","s":"","c":"goods","p":"ブース 403","d":"「見たことないもの」をテーマにした自作（3Dプリント）雑貨。今年はスパイラルストラップがテーマ。","tags":["play","craft","art"],"kw":["雑貨"],"url":"https://monokoto-market.com/content_show/1790325224397x545219815656652800"},{"id":133,"t":"瀧澤商店","s":"","c":"goods","p":"ブース 502","d":"私物と友人達のお宝を集めたリサイクル／リメイク雑貨店。レディース多め、ハンドメイドやヘンなグッズも多数。","tags":["eco","cute","play"],"kw":["雑貨"],"url":"https://monokoto-market.com/content_show/1790324867079x288146621637066750"},{"id":134,"t":"OMU","s":"","c":"goods","p":"ブース 409","d":"普段の装いに特別感を添えるハンドメイドアクセサリー。ギフトにも◎","tags":["craft","cute"],"kw":["アクセサリー"],"url":"https://monokoto-market.com/content_show/1790324720351x638614348201197600"}]}</script>
 <script>
 "use strict";
 /* =====================================================================
-   DROP. Coach — 投稿づくりチャット v4（drop_coach_chat.html）  2026/11/16
+   DROP. Coach — 投稿づくりチャット v5（drop_coach_chat.html）  2026/11/16
    ---------------------------------------------------------------------
+   v5（2026/11/16 午後）
+   - 見た目をみんまちDROP の雰囲気に（生成り・白い角丸カード・こげ茶のボタン・しずくの 5 色）。案内役「ぽとり」を色ガラスのしずくに描き直した
+   - チャットは LINE のように：あなた＝こげ茶の吹き出し／ぽとり＝白。下の答える欄も同じ（ぽとりの問い・確かめ＝白、選んだもの・送る＝こげ茶）
+   - かけら集めをダンジョン風に：5 つの部屋（はじまりの広場・こころの泉・虫めがねの小道・であいの回廊・とびらの前）をまわってかけらを集める
+     上に「かけらの地図」、答えるたびに「かけらゲット」、自分のことばならキラ✦、任意の問いは「ひみつの部屋」のレアかけら、そろうと「DROP の原石」
+   - コピーのあと：本数は運営からのお知らせ（「本日○本目（通算○本目）です。」キャラにしゃべらせない）→ 本日の DROP → おまけ「ごほうびの宝箱」
+     （このあとのおすすめ 3 つ：ど真ん中／ちょい冒険／B面の人に会う）→ 開けたら運営からの質問（会社の見え方・使いごこち）
+   - 「AI でもう一案」は投稿文カードにも出し、コピーしたあとも使える（最大 4 案）
+   - 運営からの質問の文は、関西弁・標準語の設定にかかわらず同じ（答えを比べられるように）
+   （以下は v4）
    V3 リポジトリ（DROP_Dashboard_Shinagawa3.0）。2026/11/16 の要件で作り直した
    - ことばのワークショップ：写真 1 枚から、5 つの「ことばのかけら」（できごと・気持ち・どこが・だれと・しめ）を集めて投稿文をつくる
-   - 案内役はインクのしずくのキャラクター「ぽとり」（関西弁。CONFIG.VOICE を "standard" にすると標準語）。投稿文は本人の口調のまま
+   - 案内役は色ガラスのしずくのキャラクター「ぽとり」（関西弁。CONFIG.VOICE を "standard" にすると標準語）。投稿文は本人の口調のまま
    - 答えは自分のことばが先。迷った人は「迷ったらヒント」で候補（運営の選択肢＋AI が写真とひとことから作った候補）がぜんぶ出る
      ひとことだけは候補を出さない。「だれと」「しめ」は、書いたことばを画面がすぐ区分に当てはめ、本人が 1 タップで確かめる（KPI を本人の答えで測るため）
    - 「そうそう！」：気持ちとどこがのあと、本人のことばだけから AI が「言いたかったのは、こういうこと？」を 3 通り。選ぶと投稿文の 1 行になる
@@ -355,7 +451,7 @@
    - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v9）の /exec URL（★ 同上）。記録と「チャットの設定」の配布
    - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
 ===================================================================== */
-const APP_VERSION = "chat-v4.0 (2026-11-16)";
+const APP_VERSION = "chat-v5.0 (2026-11-16)";
 const CONFIG = {
   // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
   GAS_URL: "https://script.google.com/macros/s/AKfycbzdkIa8xnE0useu-5tuXMfLTBXCU80_9yhhpN0C6pcxnkePNdfR2jtVZ51PqyAb3XRe/exec",   // 仕上げ用 GAS（DROP_COACH_GPT v10）
@@ -378,6 +474,7 @@ const CONFIG = {
   SEND_SAMPLES: false,        // 見本投稿の本文を AI に送る（見本 8 例はプロンプトの 6 章に入っているので、ふだんは送らない。見本を足したときだけ true）
   SEND_SAMPLE_IMAGES: false,  // 見本投稿の写真も AI に渡す（待ち時間が長くなる）
   DROP_URL: "",               // DROP の投稿画面の URL（入れるとコピー後に「DROP を開く」ボタンを出す）
+  RECOMMEND_ON: true,         // コピーのあと「ごほうびの宝箱」（このあとのおすすめ 3 つ）を出す。json/cs_contents.json を使う
   BOT_DELAY: 420, TIMEOUT_MS: 90000, SETTINGS_TIMEOUT_MS: 8000,
   IMG_MAX_EDGE: 512, IMG_QUALITY: 0.8, PREVIEW_EDGE: 1080, MAX_MB: 30,
   MAX_TEXT1: 100, MAX_DETAIL: 30, MAX_FREE: 40, MAX_FINAL: 300,
@@ -385,7 +482,7 @@ const CONFIG = {
   // V2 と同じ GitHub Pages のドメインで動くので、保存の名前は V4 専用にする（V2 の保存とまざらない）
   KEYS: { SESSION: "dropChatV4Session", PHOTO: "dropChatV4Photo", BIG: "dropChatV4Big", HISTORY: "dropChatV4History", SETTINGS: "dropChatV4Settings", POSTS: "dropChatV4Posts",
           TOKEN: "dropChatV4Token", LOG_TOKEN: "dropChatV4LogToken", NAME: "dropChatV4Name", PW: "dropChatV4Pw", PROFILE: "dropChatV4Profile",
-          DEVICE: "dropChatV4Device", PULSE: "dropChatV4Pulse", IAB: "dropChatV4IabClosed" }
+          DEVICE: "dropChatV4Device", PULSE: "dropChatV4Pulse", IAB: "dropChatV4IabClosed", WANT: "dropChatV4Want" }
 };
 
 /* =====================================================================
@@ -544,18 +641,47 @@ const ICON = {
   open: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
 };
 
-/* ---------- キャラクター「ぽとり」（インクのしずく。オリジナル） ---------- */
-const CHAR_SVG = '<svg viewBox="0 0 34 34" aria-hidden="true"><path d="M17 2.5C17 2.5 6 14.6 6 21.2a11 11 0 0 0 22 0C28 14.6 17 2.5 17 2.5z" fill="#6d4bc3"/><path d="M11.2 15.2c1-2.2 2.6-4.4 3.7-5.8" stroke="#fff" stroke-width="1.6" stroke-linecap="round" fill="none" opacity=".45"/><circle cx="13.2" cy="21.2" r="1.9" fill="#fff"/><circle cx="20.8" cy="21.2" r="1.9" fill="#fff"/><circle cx="13.6" cy="21.6" r=".9" fill="#2a1a55"/><circle cx="21.2" cy="21.6" r=".9" fill="#2a1a55"/><path d="M14.6 25.4q2.4 1.9 4.8 0" stroke="#fff" stroke-width="1.5" stroke-linecap="round" fill="none"/><ellipse cx="10.4" cy="24.4" rx="1.5" ry=".9" fill="#f3a6c8" opacity=".75"/><ellipse cx="23.6" cy="24.4" rx="1.5" ry=".9" fill="#f3a6c8" opacity=".75"/></svg>';
+/* ---------- 絵（オリジナル）：案内役「ぽとり」＝DROP の色ガラスのようなしずく／かけら＝八角形の宝石／宝箱 ----------
+   しずくの 5 つの面の色が、5 つの「ことばのかけら」の色（橙＝できごと・桃＝気持ち・黄＝どこが・水＝だれと・緑＝しめ） */
+let ART_N = 0;
+const DROP_PATH = "M20 2.6C20 2.6 7.2 16.4 7.2 25.2a12.8 12.8 0 0 0 25.6 0C32.8 16.4 20 2.6 20 2.6z";
+const FACETS = [["M4 0h32v17.5H4z", "#f39a5f", .82], ["M3 11.5h17.2v19H3z", "#f2a3c2", .78], ["M19.4 11.5H37v19H19.4z", "#f6d35a", .82], ["M3 25.5h18.4V41H3z", "#68c4da", .78], ["M19.2 26.5H37V41H19.2z", "#93c46e", .72]];
+const GEM_COLOR = ["#f08c4e", "#ec8fb1", "#f2c64a", "#4fbcd4", "#72ad48"];
+/** しずく。on：5 つの面のうち色をつける面（省略＝全部）。face：顔（ぽとり） */
+function dropSvg(on, face) {
+  const id = "dc" + (++ART_N), all = !on;
+  const fac = FACETS.map(([d, c, o], i) => (all || on[i] ? "" : `<path d="${d}" fill="#efe3da" opacity=".5"/>`)).join("") + FACETS.map(([d, c, o], i) => (all || on[i] ? `<path d="${d}" fill="${c}" opacity="${o}"/>` : "")).join("");
+  return `<svg width="100%" height="100%" viewBox="0 0 40 40" aria-hidden="true"><defs><clipPath id="${id}"><path d="${DROP_PATH}"/></clipPath></defs><path d="${DROP_PATH}" fill="#fff8f1"/>` +
+    `<g clip-path="url(#${id})" style="mix-blend-mode:multiply">${fac}</g>` + (all ? "" : `<path d="${DROP_PATH}" fill="none" stroke="#e0d1c6" stroke-width=".8"/>`) +
+    `<path d="M12.6 15.4c1.1-2.2 2.6-4.3 3.8-5.7" stroke="#fff" stroke-width="1.9" stroke-linecap="round" fill="none" opacity=".95"/>` +
+    (face ? `<ellipse cx="16.3" cy="25.6" rx="1.45" ry="1.8" fill="#2b211d"/><ellipse cx="23.7" cy="25.6" rx="1.45" ry="1.8" fill="#2b211d"/><circle cx="16.8" cy="25" r=".5" fill="#fff"/><circle cx="24.2" cy="25" r=".5" fill="#fff"/><path d="M18.4 28.9q1.6 1.3 3.2 0" stroke="#2b211d" stroke-width="1.3" stroke-linecap="round" fill="none"/>` : "") + `</svg>`;
+}
+const charSvg = () => dropSvg(null, true);
+/** かけら（八角形の宝石）。st：got（色）／now（いまの部屋）／empty（まだ）／miss（見送り）／rare（レアかけら） */
+function gemSvg(i, st) {
+  const c = st === "rare" ? "#e3a92b" : GEM_COLOR[i] || "#ccc";
+  const oct = "M8.2 2h7.6L22 8.2v7.6L15.8 22H8.2L2 15.8V8.2z", inner = "M9.6 6h4.8L18 9.6v4.8L14.4 18H9.6L6 14.4V9.6z";
+  if (st === "got" || st === "rare") return `<svg width="100%" height="100%" viewBox="0 0 24 24" aria-hidden="true"><path d="${oct}" fill="${c}"/><path d="${inner}" fill="#fff" opacity=".28"/><path d="M8.2 2h7.6L14.4 6H9.6z" fill="#fff" opacity=".45"/><path d="M2 15.8 6 14.4 9.6 18 8.2 22z" fill="#000" opacity=".1"/>${st === "rare" ? '<path d="M12 7.2l1.2 3.6 3.6 1.2-3.6 1.2L12 16.8l-1.2-3.6L7.2 12l3.6-1.2z" fill="#fff"/>' : ""}</svg>`;
+  if (st === "miss") return `<svg width="100%" height="100%" viewBox="0 0 24 24" aria-hidden="true"><path d="${oct}" fill="#e7ddd5"/><path d="M7 12h10" stroke="#b9aaa0" stroke-width="1.6" stroke-linecap="round"/></svg>`;
+  return `<svg width="100%" height="100%" viewBox="0 0 24 24" aria-hidden="true"><path d="${oct}" fill="#fff" stroke="${st === "now" ? c : "#d9c9bd"}" stroke-width="1.6" stroke-dasharray="${st === "now" ? "0" : "2.4 2"}"/><path d="${inner}" fill="${st === "now" ? c : "#efe5de"}" opacity="${st === "now" ? .25 : 1}"/></svg>`;
+}
+function chestSvg(open) {
+  return open
+    ? `<svg width="100%" height="100%" viewBox="0 0 48 42" aria-hidden="true"><path d="M24 1v6M12 5l3 5M36 5l-3 5M5 13l5 3M43 13l-5 3" stroke="#e3a92b" stroke-width="2" stroke-linecap="round"/><path d="M8 20 12 9h24l4 11z" fill="#6a5049"/><path d="M14 19l3-5h4l-2 5zM22 19l2-6h4l1 6zM30 19l1-4h3l1 4z" fill="#f08c4e"/><path d="M22 19l2-6h4l1 6z" fill="#4fbcd4"/><path d="M30 19l1-4h3l1 4z" fill="#ec8fb1"/><path d="M8 20h32v18a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2z" fill="#4e3b38"/><path d="M8 20h32v4H8z" fill="#e3a92b"/><path d="M21 22h6v7h-6z" fill="#f2c64a"/></svg>`
+    : `<svg width="100%" height="100%" viewBox="0 0 48 42" aria-hidden="true"><path d="M8 18c0-7 4-12 16-12s16 5 16 12z" fill="#6a5049"/><path d="M8 18h32v20a2 2 0 0 1-2 2H10a2 2 0 0 1-2-2z" fill="#4e3b38"/><path d="M8 18h32v4H8zM22 6h4v34h-4z" fill="#e3a92b"/><rect x="20.5" y="19" width="7" height="8" rx="1.5" fill="#f2c64a" stroke="#4e3b38" stroke-width="1"/><circle cx="24" cy="23" r="1.2" fill="#4e3b38"/></svg>`;
+}
+const PIN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0 1 13 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.3"/></svg>';
 const LOCK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
 ICON.bulb = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1.1 2h5c.1-.8.5-1.5 1.1-2A6 6 0 0 0 12 3z"/></svg>';
 ICON.swap = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h13l-3-3M20 15H7l3 3"/></svg>';
 
 /* ---------- セリフ（[関西弁, 標準語]。{名前} は差し込み） ---------- */
 const TXT = {
-  hello1: ["まいど！ ことば職人見習いの「ぽとり」やで。写真1枚から、DROP の投稿文を一緒につくろ", "こんにちは！ ことば職人見習いの「ぽとり」です。写真1枚から、DROP の投稿文を一緒につくりましょう"],
-  hello1sub: ["5つの「ことばのかけら」を集めたら完成や。答えは自分のことばでOK。迷ったら「ヒント」も出すで", "5つの「ことばのかけら」を集めたら完成です。答えは自分のことばでOK。迷ったら「ヒント」も出します"],
-  hello2: ["おかえり！ 今日{n}本目、いってみよか", "おかえりなさい！ 今日{n}本目、いってみましょう"],
-  hello2sub: ["写真えらんで、ひとこと書いたら、あとは5つのかけらを集めるだけやで", "写真をえらんで、ひとことを書いたら、あとは5つのかけらを集めるだけです"],
+  hello1: ["まいど！ 案内役の「ぽとり」やで。写真1枚から、DROP の投稿文を一緒につくろ", "こんにちは！ 案内役の「ぽとり」です。写真1枚から、DROP の投稿文を一緒につくりましょう"],
+  hello1sub: ["5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成や。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光るで✦", "5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成です。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光ります✦"],
+  hello2: ["おかえり！ {n}本目の冒険、いってみよか", "おかえりなさい！ {n}本目の冒険、いってみましょう"],
+  hello2sub: ["写真えらんで、ひとこと書いたら、また5つのかけらを集めにいこ", "写真をえらんで、ひとことを書いたら、また5つのかけらを集めにいきましょう"],
+  hello_want: ["☆行ってみるリストに{n}か所あるで。行った先の写真でもつくれるで（右上のメニューから見られる）", "☆行ってみるリストに{n}か所あります。行った先の写真でもつくれます（右上のメニューから見られます）"],
   login_q: ["はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてな。この端末では1回だけやで", "はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてください。この端末では1回だけです"],
   login_sub: ["本名ではなく、ニックネーム（ひらがな）を入れてください。答えは、イベントの効果を確かめる分析にだけ使います", "本名ではなく、ニックネーム（ひらがな）を入れてください。答えは、イベントの効果を確かめる分析にだけ使います"],
   photo_q: ["まずは、投稿する写真を1枚えらんでな（写真なしでもOKやで）", "まずは、投稿する写真を1枚えらんでください（写真なしでも大丈夫です）"],
@@ -567,8 +693,8 @@ const TXT = {
   react_neg: ["「{t}」、正直に教えてくれておおきに。", "「{t}」、正直に教えてくれてありがとうございます。"],
   react_pos: ["「{t}」、ええやん！", "「{t}」、いいですね！"],
   react_neu: ["「{t}」、なるほどな。", "「{t}」、ありがとうございます。"],
-  react_tail: ["ほな、あと{n}つ聞かせてな", "あと{n}つ、聞かせてください"],
-  react_sub: ["答えるたびに、上の「ことばのかけら」がたまっていくで", "答えるたびに、上の「ことばのかけら」がたまっていきます"],
+  react_tail: ["ほな、のこり{n}つのかけらを集めにいこか", "では、のこり{n}つのかけらを集めにいきましょう"],
+  react_sub: ["上の地図で、いまどの部屋にいるか見られるで", "上の地図で、いまどの部屋にいるか見られます"],
   feel_q: ["そのとき、どんな気持ちやった？", "そのとき、どんな気持ちでしたか？"],
   feel_q2: ["「{f}」のほかにも、どんな気持ちやった？", "「{f}」のほかにも、どんな気持ちでしたか？"],
   feel_sub: ["思ったまんまのことばでええで。迷ったら「ヒント」から選んでもOK", "思ったままのことばで大丈夫です。迷ったら「ヒント」から選んでもOKです"],
@@ -584,16 +710,28 @@ const TXT = {
   who_confirm: ["「{t}」やね！ ほな「{l}」で入れとくで", "「{t}」ですね。「{l}」として入れておきます"],
   next_confirm: ["「{t}」やね！ ほな「{l}」の気持ちで入れとくで", "「{t}」ですね。「{l}」として入れておきます"],
   pick_q: ["どれがいちばん近い？", "どれがいちばん近いですか？"],
-  reflect_q: ["ここまでのことばから、1行にしてみたで。言いたかったんって、こういうことちゃう？", "ここまでのことばから、1行にしてみました。言いたかったのは、こういうことですか？"],
+  reflect_q: ["ここまでのかけらを、1行にみがいてみたで。言いたかったんって、こういうことちゃう？", "ここまでのかけらを、1行にみがいてみました。言いたかったのは、こういうことですか？"],
   reflect_sub: ["えらぶと、投稿文の1行になるで。直してから使ってもええよ", "えらぶと、投稿文の1行になります。直してから使ってもOKです"],
-  reflect_wait: ["ことばを練ってるで…", "ことばを考えています…"],
+  reflect_wait: ["かけらをみがいてるで…", "かけらをみがいています…"],
   reflect_ph: ["自分のことばで1行", "自分のことばで1行"],
   next_qp: ["{p}と話して、なんか残ったことある？ この先につながりそうなことでも、今の気持ちでもええで。それで最後の1行つくろか", "{p}と話して、何か残ったことはありますか？ この先につながりそうなことでも、今の気持ちでも大丈夫です。それで最後の1行をつくりましょう"],
   next_qp2: ["{p}と一緒にいて、なんか残ったことある？ この先につながりそうなことでも、今の気持ちでもええで。それで最後の1行つくろか", "{p}と一緒にいて、何か残ったことはありますか？ この先につながりそうなことでも、今の気持ちでも大丈夫です。それで最後の1行をつくりましょう"],
   next_q: ["ほな、しめの1行いこか。今日のこと、このあとどうなったらええなって思う？ 思いつかんかったら、今の気持ちでしめてもええで", "では、しめの1行です。今日のこと、このあとどうなったらいいなと思いますか？ 思いつかなければ、今の気持ちでしめても大丈夫です"],
   next_ph: ["例：次は自分も焼いてみたい、今日はいい日だった", "例：次は自分も焼いてみたい、今日はいい日だった"],
-  opt_intro: ["これで5つのかけらがそろったで！ もう投稿文つくれるで", "これで5つのかけらがそろいました！ もう投稿文をつくれます"],
-  opt_intro_sub: ["よかったら、もうちょっとだけ聞かせて（任意）。見本みたいな投稿に近づくで。いつでも「投稿文をつくる」で終われるで", "よければ、もう少しだけ聞かせてください（任意）。見本のような投稿に近づきます。いつでも「投稿文をつくる」で終われます"],
+  opt_intro: ["もう投稿文つくれるで。よかったら、ひみつの部屋にも寄ってみる？ レアかけらがあると、投稿がもっと光るで（任意）", "もう投稿文をつくれます。よければ、ひみつの部屋にも寄ってみますか？ レアかけらがあると、投稿がもっと光ります（任意）"],
+  opt_intro_sub: ["いつでも「投稿文をつくる」で終われるで", "いつでも「投稿文をつくる」で終われます"],
+  get: ["{p}のかけら、ゲット！", "{p}のかけらをゲット！"],
+  get_rare: ["レアかけら「{p}」、ゲット！", "レアかけら「{p}」をゲット！"],
+  get_miss: ["{p}のかけらは見送り", "{p}のかけらは見送り"],
+  done_p: ["5つのかけらがそろったで。あとは投稿文にみがくだけや", "5つのかけらがそろいました。あとは投稿文にみがくだけです"],
+  done_part: ["{n}色のかけらで、原石ができたで。このままでも投稿文はつくれるで", "{n}色のかけらで、原石ができました。このままでも投稿文はつくれます"],
+  tr_p: ["DROP 完成のおまけや。あなたの答えから、このあとカルチャースナックで楽しめそうなところを選んだで", "DROP 完成のおまけです。あなたの答えから、このあとカルチャースナックで楽しめそうなところを選びました"],
+  tr_sub: ["気になったら行ってみてな。行った先の写真で、もう1本つくれるで", "気になったら行ってみてください。行った先の写真で、もう1本つくれます"],
+  why_kw: ["「{w}」が気になってたあなたに", "「{w}」が気になっていたあなたに"],
+  why_tag: ["「{s}」って答えたあなたに。{t}つながりで", "「{s}」と答えたあなたに。{t}つながりで"],
+  why_tag0: ["{t}が好きそうなあなたに", "{t}が好きそうなあなたに"],
+  why_detour: ["いつもとちがうジャンルに、ちょっと寄り道してみいひん？", "いつもとちがうジャンルに、ちょっと寄り道してみませんか？"],
+  rally: ["みんまちDROP では「{t}」（{p}）もやってるで", "みんまちDROP では「{t}」（{p}）もやっています"],
   find_q: ["今日、なんか発見はあった？", "今日、なにか発見はありましたか？"],
   find_sub: ["投稿の見どころになるで", "投稿の見どころになります"],
   find_ph: ["例：こんな作り方があるんだ", "例：こんな作り方があるんだ"],
@@ -601,7 +739,7 @@ const TXT = {
   face_sub: ["「平日は〇〇、今日は〇〇！」みたいなギャップが、いちばんの見どころになるで", "「平日は〇〇、今日は〇〇！」のようなギャップが、いちばんの見どころになります"],
   face_ph: ["例：平日は隣のビルの経理さん", "例：平日は隣のビルの経理さん"],
   profile_q: ["さいごに、あなたについて教えてな（この端末では1回だけ聞くで）", "さいごに、あなたについて教えてください（この端末では1回だけ聞きます）"],
-  compose_lead: ["おおきに！ 答えをもとに投稿文つくるで", "ありがとうございます！ 答えをもとに投稿文をつくります"],
+  compose_lead: ["おおきに！ 集めたかけらで、投稿文にみがくで", "ありがとうございます！ 集めたかけらで、投稿文にみがきます"],
   compose_lead_early: ["ここまでの答えで、投稿文つくるで", "ここまでの答えで、投稿文をつくります"],
   compose_ok: ["投稿文できたで！", "投稿文ができました"],
   compose_ok_sub: ["行を押すと、言いかえの案が出るで。「自分の言葉の文」に切りかえたり、直接直したりもできるで", "行を押すと、言いかえの案が出ます。「自分の言葉の文」に切りかえたり、直接直したりもできます"],
@@ -616,8 +754,9 @@ const TXT = {
   stamp3: ["3本目！ もう DROP 名人やな。ほかに気になったとこある？", "3本目！ もう DROP 名人です。ほかに気になったところはありますか？"],
   stamp5: ["スタンプそろったで！ たくさんの声、おおきに", "スタンプがそろいました！ たくさんの声をありがとうございます"],
   stampN: ["完成や！ 気づいたことがあったら、もう1本どう？", "完成です！ 気づいたことがあれば、もう1本どうですか？"],
-  pulse_q: ["今日のことで、会社や職場の見え方は変わった？", "今日のことで、会社や職場の見え方は変わりましたか？"],
-  pulse_thanks: ["おおきに！ 参考にさせてもらうで", "ありがとうございます！ 参考にします"],
+  // 運営からの質問（KPI ③など）は、話し方の設定にかかわらず同じ文（答えを比べられるように）
+  pulse_q: ["今日のことで、会社や職場の見え方は変わりましたか？", "今日のことで、会社や職場の見え方は変わりましたか？"],
+  pulse_thanks: ["ありがとうございました。参考にします", "ありがとうございました。参考にします"],
   pii_warn: ["「{w}」は人の名前かもしれへん。名前は入れんといてな", "「{w}」は人の名前かもしれません。名前は入れないでください"],
   pii_copy: ["「{w}」は人の名前かもしれへん。名前やなかったら、もう一度押してな", "「{w}」は人の名前かもしれません。名前でなければ、もう一度押してください"],
   hint_none: ["ヒントはまだ準備中やで。自分のことばで書いてみてな", "ヒントはまだ準備中です。自分のことばで書いてみてください"]
@@ -778,6 +917,22 @@ const STEPS = [
   { id: "profile", kind: "single", opts: "profile", count: false,
     when: () => CONFIG.ASK_PROFILE && !LS.get(CONFIG.KEYS.PROFILE, null), q: () => T("profile_q") }
 ];
+/* 部屋（ダンジョン）：5 つの部屋をまわって、ことばのかけらを集める。任意の問いは「ひみつの部屋」でレアかけら */
+const ROOM = {
+  text1: { i: 0, name: "はじまりの広場", piece: "できごと" },
+  feel: { i: 1, name: "こころの泉", piece: "気持ち" },
+  why: { i: 2, name: "虫めがねの小道", piece: "どこが" },
+  who: { i: 3, name: "であいの回廊", piece: "だれと" },
+  reflect: { name: "みがきの間", piece: "" },
+  next: { i: 4, name: "とびらの前", piece: "しめ" },
+  find: { rare: true, name: "ひみつの部屋", piece: "発見" },
+  face: { rare: true, name: "ひみつの部屋", piece: "その人のB面" }
+};
+/** キラかけら：自分のことばで答えた（ひとことは全員自分のことばなので数えない） */
+const isKira = id => id !== "text1" && !!String((S && S.own && S.own[id]) || "").trim() && !!S && !S.skipped.includes(id);
+const kiraCount = () => ["feel", "why", "who", "next", "find", "face"].filter(id => S.done.includes(id) && isKira(id)).length;
+const rareCount = () => ["find", "face"].filter(id => S.done.includes(id) && !S.skipped.includes(id)).length;
+function buzz() { try { if (navigator.vibrate && !matchMedia("(prefers-reduced-motion:reduce)").matches) navigator.vibrate(18); } catch (e) {} }
 const STEP_LABEL = { login: "ログイン", photo: "写真", text1: "ひとこと", who: "だれと", why: "どこが", feel: "気持ち", score: "点数", reflect: "そうそう", find: "今日の発見", face: "その人のふだん", next: "しめ", profile: "あなたについて" };
 /** 「その人のふだん」を聞くのは、作った人・ちがう会社・近所の人と話したとき、または「意外な一面」を見つけたとき */
 function faceNeeded() {
@@ -802,22 +957,47 @@ function answeredCount() { return S.done.filter(id => { const st = stepOf(id); r
 function renderMsgs() {
   const box = $("msgs"), n = S.msgs.length;
   box.innerHTML = S.msgs.map((m, i) => msgHtml(m, (RT.rendered > 0 && i >= RT.rendered) || (RT.rendered === 0 && i === n - 1))).join("") +
-    (RT.typing ? `<div class="msg bot typing"><div class="avatar">${CHAR_SVG}</div><div class="bubble"><i></i><i></i><i></i>${RT.typingText ? `<em>${esc(RT.typingText)}</em>` : ""}</div></div>` : "");
+    (RT.typing ? `<div class="msg bot typing"><div class="avatar">${charSvg()}</div><div class="bubble"><i></i><i></i><i></i>${RT.typingText ? `<em>${esc(RT.typingText)}</em>` : ""}</div></div>` : "");
   RT.rendered = n;
-  bindCards(); renderProgress(); scrollEnd();
+  bindCards(); renderProgress(); if (!RT.noScroll) scrollEnd();
 }
 function msgHtml(m, isNew) {
   if (m.qid && S.phase === "ask" && m.qid === S.cur && !S.done.includes(m.qid)) return "";   // いまの問いは回答シートの頭に出す
   const cls = "msg " + m.who + (isNew ? " new" : "");
   if (m.notice) return `<div class="notice" role="note">${LOCK_SVG}<span><b>おねがい：</b>${esc(PII_NOTICE)}</span></div>`;
+  if (m.who === "sys") return sysHtml(m, isNew);
   if (m.who === "me") {
     if (m.photo) return `<div class="${cls}"><div class="bubble photo">${PHOTO.img ? `<img src="${esc(PHOTO.img)}" alt="えらんだ写真">` : '<span class="nophoto">写真（この画面では表示できません）</span>'}</div></div>`;
     return `<div class="${cls}"><div class="bubble${m.muted ? " muted" : ""}">${esc(m.text)}</div></div>`;
   }
-  const av = `<div class="avatar">${CHAR_SVG}</div>`;
+  const av = `<div class="avatar">${charSvg()}</div>`;
   if (m.card === "compose") return `<div class="${cls} wide">${composeCardHtml()}</div>`;
   if (m.card === "stamp") return `<div class="${cls} wide">${stampCardHtml()}</div>`;
+  if (m.card === "treasure") return `<div class="${cls} wide">${treasureCardHtml()}</div>`;
+  if (m.card === "survey") return `<div class="${cls} wide">${surveyCardHtml()}</div>`;
   return `<div class="${cls}">${av}<div class="bubble">${esc(m.text)}${m.sub ? `<span class="sub">${esc(m.sub)}</span>` : ""}</div></div>`;
+}
+/** 運営からのお知らせ・部屋に入る・かけらゲット・原石の完成（キャラにしゃべらせない表示） */
+function sysHtml(m, isNew) {
+  if (m.ann) return `<div class="notice ann" role="note"><b>${esc(m.ann)}</b>${m.sub ? `<small>${esc(m.sub)}</small>` : ""}</div>`;
+  if (m.room) {
+    const r = ROOM[m.room]; if (!r) return "";
+    const icon = r.i != null ? gemSvg(r.i, "now") : r.rare ? gemSvg(0, "rare") : ICON.spark;
+    return `<div class="room${r.rare ? " secret" : ""}"><span>${icon}${esc(r.name)}${r.piece ? `<small>${esc(r.piece)}のかけら</small>` : "<small>かけらをみがく</small>"}</span></div>`;
+  }
+  if (m.get) {
+    const r = ROOM[m.get]; if (!r) return "";
+    if (m.miss) return `<div class="get miss"><span class="get-in">${gemSvg(r.i, "miss")}${esc(T("get_miss", { p: r.piece }))}</span></div>`;
+    return `<div class="get${isNew ? " new" : ""}" role="status"><span class="get-in">${r.rare ? gemSvg(0, "rare") : gemSvg(r.i, "got")}${esc(T(r.rare ? "get_rare" : "get", { p: r.piece }))}${m.kira ? '<em title="自分のことばで答えました">✦キラ</em>' : ""}</span></div>`;
+  }
+  if (m.done) {
+    const on = PIECES.map(([id]) => pieceOn(id)), n = on.filter(Boolean).length, k = kiraCount(), rr = rareCount();
+    return `<div class="done-card${isNew ? " new" : ""}" role="status"><span class="big">${dropSvg(n === 5 ? null : on, false)}</span>
+      <h3>${n === 5 ? "DROP の原石、完成！" : "DROP の原石"}</h3><p>${esc(n === 5 ? T("done_p") : T("done_part", { n }))}</p>
+      <div class="bag">${PIECES.map(([id], i) => gemSvg(i, pieceOn(id) ? "got" : "miss")).join("")}${Array.from({ length: rr }, () => gemSvg(0, "rare")).join("")}</div>
+      ${k ? `<p style="font-size:12.5px">自分のことばで答えたキラかけら ✦×${k}</p>` : ""}</div>`;
+  }
+  return "";
 }
 function scrollEnd() { requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" })); }
 const PROG_STEPS = ["text1", "feel", "why", "who", "next"];   // 5 つのかけら
@@ -826,9 +1006,16 @@ const pieceOn = id => !!S && S.done.includes(id) && !S.skipped.includes(id);
 function renderProgress() {
   const done = PIECES.filter(([id]) => pieceOn(id)).map(([id]) => id);
   const fresh = RT.lastPieces ? done.filter(id => !RT.lastPieces.includes(id)) : [];
-  $("pieces").innerHTML = PIECES.map(([id, l]) => `<i class="${pieceOn(id) ? "on" : S && S.phase === "ask" && S.cur === id ? "now" : ""}${fresh.includes(id) ? " pop" : ""}" title="${esc(l)}${pieceOn(id) ? "（そろった）" : ""}">${esc(l)}</i>`).join("");
-  $("pvBar").setAttribute("aria-label", `ことばのかけら ${done.length}/5（押すと、いまの投稿イメージ）`);
-  $("pvOpen").classList.toggle("off", !(S && S.done.includes("text1")));
+  const cur = S && S.phase === "ask" ? S.cur : null;
+  const last = PIECES.reduce((k, [id], i) => (S && S.done.includes(id) ? i : k), -1);   // 道をどこまで進んだか
+  $("pieces").innerHTML = `<span class="walk" style="width:${Math.max(0, last) * 20}%"></span>` + PIECES.map(([id, l], i) => {
+    const got = pieceOn(id), miss = !!S && S.done.includes(id) && S.skipped.includes(id), now = cur === id;
+    return `<span class="node${got ? " got" : ""}${now ? " now" : ""}${fresh.includes(id) ? " pop" : ""}"><span class="gem">${gemSvg(i, got ? "got" : miss ? "miss" : now ? "now" : "empty")}</span>${got && isKira(id) ? '<b class="kira" aria-hidden="true">✦</b>' : ""}<i>${esc(l)}</i></span>`;
+  }).join("");
+  const el = $("pvOpen");
+  el.className = "chest" + (done.length === PIECES.length ? " full" : "");
+  el.innerHTML = `${chestSvg(!!S && S.phase === "compose")}<i>DROP</i>`;
+  $("pvBar").setAttribute("aria-label", `ことばのかけらの地図：${done.length ? done.map(id => ROOM[id].piece).join("・") + "のかけらを集めた" : "まだかけらはありません"}（押すと、いまの投稿イメージ）`);
   RT.lastPieces = done;
 }
 const renderPreviewBar = renderProgress;
@@ -908,8 +1095,8 @@ function openPreview() {
   openSheet("いまの投稿イメージ", `
     <p>答えるたびに、あなたの投稿がこう育っていきます。最後に AI が読みやすく整えます（AI の文と、自分の言葉の文は、あとで見比べて選べます）。</p>
     <div class="draft">${esc(S.phase === "compose" ? finalText() : composeText())}</div>
-    <div class="sec-h">そろったかけら（${n} / ${MATERIALS.length}）</div>
-    <div class="mat">${MATERIALS.map(m => `<span class="${m.done() ? "on" : ""}"><i>${m.done() ? "✓" : "・"}</i>${esc(m.label)}</span>`).join("")}</div>
+    <div class="sec-h">集めたかけら</div>
+    <div class="mat">${MATERIALS.map((m, i) => `<span class="${m.done() ? "on" : ""}">${i < 5 ? gemSvg(i, m.done() ? "got" : "empty") : gemSvg(0, m.done() ? "rare" : "empty")}${esc(m.label)}</span>`).join("")}</div>
     <p style="margin-top:8px;font-size:13.5px">全部そろわなくても大丈夫です。いつでも「ここで投稿文へ」で終われます。</p>
     <div class="row"><button type="button" class="btn ghost wide" id="shEx">ほかの人の例</button><button type="button" class="btn wide" id="shBack">チャットにもどる</button></div>
     <div id="shExList"></div>`);
@@ -961,10 +1148,12 @@ async function ask(st) {
     markDone(st); if (!S.skipped.includes(st.id)) S.skipped.push(st.id); save();
     return advance(st.id, g);
   }
-  if (st.optional && !S.optIntro) {   // 5 つのかけらがそろったことを伝えてから、そのまま任意の問いへ
+  if (st.optional && !S.optIntro) {   // 原石ができたことを伝えてから、そのまま任意の問い（ひみつの部屋）へ
     S.optIntro = true;
+    showDone();
     if (!await bot(T("opt_intro"), { sub: T("opt_intro_sub") })) return;
   }
+  enterRoom(st.id);
   if (st.opts) prepareOrder(st);
   setSelFromAns(st);
   RT.confirm = null; RT.reflectEdit = null;
@@ -978,10 +1167,26 @@ async function advance(fromId, g = RT.gen) {
   const n = nextStepAfter(fromId);
   if (n) await ask(n); else await toCompose(false);
 }
+/** 部屋に入る（1 回だけ区切りを出す） */
+function enterRoom(id) {
+  if (!ROOM[id] || (S.rooms || []).includes(id)) return;
+  S.rooms = (S.rooms || []).concat(id); S.msgs.push({ who: "sys", room: id }); renderMsgs();
+}
+/** かけらゲット（自分のことばならキラ✦）／見送り */
+function gotPiece(id, miss) {
+  const r = ROOM[id]; if (!r || (r.i == null && !r.rare)) return;
+  if (miss) { if (r.i != null) S.msgs.push({ who: "sys", get: id, miss: true }); return; }
+  S.msgs.push({ who: "sys", get: id, kira: isKira(id) }); buzz();
+}
+/** DROP の原石（5 つのかけら）。任意の問いの前、または投稿文の前に 1 回だけ */
+function showDone() {
+  if (S.doneShown || !PIECES.some(([id]) => pieceOn(id))) return;
+  S.doneShown = true; S.msgs.push({ who: "sys", done: true }); renderMsgs(); save();
+}
 function markDone(st) { if (!S.done.includes(st.id)) S.done.push(st.id); const t = S.times[st.id]; if (t) t.answered = now(); }
 async function answered(st, display, extra) {
   markDone(st); S.skipped = S.skipped.filter(x => x !== st.id);
-  if (display != null) me(display, extra);
+  if (display != null) { S.msgs.push({ who: "me", text: display, ...(extra || {}) }); gotPiece(st.id); renderMsgs(); save(); }
   if (st.id === "why") fireReflect();   // 「だれと」に答えているあいだに「そうそう！」を用意する
   lockDock(); await advance(st.id);
 }
@@ -990,7 +1195,7 @@ async function skipStep(st) {
   if (st.id === "profile") LS.set(CONFIG.KEYS.PROFILE, { id: "none", label: "答えない" });
   if (st.id === "reflect" && S.reflect) S.reflect.how = "とばした";
   if (!S.skipped.includes(st.id)) S.skipped.push(st.id);
-  markDone(st); me("とばす", { muted: true });
+  markDone(st); S.msgs.push({ who: "me", text: "とばす", muted: true }); gotPiece(st.id, true); renderMsgs(); save();
   if (st.id === "why") fireReflect();
   lockDock(); await advance(st.id);
 }
@@ -1025,10 +1230,14 @@ function setSelFromAns(st) {
 }
 
 /* ---------- 回答エリア ---------- */
+/** 問いの頭：いまの部屋（かけらの色）。数（1/5 など）は出さない */
 function stepBadge(st) {
-  const core = PROG_STEPS.indexOf(st.id);
-  return st.optional ? '<span class="q-step opt">任意</span>' : core >= 0 ? `<span class="q-step">かけら ${core + 1}/${PROG_STEPS.length}</span>`
-    : st.id === "reflect" ? '<span class="q-step">そうそう！</span>' : st.id === "profile" ? '<span class="q-step opt">さいごに</span>' : "";
+  const r = ROOM[st.id];
+  if (r && r.i != null) return `<span class="q-step">${gemSvg(r.i, "now")}${esc(r.name)}</span>`;
+  if (r && r.rare) return `<span class="q-step opt">${gemSvg(0, "rare")}${esc(r.name)}（任意）</span>`;
+  if (st.id === "reflect") return `<span class="q-step">${ICON.spark}${esc(r.name)}</span>`;
+  if (st.id === "profile") return '<span class="q-step">さいごに</span>';
+  return "";
 }
 function renderDock() {
   if (!S) return;
@@ -1041,8 +1250,8 @@ function renderDock() {
   const badge = stepBadge(st);
   const ins = { text: st.required ? "必ず書いてください（短くてOK）" : "", photo: "1枚えらぶ", scale: "1〜10", login: "この端末で1回だけ", single: "1つえらぶ", free: "自分のことばで", reflect: "1つえらぶ" }[st.kind] || "";
   const qm = [...S.msgs].reverse().find(m => m.qid === st.id);
-  const head = `<div class="q-meta">${badge}<span class="q-ins">${esc(ins)}</span>${canExit ? `<button type="button" class="lnk" id="dExit">ここで投稿文へ</button>` : ""}</div>
-    ${qm ? `<div class="q-title">${esc(qm.text)}</div>${qm.sub ? `<div class="q-sub">${esc(qm.sub)}</div>` : ""}` : ""}`;
+  const head = `<div class="q-card"><div class="avatar">${charSvg()}</div><div class="qc"><div class="q-meta">${badge}<span class="q-ins">${esc(ins)}</span>${canExit ? `<button type="button" class="lnk" id="dExit">ここで投稿文へ</button>` : ""}</div>
+    ${qm ? `<div class="q-title">${esc(qm.text)}</div>${qm.sub ? `<div class="q-sub">${esc(qm.sub)}</div>` : ""}` : ""}</div></div>`;
   const mini = `${badge}<span class="mq">${esc(qm ? qm.text : stepName(st.id))}</span><span class="mo">答える ▲</span>`;
   const skipBtn = `<button type="button" class="btn text" id="dSkip">とばす</button>`;
   const tile = (o, on, mark) => `<button type="button" class="chip${on ? " on" : ""}${o.ai ? " ai" : ""}${String(o.label).length > 10 ? " wide" : ""}" data-id="${esc(o.id)}" aria-pressed="${!!on}"><span>${o.ai ? `<small>${hasPhoto() ? "写真から" : "AIの案"}</small>` : ""}${esc(o.label)}</span>${mark || ""}</button>`;
@@ -1061,10 +1270,10 @@ function renderDock() {
     const c = RT.confirm, labs = c.picks.map(id => (item(st.opts, id) || {}).label).filter(Boolean);
     const short = c.text.length > 16 ? c.text.slice(0, 15) + "…" : c.text;
     if (c.mode === "confirm") {
-      html = `<div class="confirm">${esc(T(st.id === "who" ? "who_confirm" : "next_confirm", { t: short, l: labs.join("」「") }))}</div>`;
+      html = `<div class="say"><div class="avatar">${charSvg()}</div><p>${esc(T(st.id === "who" ? "who_confirm" : "next_confirm", { t: short, l: labs.join("」「") }))}</p></div>`;
       act = `<div class="row"><button type="button" class="btn ghost wide" id="dNo">ちがう</button><button type="button" class="btn wide" id="dYes">OK</button></div>`;
     } else {
-      html = `<div class="confirm">「${esc(short)}」──${esc(T("pick_q"))}</div><div class="chips" style="margin-top:10px">${V[st.opts].filter(x => !x.hidden).map(o => { const k = c.picks.indexOf(o.id); return tile(o, k >= 0, k >= 0 ? `<span class="ck">✓</span>` : ""); }).join("")}</div><div class="hint" id="dMax" hidden>${st.max > 1 ? `選べるのは${st.max}つまでです` : ""}</div>`;
+      html = `<div class="say"><div class="avatar">${charSvg()}</div><p>「${esc(short)}」──${esc(T("pick_q"))}</p></div><div class="chips" style="margin-top:10px">${V[st.opts].filter(x => !x.hidden).map(o => { const k = c.picks.indexOf(o.id); return tile(o, k >= 0, k >= 0 ? `<span class="ck">✓</span>` : ""); }).join("")}</div><div class="hint" id="dMax" hidden>${st.max > 1 ? `選べるのは${st.max}つまでです` : ""}</div>`;
       act = `<div class="row"><button type="button" class="btn text" id="dBack">書きなおす</button><button type="button" class="btn wide" id="dYes" ${c.picks.length ? "" : "disabled"}>次へ</button></div>`;
     }
   } else if (st.kind === "free") {
@@ -1088,7 +1297,7 @@ function renderDock() {
       act = `<div class="row"><button type="button" class="btn text" id="dBack">もどる</button></div>`;
     } else {
       html = `<div class="chips">${opts.map((o, i) => `<button type="button" class="chip wide" data-i="${i}"><span>${esc(o)}</span></button>`).join("")}</div>`;
-      act = `<div class="row"><button type="button" class="btn ghost wide sm" id="dOwn">直して使う・自分で書く</button><button type="button" class="btn ghost wide sm" id="dNone">どれもちがう</button></div>`;
+      act = `<div class="row"><button type="button" class="btn ghost wide sm" id="dOwn">自分で直す</button><button type="button" class="btn ghost wide sm" id="dNone">どれもちがう</button></div>`;
     }
   } else if (st.kind === "single") {
     html = `<div class="chips">${optionsOf(st).map(o => tile(o, false)).join("")}</div><div id="dFreeBox"></div>`;
@@ -1157,7 +1366,7 @@ function bindDock(st) {
       if (!v || !await piiGate(v)) return;
       if (st.id === "text1") {
         S.ans.text1 = v; S.det = detect(v);
-        markDone(st); me(v); lockDock();
+        markDone(st); S.msgs.push({ who: "me", text: v }); gotPiece("text1"); renderMsgs(); save(); lockDock();
         fireHint();   // 裏で AI のヒント（待たない）
         const g = RT.gen, d = S.det, short = v.length > 22 ? v.slice(0, 21) + "…" : v;
         const neg = d.negCue || d.feels.some(id => { const it = item("feel", id) || {}; return it.negative || (typeof it.val === "number" && it.val < 0); });
@@ -1440,6 +1649,7 @@ function finalText() {
 }
 async function toCompose(early) {
   const g = RT.gen;
+  showDone();
   S.phase = "compose"; S.cur = null; S.early = !!early;
   S.composed = composeText();
   S.msgs = S.msgs.filter(m => m.card !== "compose");
@@ -1478,7 +1688,7 @@ function composeCardHtml() {
   return `<div class="card" id="composeCard">
     <div class="card-hd"><span class="post-label">あなたの投稿</span><span class="cnt" style="margin-left:auto;font-size:12.5px;color:var(--dim)">このままコピーして DROP へ</span></div>
     ${tabs}
-    ${ds.length ? `<div class="row" style="margin:0 0 8px"><button type="button" class="lnk" id="cCompare" style="padding:4px 2px">${RT.compare ? "1つずつ見る" : `ならべて見る（${keys.length}つ）`}</button></div>` : ""}
+    ${ds.length || canMoreAI() ? `<div class="ai-more">${ds.length ? `<button type="button" class="lnk" id="cCompare">${RT.compare ? "1つずつ見る" : `ならべて見る（${keys.length}つ）`}</button>` : ""}${canMoreAI() ? `<button type="button" class="btn ghost sm" id="cMore" style="margin-left:auto">${ICON.spark}AI でもう一案（あと${CONFIG.AI_MAX - ds.length}回）</button>` : ""}</div>` : ""}
     ${RT.compare ? compare : `${PHOTO.img ? `<img class="post-photo" src="${esc(PHOTO.img)}" alt="えらんだ写真">` : ""}
     ${lineMode ? lines : `<textarea id="cText" rows="5" maxlength="${CONFIG.MAX_FINAL}" aria-label="投稿文（タップして直せます）">${esc(bodyOf(S.chosen))}</textarea>`}
     <div class="card-foot"><span class="cnt" id="cCnt">${len} 字${lineMode ? "・行を押すと言いかえ" : "・文をタップして直せます"}</span>${lineMode ? `<button type="button" class="lnk" id="cEdit" style="padding:4px 2px">文を直接直す</button>` : d && isEdited() ? `<button type="button" class="lnk" id="cUndo" style="padding:4px 2px">直す前にもどす</button>` : ""}<label class="switch"><input type="checkbox" id="cTagsOn" ${S.tagsOn ? "checked" : ""}>ハッシュタグ</label></div>
@@ -1487,7 +1697,7 @@ function composeCardHtml() {
   </div>`;
 }
 function bindCards() {
-  bindRate();
+  bindRate(); bindTreasure();
   const ta = $("cText");
   if (ta) {
     const grow = () => { ta.style.height = "auto"; ta.style.height = Math.max(140, ta.scrollHeight) + "px"; };
@@ -1499,6 +1709,7 @@ function bindCards() {
   document.querySelectorAll("#composeCard .seg button").forEach(b => b.addEventListener("click", () => { if (S.chosen === b.dataset.v) return; S.chosen = b.dataset.v; RT.lineOpen = -1; RT.editAI = false; refreshCompose(); }));
   document.querySelectorAll("#composeCard [data-pick]").forEach(b => b.addEventListener("click", () => { S.chosen = b.dataset.pick; RT.compare = false; RT.lineOpen = -1; RT.editAI = false; refreshCompose(); toast(tabLabel(S.chosen) + " にしました"); }));
   const cmp = $("cCompare"); if (cmp) cmp.addEventListener("click", () => { RT.compare = !RT.compare; refreshCompose(); });
+  const more = $("cMore"); if (more) more.addEventListener("click", () => redoAI(true));
   document.querySelectorAll("#cLines [data-ln]").forEach(b => b.addEventListener("click", () => {
     const i = Number(b.dataset.ln), d = chosenDraft(); if (!d) return;
     if (b.dataset.alt != null) { const j = Number(b.dataset.alt); if ((d.sel[i] || 0) !== j) { d.sel[i] = j; S.lineSwaps = (S.lineSwaps || 0) + 1; } RT.lineOpen = -1; }
@@ -1511,6 +1722,8 @@ function bindCards() {
   const tg = $("cTagsOn"); if (tg) tg.addEventListener("change", () => { S.tagsOn = tg.checked; if (S.tagsOn) S.tagOff = []; refreshCompose(); });
 }
 function refreshCompose() { const card = $("composeCard"); if (card) { card.outerHTML = composeCardHtml(); bindCards(); } save(); renderStaff(); }
+/** AI の案をもう 1 つ作れるか（コピーしたあとも作れる。前の案は残して見比べる） */
+const canMoreAI = () => gasOn() && (S.drafts || []).length > 0 && !S.aiStale && (S.drafts || []).length < CONFIG.AI_MAX && !RT.aiWait;
 function renderComposeDock() {
   const mini = `<span class="mq">投稿文</span><span class="mo">ひらく ▲</span>`;
   if (RT.aiWait) { dock(`<div class="wait"><span class="spin"></span><span>AI が投稿文を整えています… <b id="aiSec">0</b> 秒</span></div>`, "", "", mini); return; }
@@ -1522,15 +1735,15 @@ function renderComposeDock() {
   }
   const n = (S.drafts || []).length, left = CONFIG.AI_MAX - n;
   const canRedo = gasOn() && left > 0 && (S.aiOk === false || S.aiStale);
-  const canMore = gasOn() && n > 0 && !S.aiStale && left > 0;   // AI の案ができたあと「もう一案」（前の案は残して見比べる）
+  const canMore = canMoreAI();   // AI の案ができたあと「もう一案」（前の案は残して見比べる。コピーしたあとも）
   const rest = remainingSteps().filter(st => st.id !== "profile");
-  if (S.copied) {   // コピーしたあと：いちばん目立つボタンを「次の 1 本」に
+  if (S.copied) {   // コピーしたあと：いちばん目立つボタンを「次の 1 本」に。AI の案はコピーのあとも足せる
+    const same = S.copiedText === finalText();
     dock(`<button type="button" class="btn full" id="dNext">${ICON.camera}次の写真で、もう1本つくる</button>
-      <div class="row"><button type="button" class="btn ghost wide sm" id="dCopy">${ICON.copy}もう一度コピー</button>${CONFIG.DROP_URL ? `<a class="btn ghost wide sm" href="${esc(CONFIG.DROP_URL)}" target="_blank" rel="noopener">${ICON.open}DROP を開く</a>` : ""}</div>
-      <div class="row center"><button type="button" class="lnk" id="dEx">ほかの人の例</button></div>`, "", "", mini);
+      <div class="row"><button type="button" class="btn ghost wide sm" id="dCopy">${ICON.copy}${same ? "もう一度コピー" : "この文をコピー"}</button>${canMore ? `<button type="button" class="btn ghost wide sm" id="dAI2">${ICON.spark}AI でもう一案<small style="font-size:11.5px;color:var(--dim)">あと${left}</small></button>` : ""}${CONFIG.DROP_URL ? `<a class="btn ghost wide sm" href="${esc(CONFIG.DROP_URL)}" target="_blank" rel="noopener">${ICON.open}DROP を開く</a>` : ""}</div>`, "", "", `<span class="mq">次の1本・コピー・AI でもう一案</span><span class="mo">ひらく ▲</span>`);
     $("dNext").addEventListener("click", () => restart());
     $("dCopy").addEventListener("click", copyFinal);
-    $("dEx").addEventListener("click", openExamples);
+    const m2 = $("dAI2"); if (m2) m2.addEventListener("click", () => redoAI(true));
     return;
   }
   dock(`<button type="button" class="btn full" id="dCopy">${ICON.copy}コピーして DROP に投稿へ</button>
@@ -1549,6 +1762,7 @@ function renderComposeDock() {
 }
 async function redoAI(another) {
   if (RT.busy || RT.aiWait) return;
+  if (another && !canMoreAI()) { toast(`AI の案は ${CONFIG.AI_MAX} つまでです`); return; }
   S.msgs = S.msgs.filter(m => m.card !== "compose");
   RT.forceAI = !!another;   // 同じ答えでも別の案になるよう、GAS のキャッシュを使わない
   me(another ? "AI でもう一案" : "AI で整え直す", { muted: true }); lockDock();
@@ -1569,15 +1783,19 @@ function stampCardHtml() {
   const ps = postStats(), n = S.postNo || ps.n, tot = S.postTotal || ps.total, k = ((Math.max(n, 1) - 1) % STAMP_SLOTS) + 1, round = Math.ceil(Math.max(n, 1) / STAMP_SLOTS);
   const enc = n === 1 ? T("stamp1") : k === STAMP_SLOTS ? T("stamp5") : n === 3 ? T("stamp3") : T("stampN");
   const d = chosenDraft(), head = d && d.result && d.result.headline ? d.result.headline : "";
-  return `<div class="card stamp"><div class="card-hd"><b>今日の投稿スタンプ${round > 1 ? `（${round}枚目）` : ""}</b><span class="stamp-n">今日${n}本・通算${tot}本</span></div>
-    <div class="stamps" role="img" aria-label="${STAMP_SLOTS}つのうち${k}つ">${Array.from({ length: STAMP_SLOTS }, (_, i) => `<i class="${i < k ? "on" : ""}">${i < k ? i + 1 + (round - 1) * STAMP_SLOTS : ""}</i>`).join("")}</div>
-    <p class="stamp-msg">${esc(enc)}</p>${head ? `<p class="stamp-ai"><span>ぽとり</span>${esc(head)}</p>` : ""}${pulseHtml()}${rateHtml()}</div>`;
+  return `<div class="card stamp"><div class="card-hd"><b>本日の DROP${round > 1 ? `（${round}列目）` : ""}</b><span class="stamp-n">本日${n}本・通算${tot}本</span></div>
+    <div class="stamps" role="img" aria-label="本日${n}本">${Array.from({ length: STAMP_SLOTS }, (_, i) => `<i class="${i < k ? "on" : ""}">${i < k ? dropSvg(null, false) : ""}</i>`).join("")}</div>
+    <p class="stamp-msg">${esc(enc)}</p>${head ? `<div class="stamp-ai"><span class="avatar">${charSvg()}</span><span>${esc(head)}</span></div>` : ""}</div>`;
+}
+/** 運営からの質問（任意）：会社や職場の見え方（KPI ③。1 日 1 回）・使いごこち。宝箱を開けた（またはとばした）あとに出す */
+function surveyCardHtml() {
+  return `<div class="card survey"><div class="card-hd"><b>運営からの質問</b><span class="cnt" style="margin-left:auto;font-size:12.5px;color:var(--dim)">任意</span></div>${pulseHtml()}${rateHtml()}</div>`;
 }
 /* ---------- 会社や職場の見え方（KPI ③。コピーのあと 1 日 1 回・1 タップ） ---------- */
 const PULSE_OPTS = ["変わった", "少し変わった", "変わらない", "わからない"];
 function pulseHtml() {
   if (!S.pulseAsk) return "";
-  if (S.companyView) return `<div class="rate"><p class="rate-done">${esc(T("pulse_thanks"))}</p></div>`;
+  if (S.companyView) return `<div class="rate"><p class="rate-done">「${esc(S.companyView)}」${esc(T("pulse_thanks"))}</p></div>`;
   return `<div class="rate"><p class="rate-q">${esc(T("pulse_q"))}<small>1日1回・1タップ</small></p><div class="pulse-btns">${PULSE_OPTS.map(v => `<button type="button" data-pulse="${v}">${v}</button>`).join("")}</div></div>`;
 }
 /* ---------- このチャットの使いごこち（5 段階・任意）と運営へのひとこと ---------- */
@@ -1610,7 +1828,7 @@ function bindRate() {
     S.ratingComment = v; S.ratingSent = true; save(); refreshStamp(); sendLog("feedback"); toast("送りました。ありがとうございました");
   });
 }
-function refreshStamp() { const el = document.querySelector(".card.stamp"); if (el) { el.outerHTML = stampCardHtml(); bindRate(); } }
+function refreshStamp() { const el = document.querySelector(".card.survey"); if (el) { el.outerHTML = surveyCardHtml(); bindRate(); } }
 async function copyFinal() {
   const text = finalText();
   if (!text) { toast("文が空です"); return; }
@@ -1622,7 +1840,7 @@ async function copyFinal() {
   catch (e) { try { const t = document.createElement("textarea"); t.value = text; t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select(); ok = document.execCommand("copy"); t.remove(); } catch (e2) {} }
   if (!ok) { toast("コピーできませんでした。文を長押ししてコピーしてください"); return; }
   const first = !S.copied;
-  S.copied++;
+  S.copied++; S.copiedText = text;
   if (first) {
     const p = countPost(); S.postNo = p.n; S.postTotal = p.total;
     S.pulseAsk = LS.get(CONFIG.KEYS.PULSE, "") !== jstDate();   // 会社の見え方は 1 日 1 回だけ聞く
@@ -1630,11 +1848,151 @@ async function copyFinal() {
   save();
   if (first) {
     await bot(T("copied"));
-    await bot(`今日${S.postNo}本目（通算${S.postTotal}本目）です。`, { sub: "※この端末でコピーした投稿の数" });
-    S.msgs.push({ who: "bot", card: "stamp" }); renderMsgs(); save();
+    // 本数は運営からのお知らせ（キャラにしゃべらせない）。そのあと「本日の DROP」→ おまけの宝箱 →（開けたら）運営からの質問
+    S.msgs.push({ who: "sys", ann: `本日${S.postNo}本目（通算${S.postTotal}本目）です。`, sub: "※この端末でコピーした投稿の数" });
+    S.msgs.push({ who: "bot", card: "stamp" });
+    if (CONFIG.RECOMMEND_ON && CS.items.length) { S.rec = S.rec || newRec(); S.msgs.push({ who: "bot", card: "treasure" }); }
+    else S.msgs.push({ who: "bot", card: "survey" });
+    renderMsgs(); save();
   } else toast("コピーしました");
   renderComposeDock();
   sendLog("copy");
+}
+
+/* =====================================================================
+   おまけ：ごほうびの宝箱（このあとカルチャースナックで楽しめそうなところ）
+   - json/cs_contents.json（運営の「掲載コンテンツ一覧」から作った）から、答えに合わせて 3 つ：
+     ど真ん中（答えにいちばん合う）／ちょい冒険（いつもとちがうジャンル。挑戦のきっかけ）／B面の人に会う（ふだんは別の顔の人のお店・ステージ）
+   - 当てはめ：気持ち・どこが・だれと・しめ・発見の答え（自分のことばは AI が当てはめた区分も）と、AI の読み取り（行動・コンテンツ）→ タグの重み
+     書いたことばに、コンテンツと同じことば（コーヒー・ジャズ など）があれば強く当てはめる
+   - さっき行ったところ（タイトルのことばがひとことにある）は出さない。「学生」の人にお酒は出さない。日付の決まったものはその日だけ
+   - AI は呼ばない（すぐ出る・費用がかからない）。並びはセッションごとに決まる（開きなおしても同じ）。「ほかの宝もみる」は 2 回まで
+===================================================================== */
+let CS = { items: [], stamp_rally: null };
+const REC_KIND = { fit: { label: "ど真ん中", color: "var(--g1)" }, detour: { label: "ちょい冒険", color: "var(--g4)" }, bmen: { label: "B面の人に会う", color: "var(--g2)" } };
+const SIG = {
+  feel: { oishii: "eat sweets drink", tanoshii: "play make perform music", kawaii: "cute craft", sugoi: "craft perform art make", kirei: "art craft nature", hokkori: "sweets drink kids craft scent", igai: "bmen world play", shigeki: "make bmen words perform" },
+  who: { samedept: "company bmen", otherdept: "company bmen talk", otherco: "company talk", maker: "bmen craft talk", local: "town local", family: "kids", work: "company bmen" },
+  next: { try: "make", again: "talk bmen", work: "company bmen", tell: "words", walk: "town" },
+  find: { unexpected: "bmen", newpeople: "talk", coworker: "company bmen", newlike: "world make", town: "town", companyview: "company" },
+  act: { eat: "eat sweets drink", make: "make craft", watch: "perform music", buy: "craft cute", talk: "talk bmen", host: "bmen", stroll: "town" }
+};
+const LABEL_SIG = [[/味|香り|おいし|あたたか/, "eat drink scent"], [/見た目|色|形|デザイン|飾り|照明|商品|ショッパー|品物|作品/, "art cute craft"], [/技|うまさ|細か|作りこみ|手づくり/, "craft make"],
+  [/作った人|演じた人|お店の人|本業|生き方|挑戦|ギャップ|出会った|話した/, "bmen talk"], [/音楽|演奏/, "music"], [/体験|ワークショップ/, "make"], [/雰囲気/, "perform music"], [/品川|街|景色|場所/, "town"], [/子ども|家族/, "kids"]];
+const TAG_WORD = { eat: "おいしいもの", sweets: "あまいもの", drink: "おいしい一杯", alc: "お酒", make: "つくる体験", craft: "手しごと", cute: "かわいいもの", art: "アート", music: "音楽", perform: "ステージ", play: "あそび",
+  body: "からだをほぐす", scent: "香り", words: "ことば", nature: "自然", local: "地域の味", world: "海外の文化", town: "品川のまち", kids: "家族で楽しむ", bmen: "人の B 面", company: "会社の人の別の顔", eco: "アップサイクル", animal: "動物", fortune: "占い", talk: "おしゃべり" };
+const CHALLENGE = ["make", "play", "body", "words"];
+const newRec = () => ({ opened: false, skipped: false, picks: [], shown: [], clicked: [], saved: [], rerolls: 0 });
+/** 文字列から決まる乱数（同じセッションなら同じ並び） */
+function seeded(str) { let h = 2166136261; for (const c of String(str)) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return () => { h += 0x6D2B79F5; let t = h; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+function userSignals() {
+  const sig = {}, from = {};
+  const add = (tags, w, label) => String(tags || "").split(/\s+/).filter(Boolean).forEach(t => { sig[t] = (sig[t] || 0) + w; if (label && (!from[t] || from[t].w < w)) from[t] = { w, label: String(label).slice(0, 14) }; });
+  const A = S.ans, mp = mappedOf(), d = chosenDraft() || (S.drafts || []).slice(-1)[0], ai = (d && d.result) || {};
+  A.feel.forEach((x, i) => { if (x.id !== "other") add(SIG.feel[x.id], 1 - i * .2, x.label); });
+  (mp.feel || []).forEach(l => { const f = V.feel.find(x => x.label === l); if (f) add(SIG.feel[f.id], .8, S.own.feel || l); });
+  A.why.forEach(x => LABEL_SIG.forEach(([re, t]) => { if (re.test(x.label)) add(t, 1, x.label); }));
+  (mp.why || []).forEach(l => LABEL_SIG.forEach(([re, t]) => { if (re.test(l)) add(t, .8, S.own.why || l); }));
+  if (A.who) add(SIG.who[A.who.id], .6, A.who.detail || A.who.label);
+  A.next.forEach(x => add(SIG.next[x.id], .8, S.own.next || x.label));
+  A.find.forEach(x => add(SIG.find[x.id], .6, x.label));
+  if (ai.act) add(SIG.act[ai.act], .8, "");
+  const text = [A.text1, ...Object.values(S.own || {}), subjectOf(), ...(ai.content || [])].join(" ").normalize("NFKC");
+  return { sig, from, text };
+}
+const profileId = () => ((S.ans.profile || LS.get(CONFIG.KEYS.PROFILE, null) || {}).id || "");
+/** おすすめを 3 つ選ぶ（ex：もう見せたもの） */
+function pickRecs(ex) {
+  const U = userSignals(), rnd = seeded(S.sid + ":" + (S.rec ? S.rec.rerolls : 0)), today = jstDate();
+  const visited = it => (String(it.t).normalize("NFKC").match(/[ァ-ヶー]{3,}|[A-Za-z]{4,}|[一-龥々]{3,}/g) || []).some(w => U.text.includes(w));
+  const pool = CS.items.filter(it => !ex.includes(it.id) && (!it.day || it.day === today) && !(profileId() === "student" && (it.tags || []).includes("alc")) && !visited(it));
+  const kwHit = it => (it.kw || []).find(w => U.text.includes(w.normalize("NFKC")));
+  const score = it => (it.tags || []).reduce((a, t) => a + (U.sig[t] || 0), 0) + (kwHit(it) ? 3 : 0) + rnd() * .6;
+  const sc = new Map(pool.map(it => [it.id, score(it)]));
+  const by = (a, b) => sc.get(b.id) - sc.get(a.id);
+  const out = [];
+  const fit = pool.slice().sort(by)[0];
+  if (fit) out.push({ kind: "fit", it: fit });
+  const topCats = pool.slice().sort(by).slice(0, 5).map(x => x.c);
+  const det = pool.filter(it => it !== fit && it.c !== (fit && fit.c) && !topCats.includes(it.c) && it.c !== "special")
+    .map(it => ({ it, v: rnd() * 2 + ((it.tags || []).some(t => CHALLENGE.includes(t)) ? 1 : 0) + sc.get(it.id) * .2 })).sort((a, b) => b.v - a.v)[0];
+  const det2 = det || pool.filter(it => it !== fit && it.c !== (fit && fit.c)).map(it => ({ it, v: rnd() })).sort((a, b) => b.v - a.v)[0];
+  if (det2) out.push({ kind: "detour", it: det2.it });
+  const used = out.map(x => x.it);
+  const bm = pool.filter(it => it.note && !used.includes(it)).map(it => ({ it, v: sc.get(it.id) + rnd() * 1.2 })).sort((a, b) => b.v - a.v)[0];
+  if (bm) out.push({ kind: "bmen", it: bm.it });
+  return out.map(p => ({ id: p.it.id, kind: p.kind, why: recWhy(p, U, kwHit) }));
+}
+function recWhy(p, U, kwHit) {
+  if (p.kind === "bmen") return p.it.note || "";
+  if (p.kind === "detour") return T("why_detour");
+  const w = kwHit(p.it); if (w) return T("why_kw", { w });
+  const t = (p.it.tags || []).filter(x => U.sig[x]).sort((a, b) => U.sig[b] - U.sig[a])[0];
+  if (!t) return T("why_tag0", { t: TAG_WORD[(p.it.tags || [])[0]] || "いろいろ" });
+  return U.from[t] && U.from[t].label ? T("why_tag", { s: U.from[t].label, t: TAG_WORD[t] || t }) : T("why_tag0", { t: TAG_WORD[t] || t });
+}
+const csItem = id => CS.items.find(x => x.id === id);
+const wantList = () => LS.get(CONFIG.KEYS.WANT, []) || [];
+function treasureCardHtml() {
+  const R = S.rec || newRec();
+  if (!R.opened) {
+    return `<div class="card treasure${R.skipped ? "" : " shake"}"><span class="chest-big">${chestSvg(false)}</span><h3>ごほうびの宝箱</h3><p>${esc(T("tr_p"))}</p>
+      <button type="button" class="btn full" id="trOpen">宝箱をあける<span class="go">${ICON.send}</span></button>
+      ${R.skipped ? "" : `<div class="row center" style="margin-top:4px"><button type="button" class="lnk" id="trSkip">あけずに進む</button></div>`}</div>`;
+  }
+  const w = wantList().map(x => x.id), left = 2 - R.rerolls;
+  const cards = R.picks.map(p => { const it = csItem(p.id); if (!it) return ""; const k = REC_KIND[p.kind] || REC_KIND.fit, saved = w.includes(it.id);
+    return `<div class="rec" style="--k:${k.color}"><span class="kind">${esc(k.label)}</span><h4>${esc(it.t)}</h4>${it.s ? `<div class="who">${esc(it.s)}</div>` : ""}
+      ${it.p ? `<div class="place">${PIN_SVG}${esc(it.p)}</div>` : ""}<p class="desc">${esc(it.d)}</p>${p.why ? `<p class="why">${esc(p.why)}</p>` : ""}
+      <div class="row">${it.url ? `<a class="btn ghost sm wide" href="${esc(it.url)}" target="_blank" rel="noopener" data-rec="${it.id}">${ICON.open}詳しく見る</a>` : ""}<button type="button" class="btn ghost sm wide${saved ? " saved" : ""}" data-want="${it.id}" aria-pressed="${saved}">${saved ? "★ 行ってみる" : "☆ 行ってみる"}</button></div></div>`; }).join("");
+  const sr = CS.stamp_rally;
+  return `<div class="card treasure opened"><div class="tr-hd">${chestSvg(true)}<div><b>このあとの冒険先</b><small>${esc(T("tr_sub"))}</small></div></div>
+    <div class="recs">${cards}</div>
+    <div class="tr-foot">${left > 0 ? `<button type="button" class="lnk" id="trMore">ほかの宝もみる（あと${left}回）</button>` : ""}${w.length ? `<button type="button" class="lnk" id="trWant">☆行ってみるリスト（${w.length}）</button>` : ""}</div>
+    ${sr && sr.t ? `<p class="tr-note">${esc(T("rally", { t: sr.t.replace(/ by みんまちDROP$/, ""), p: sr.p }))}${sr.url ? ` <a href="${esc(sr.url)}" target="_blank" rel="noopener" data-rec="rally">くわしく</a>` : ""}</p>` : ""}
+    <p class="tr-note" style="color:var(--dim)">※ 運営の掲載コンテンツ一覧から、答えをもとに自動で選んでいます。時間や内容は会場の案内で確かめてください</p></div>`;
+}
+function refreshTreasure() { const el = document.querySelector(".card.treasure"); if (el) { el.outerHTML = treasureCardHtml(); bindTreasure(); } save(); }
+/** 運営からの質問を宝箱の下に足す（宝箱のおすすめを読めるよう、画面は下まで送らない） */
+function addSurvey() { if (!S.msgs.some(m => m.card === "survey")) { S.msgs.push({ who: "bot", card: "survey" }); RT.noScroll = true; renderMsgs(); RT.noScroll = false; save(); } }
+let recLogTimer = null;
+function logRec() { clearTimeout(recLogTimer); recLogTimer = setTimeout(() => sendLog("recommend"), 1200); }
+function bindTreasure() {
+  const R = S && S.rec; if (!R) return;
+  const on = (id, fn) => { const el = $(id); if (el) el.addEventListener("click", fn); };
+  on("trOpen", () => {
+    R.opened = true; R.picks = pickRecs([]); R.shown = R.picks.map(p => p.id); R.hist = R.picks.map(p => ({ id: p.id, kind: p.kind })); R.openedAt = Math.round((now() - S.t0) / 1000);
+    buzz(); addSurvey(); refreshTreasure(); logRec();
+    const el = document.querySelector(".card.treasure"); if (el) requestAnimationFrame(() => { const top = el.getBoundingClientRect().top + window.scrollY - document.querySelector(".top").offsetHeight - 8; window.scrollTo({ top, behavior: "smooth" }); });
+  });
+  on("trSkip", () => { R.skipped = true; refreshTreasure(); addSurvey(); logRec(); });
+  on("trMore", () => {
+    if (R.rerolls >= 2) return;
+    R.rerolls++; const p = pickRecs(R.shown);
+    if (!p.length) { toast("ほかの宝は見つかりませんでした"); return; }
+    R.picks = p; R.shown = uniq(R.shown.concat(p.map(x => x.id))); R.hist = (R.hist || []).concat(p.map(x => ({ id: x.id, kind: x.kind }))); refreshTreasure(); logRec();
+  });
+  on("trWant", openWant);
+  document.querySelectorAll(".card.treasure [data-rec]").forEach(a => a.addEventListener("click", () => { const id = a.dataset.rec === "rally" ? "rally" : Number(a.dataset.rec); if (!R.clicked.includes(id)) R.clicked.push(id); save(); logRec(); }));
+  document.querySelectorAll(".card.treasure [data-want]").forEach(b => b.addEventListener("click", () => {
+    const id = Number(b.dataset.want), it = csItem(id); if (!it) return;
+    let w = wantList();
+    if (w.some(x => x.id === id)) { w = w.filter(x => x.id !== id); R.saved = R.saved.filter(x => x !== id); }
+    else { w.push({ id, t: it.t, p: it.p, url: it.url, at: jstDate() }); if (!R.saved.includes(id)) R.saved.push(id); toast("☆行ってみるリストに入れました（右上のメニューから見られます）"); }
+    LS.set(CONFIG.KEYS.WANT, w.slice(-30)); refreshTreasure(); logRec();
+  }));
+}
+/** ☆行ってみるリスト（この端末に保存。メニューから） */
+function openWant() {
+  const w = wantList();
+  openSheet("☆行ってみるリスト", (w.length ? `<p>宝箱で☆を付けたところです。行った先の写真で、もう1本つくれます。</p>` + w.map(x => `<div class="want"><div><b>${esc(x.t)}</b><small>${esc(x.p || "")}</small></div>${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">詳しく ↗</a>` : ""}<button type="button" class="lnk" data-unwant="${x.id}" style="min-height:36px;padding:4px">外す</button></div>`).join("")
+    : `<p>まだありません。投稿文をコピーしたあとの「ごほうびの宝箱」で☆を付けると、ここに入ります。</p>`) + `<div class="row"><button type="button" class="btn full" id="shBack">もどる</button></div>`);
+  $("shBack").addEventListener("click", closeModal);
+  document.querySelectorAll("[data-unwant]").forEach(b => b.addEventListener("click", () => { LS.set(CONFIG.KEYS.WANT, wantList().filter(x => x.id !== Number(b.dataset.unwant))); openWant(); if (S && S.rec) refreshTreasure(); }));
+}
+async function loadContents() {
+  try { const r = await fetch("json/cs_contents.json", { cache: "no-cache" }); if (!r.ok) throw new Error("HTTP " + r.status); return await r.json(); }
+  catch (e) { try { return JSON.parse($("csFallback").textContent); } catch (e2) { return { items: [] }; } }
 }
 
 /* =====================================================================
@@ -1857,6 +2215,9 @@ function buildRecord(end) {
     own: S.own || {}, src: S.src || {},
     reflect: S.reflect ? { status: S.reflect.status || "", options: S.reflect.options || [], text: S.reflect.text || "", how: S.reflect.how || (S.reflect.status === "none" ? "出なかった" : "") } : { status: "", text: "", how: "" },
     line_swaps: S.lineSwaps || 0, company_view: S.companyView || "",
+    // v5：かけら集め（自分のことば＝キラ・任意の問い＝レア）・おまけの宝箱（おすすめ）
+    game: { kira: kiraCount(), rare: rareCount(), pieces: PIECES.filter(([id]) => pieceOn(id)).length },
+    rec: S.rec ? { opened: !!S.rec.opened, skipped: !!S.rec.skipped, picks: (S.rec.picks || []).map(p => ({ id: p.id, kind: p.kind })), hist: S.rec.hist || [], shown: S.rec.shown || [], clicked: S.rec.clicked || [], saved: S.rec.saved || [], rerolls: S.rec.rerolls || 0, opened_at_sec: S.rec.openedAt ?? null } : null,
     example_views: S.exViews || [], preview_opens: S.previewOpens || 0,
     why_for: S.whyFor || "", settings_version: SETTINGS_VER,
     extra: optState(), chat_rating: S.rating || null, chat_comment: S.ratingComment || "",
@@ -1869,7 +2230,7 @@ async function sendLog(end) {
   const rec = buildRecord(end);
   if (STAFF) pushHistory(rec);
   if (!logOn()) return;
-  const key = end + "|" + rec.texts.final + "|" + (rec.chat_rating || "") + "|" + rec.chat_comment + "|" + rec.company_view;
+  const key = end + "|" + rec.texts.final + "|" + (rec.chat_rating || "") + "|" + rec.chat_comment + "|" + rec.company_view + "|" + JSON.stringify(rec.rec || "");
   if (S.loggedKey === key) return;
   let tok = getToken(CONFIG.KEYS.LOG_TOKEN);
   if (!tok && await autoLogin()) tok = getToken(CONFIG.KEYS.LOG_TOKEN);
@@ -1949,10 +2310,12 @@ const closeMenu = () => { $("menu").hidden = true; $("menuBtn").setAttribute("ar
 document.addEventListener("click", e => { if (!$("menu").hidden && !e.target.closest("#menu") && !e.target.closest("#menuBtn")) closeMenu(); });
 $("mBig").addEventListener("click", () => { const b = !document.documentElement.classList.contains("big"); document.documentElement.classList.toggle("big", b); LS.set(CONFIG.KEYS.BIG, b); syncMenu(); syncDockH(); });
 $("mExamples").addEventListener("click", () => { closeMenu(); openExamples(); });
+$("mWant").addEventListener("click", () => { closeMenu(); openWant(); });
 $("mAbout").addEventListener("click", () => {
   closeMenu();
   openSheet("このチャットについて", `
-    <p>DROP に投稿する文を、5つの「ことばのかけら」を集めながら一緒につくるチャットです。案内役は、インクのしずくの「ぽとり」です。問いはとばせますし、いつでも「ここで投稿文へ」で終われます。</p>
+    <p>DROP に投稿する文を、5つの部屋で「ことばのかけら」を集めながら一緒につくるチャットです。案内役は、色ガラスのしずくの「ぽとり」です。問いはとばせますし、いつでも「ここで投稿文へ」で終われます。</p>
+    <p><b>おまけ：</b>投稿文をコピーすると「ごほうびの宝箱」が開けられます。答えをもとに、運営の掲載コンテンツ一覧から、このあと楽しめそうなところを 3 つ選びます（AI は使っていません）。</p>
     <div class="notice" role="note">${LOCK_SVG}<span><b>おねがい：</b>${esc(PII_NOTICE)}</span></div>
     <p><b>AI について：</b>写真とあなたの答えをもとに、AI が文を読みやすく整えます。あなたが書いていない出来事や気持ちは足さないようにしています。AI の案（最大4つ）と「自分の言葉の文」を見比べて選べます。</p>
     <p><b>答えの使い道：</b>答えと投稿文は、CULTURE SNACK の効果を確かめる分析にだけ使います。投稿文は、あなたがコピーして DROP に投稿するまで公開されません。ニックネームは分析画面にだけ表示されます。分析では、この端末につけたランダムな番号（端末 ID）とニックネームで人数を数えます。</p>
@@ -1998,7 +2361,8 @@ async function start() {
   save(); renderMsgs(); renderStaff(); lockDock(); warmLogin();
   const g = RT.gen;
   const ps = postStats();
-  const hello = ps.n > 0 ? [T("hello2", { n: ps.n + 1 }), { sub: T("hello2sub") }] : [T("hello1"), { sub: T("hello1sub") }];
+  const wl = wantList().length;
+  const hello = ps.n > 0 ? [T("hello2", { n: ps.n + 1 }), { sub: T("hello2sub") + (wl ? "\n" + T("hello_want", { n: wl }) : "") }] : [T("hello1"), { sub: T("hello1sub") }];
   if (!await bot(hello[0], hello[1])) return;
   S.msgs.push({ who: "bot", notice: true }); renderMsgs(); save();   // 個人情報のおねがい（毎回はじめに）
   await advance(null, g);
@@ -2034,13 +2398,14 @@ function checkInAppBrowser() {
   $("iabX").addEventListener("click", () => { $("iab").hidden = true; SS.set(CONFIG.KEYS.IAB, true); });
 }
 (async () => {
-  $("brandMark").innerHTML = CHAR_SVG;
+  $("brandMark").innerHTML = charSvg();
   deviceId();
   checkInAppBrowser();
   $("staffFlag").hidden = !STAFF;
   if (LS.get(CONFIG.KEYS.BIG, false)) document.documentElement.classList.add("big");
   syncMenu();
   loadSettings();
+  loadContents().then(d => { CS = { items: Array.isArray(d.items) ? d.items : [], stamp_rally: d.stamp_rally || null }; });
   const json = await loadSamples();
   SAMPLES = (Array.isArray(json) ? json : (json.records || [])).map(r => ({
     id: r.artwork_id, n: r.account_name || "", s: String(r.sentence || "").trim(), img: r.image_file_path || r.image_file_path_thumbnail || ""
