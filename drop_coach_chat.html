@@ -1,0 +1,1614 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#ffffff" />
+<title>DROP. Coach — 投稿づくりチャット</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Sans+JP:wght@400;500;700;800;900&display=swap" rel="stylesheet" />
+<style>
+  /* =====================================================================
+     デザイン（v3.2 UI）
+     - 問いと答えを近くに：最後の問いはチャットに、答えは下の「回答シート」に。シートの頭に「何問目・どう答えるか」
+     - 選択肢はそろったタイル（2 列・左寄せ・大きな押す面積）。長いことばは 1 行まるごと
+     - 主ボタンは 1 つだけ色つき（次へ／投稿文をつくる）。とばす・終えるは同じ場所に控えめに
+     - 色：紫＝操作できるもの・選んだもの／黒＝文字／灰＝説明。背景はあたたかい白
+  ===================================================================== */
+  :root{
+    --bg:#f7f6f3; --bg-b:#eeece8; --card:#fff;
+    --stroke:#dcd8e3; --stroke-soft:#ebe8ef;
+    --text:#1e1b24; --muted:#4f4b57; --dim:#8b8795;
+    --rich:#6d4bc3; --rich-2:#a68be0; --rich-soft:#f2edfc; --rich-ink:#4a2f93;
+    --ok:#2f6b4a; --ok-soft:#e7f4ec; --warn:#8a5f00; --err:#b3372a;
+    --sh-1:0 1px 2px rgba(40,25,80,.06),0 4px 14px rgba(40,25,80,.06);
+    --sh-2:0 -8px 30px -12px rgba(40,25,80,.28);
+    --font:"Inter","Noto Sans JP",system-ui,-apple-system,"Hiragino Sans",sans-serif;
+    --dockH:220px;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+  button,input,textarea{font-family:var(--font);color:inherit}
+  button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+  [hidden]{display:none!important}
+  svg{flex:none}
+  :focus-visible{outline:3px solid rgba(109,75,195,.45);outline-offset:2px}
+  html.big .chat, html.big .dock-head, html.big .dock-scroll, html.big .dock-act, html.big .sheet, html.big .pv-in{zoom:1.15}
+
+  /* ---------- 上部 ---------- */
+  .top{position:sticky;top:0;z-index:30;background:rgba(255,255,255,.97);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 1px 0 var(--stroke-soft)}
+  .appbar-in{max-width:640px;margin:0 auto;padding:8px 12px 8px 16px;display:flex;align-items:center;gap:12px;min-height:60px}
+  .brand{font-weight:900;font-size:18px;letter-spacing:-.4px;line-height:1;white-space:nowrap}
+  .brand i{font-style:normal;color:var(--rich)}
+  .brand small{display:block;font-size:10.5px;font-weight:700;letter-spacing:1px;color:var(--dim);margin-top:4px}
+  .ringbox{margin-left:auto;display:flex;align-items:center;gap:8px;padding:4px 10px 4px 4px;border-radius:999px;background:var(--rich-soft)}
+  .ring{position:relative;width:40px;height:40px;flex:none}
+  .ring svg{width:40px;height:40px;transform:rotate(-90deg);display:block}
+  .ring circle{fill:none;stroke-width:5}
+  .ring .rt{stroke:#fff}
+  .ring .rf{stroke:var(--rich);stroke-linecap:round;stroke-dasharray:113.1;stroke-dashoffset:113.1;transition:stroke-dashoffset .6s ease}
+  .ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:var(--rich-ink)}
+  .ring.done b{font-size:17px}
+  .ring.pulse{animation:ringpop .55s ease}
+  @keyframes ringpop{40%{transform:scale(1.15)}}
+  .ring-lab{font-size:13.5px;font-weight:900;color:var(--rich-ink);line-height:1.15;white-space:nowrap}
+  .ring-lab small{display:block;font-size:10.5px;color:var(--muted);font-weight:700;margin-top:2px}
+  .icon-btn{width:44px;height:44px;border:none;background:transparent;border-radius:12px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+  .icon-btn:hover{background:var(--bg-b)}
+  .icon-btn svg{width:22px;height:22px}
+  /* メニュー：右上のポップオーバー */
+  .menu{position:absolute;right:12px;top:62px;z-index:40;background:#fff;border-radius:16px;box-shadow:0 12px 40px rgba(30,20,60,.22);padding:6px;display:flex;flex-direction:column;min-width:240px}
+  .menu button{border:none;background:none;text-align:left;padding:13px 14px;border-radius:10px;font-size:15px;font-weight:700;color:var(--text)}
+  .menu button:hover{background:var(--rich-soft)}
+  .staff-flag{font-size:10px;font-weight:800;letter-spacing:1px;color:#fff;background:var(--warn);padding:3px 7px;border-radius:4px}
+  /* いまの投稿（細いバー） */
+  .pv{display:block;width:100%;border:none;border-top:1px solid var(--stroke-soft);background:#fff;padding:0;text-align:left}
+  .pv-in{max-width:640px;margin:0 auto;padding:8px 16px;display:flex;align-items:center;gap:10px}
+  .pv-k{font-size:11.5px;font-weight:900;color:#fff;background:var(--rich);border-radius:999px;padding:3px 9px;white-space:nowrap}
+  .pv-t{flex:1;min-width:0;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .pv-dots{display:flex;gap:3px}
+  .pv-dots i{width:8px;height:8px;border-radius:50%;background:var(--bg-b)}
+  .pv-dots i.on{background:var(--rich)}
+  .pv-open{font-size:12.5px;font-weight:800;color:var(--rich-ink);white-space:nowrap}
+  .pv-open::after{content:" ›"}
+
+  /* ---------- チャット ---------- */
+  .chat{max-width:640px;margin:0 auto;padding:16px 14px calc(var(--dockH) + 16px)}
+  .msg{display:flex;gap:8px;margin:10px 0;align-items:flex-end}
+  .msg.me{justify-content:flex-end}
+  .msg.wide{display:block}
+  .msg.new{animation:pop .3s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .avatar{width:30px;height:30px;border-radius:10px;background:linear-gradient(135deg,var(--rich),#9a6fe0);color:#fff;font-weight:900;font-size:12px;display:flex;align-items:center;justify-content:center;flex:none;margin-bottom:2px}
+  .avatar i{font-style:normal;opacity:.8}
+  .avatar.ai{background:linear-gradient(135deg,#3e2a7a,var(--rich))}
+  .bubble{max-width:82%;padding:12px 15px;font-size:16.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;border-radius:20px 20px 20px 6px;background:#fff;box-shadow:var(--sh-1)}
+  .msg.me .bubble{background:var(--rich);color:#fff;border-radius:20px 20px 6px 20px;box-shadow:none}
+  .msg.me .bubble.muted{background:transparent;color:var(--dim);font-size:13.5px;padding:2px 4px;font-weight:700}
+  .msg.me .bubble.photo{padding:0;overflow:hidden;max-width:64%;background:var(--bg-b);border-radius:20px 20px 6px 20px}
+  .msg.me .bubble.photo img{display:block;width:100%;max-height:340px;object-fit:cover}
+  .msg.me .bubble.photo .nophoto{display:block;padding:16px 18px;color:var(--muted);font-size:14px}
+  .bubble .sub{display:block;margin-top:6px;font-size:13.5px;color:var(--muted);white-space:normal;line-height:1.6;font-weight:400}
+  .typing .bubble{display:flex;gap:4px;align-items:center;padding:14px 16px}
+  .typing .bubble i{width:7px;height:7px;border-radius:50%;background:var(--rich-2);animation:blink 1.1s infinite}
+  .typing .bubble i:nth-child(2){animation-delay:.15s}.typing .bubble i:nth-child(3){animation-delay:.3s}
+  .typing .bubble em{font-style:normal;font-size:13.5px;color:var(--muted);margin-left:8px}
+  @keyframes blink{0%,80%,100%{opacity:.25}40%{opacity:1}}
+
+  /* ---------- 投稿文（投稿のプレビュー） ---------- */
+  .card{background:#fff;border-radius:20px;padding:14px;box-shadow:var(--sh-1)}
+  .card-hd{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+  .card-hd b{font-size:15px;color:var(--text)}
+  .post-label{font-size:12px;font-weight:900;letter-spacing:.5px;color:var(--rich-ink);background:var(--rich-soft);border-radius:999px;padding:4px 10px}
+  .post-photo{display:block;width:100%;max-height:260px;object-fit:cover;border-radius:14px;margin-bottom:10px;background:var(--bg-b)}
+  .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--bg-b);border-radius:12px;padding:3px;margin-bottom:10px}
+  .seg button{border:none;background:none;border-radius:10px;padding:10px 6px;font-size:14px;font-weight:800;color:var(--muted)}
+  .seg button.on{background:#fff;color:var(--rich-ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+  .card textarea{display:block;width:100%;border:1.5px solid transparent;border-radius:12px;resize:none;font-size:17.5px;line-height:1.8;min-height:140px;outline:none;padding:6px 8px;color:var(--text);background:#fbfaf8}
+  .card textarea:focus{border-color:var(--rich);background:#fff}
+  .card-foot{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
+  .card-foot .cnt{font-size:12.5px;color:var(--dim)}
+  .switch{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--muted);cursor:pointer;user-select:none;margin-left:auto}
+  .switch input{width:20px;height:20px;accent-color:var(--rich)}
+  .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+  .tag{border:1.5px solid var(--rich-2);background:var(--rich-soft);color:var(--rich-ink);border-radius:999px;padding:6px 12px;font-size:14px;font-weight:700}
+  .tag.off{background:#fff;border-color:var(--stroke);color:var(--dim);text-decoration:line-through}
+  .note{font-size:13.5px;color:var(--muted);line-height:1.6;margin-top:8px}
+  .note.warn{color:var(--warn)}
+  .card.staff{border:1.5px dashed var(--warn);box-shadow:none;max-width:100%}
+  .card.staff b{color:var(--warn)}
+  .card.staff table{width:100%;border-collapse:collapse;font-size:13px}
+  .card.staff td{border-top:1px solid var(--stroke-soft);padding:5px 4px;vertical-align:top}
+  .card.staff td:first-child{color:var(--dim);white-space:nowrap;width:1%}
+  .bars{display:grid;grid-template-columns:auto 1fr auto;gap:4px 8px;align-items:center;font-size:12.5px}
+  .bars s{display:block;height:8px;background:var(--bg-b);border-radius:4px;overflow:hidden;text-decoration:none}
+  .bars s u{display:block;height:100%;background:var(--rich)}
+  .card.staff pre{max-height:240px;overflow:auto;background:var(--bg);padding:8px;font-size:11px;border-radius:8px;white-space:pre-wrap;word-break:break-all}
+  /* 投稿スタンプ・使いごこち */
+  .card.stamp{background:linear-gradient(180deg,#fff,var(--rich-soft))}
+  .card.stamp .stamp-n{margin-left:auto;font-weight:900;color:var(--rich-ink);font-size:15px}
+  .stamps{display:flex;gap:8px;margin:6px 0 10px}
+  .stamps i{width:46px;height:46px;border-radius:50%;border:2px dashed var(--rich-2);display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900;color:#fff;font-size:15px}
+  .stamps i.on{background:var(--rich);border:2px solid var(--rich);transform:rotate(-8deg);box-shadow:0 2px 6px rgba(74,47,147,.35)}
+  .stamps i.on:last-of-type{animation:stamp .5s ease}
+  @keyframes stamp{0%{transform:scale(1.6) rotate(-8deg);opacity:0}100%{transform:scale(1) rotate(-8deg);opacity:1}}
+  .stamp-msg{margin:0;font-size:15.5px;line-height:1.7;font-weight:700}
+  .stamp-ai{margin:8px 0 0;font-size:14px;color:var(--muted);line-height:1.6}
+  .stamp-ai span{display:inline-block;font-size:11px;font-weight:800;color:#fff;background:var(--rich);border-radius:4px;padding:1px 6px;margin-right:6px}
+  .rate{border-top:1px dashed var(--rich-2);margin-top:12px;padding-top:10px}
+  .rate-q{margin:0 0 8px;font-size:14.5px;font-weight:800;color:var(--text)}
+  .rate-q small{display:inline-block;margin-left:6px;font-size:11.5px;color:var(--dim);font-weight:700}
+  .rate-btns{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+  .rate-btns button{height:48px;border-radius:12px;border:1.5px solid var(--stroke);background:#fff;font-weight:900;font-size:17px}
+  .rate-btns button.on{background:var(--rich);border-color:var(--rich);color:#fff}
+  .rate-lab{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-top:4px}
+  .rate-sel{margin:8px 0 6px;font-size:13.5px;color:var(--rich-ink);font-weight:800}
+  .rate textarea{width:100%;border:1.5px solid var(--stroke);border-radius:12px;padding:8px 10px;font-size:15px;resize:none;background:#fff;min-height:0;line-height:1.5}
+  .rate-done{margin:0;font-size:14px;color:var(--rich-ink);font-weight:700}
+
+  /* ---------- 回答シート（下） ---------- */
+  .dock{position:fixed;left:0;right:0;bottom:0;z-index:20;pointer-events:none}
+  .dock-in{pointer-events:auto;max-width:640px;margin:0 auto;background:#fff;border-radius:24px 24px 0 0;box-shadow:var(--sh-2);padding:8px 16px calc(14px + env(safe-area-inset-bottom));display:flex;flex-direction:column;max-height:calc(100vh - 150px);max-height:calc(100dvh - 150px)}
+  .dock-in::before{content:"";display:block;width:38px;height:4px;border-radius:2px;background:var(--stroke);margin:0 auto 8px}
+  body.editing .dock{display:none}
+  .dock-head{flex:none;margin:0 0 10px}
+  .q-meta{display:flex;align-items:center;gap:8px;min-height:28px}
+  .q-title{font-size:18px;font-weight:800;line-height:1.5;margin-top:6px;color:var(--text);animation:pop .3s ease}
+  .q-sub{font-size:13.5px;color:var(--muted);line-height:1.55;margin-top:2px}
+  .q-step{font-size:12px;font-weight:900;color:var(--rich-ink);background:var(--rich-soft);border-radius:999px;padding:4px 10px;white-space:nowrap}
+  .q-step.opt{background:var(--bg-b);color:var(--muted)}
+  .q-ins{font-size:13.5px;color:var(--muted);font-weight:700;flex:1;min-width:0}
+  .dock-head .lnk{padding:4px 0;min-height:32px;font-size:13px;color:var(--rich-ink)}
+  .dock-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 1px 4px}
+  .dock-act{flex:none;padding-top:12px}
+  .dock-act .row{margin-top:0}
+  /* 選択肢：そろったタイル */
+  .chips{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-flow:row dense;gap:8px}
+  .chip{position:relative;min-height:54px;padding:10px 12px;border:1.5px solid var(--stroke);border-radius:14px;background:#fff;font-size:15.5px;font-weight:700;color:var(--text);display:flex;align-items:center;gap:8px;text-align:left;line-height:1.35;transition:background .12s,border-color .12s,box-shadow .12s}
+  .chip.wide{grid-column:1 / -1}
+  .chip:active{transform:scale(.98)}
+  .chip.on{border:2px solid var(--rich);background:var(--rich-soft);color:var(--rich-ink);padding:9.5px 11.5px;box-shadow:0 2px 8px rgba(109,75,195,.15)}
+  .chip .ord,.chip .ck{margin-left:auto;order:2;display:inline-flex;width:24px;height:24px;border-radius:50%;background:var(--rich);color:#fff;font-size:12.5px;font-weight:900;align-items:center;justify-content:center;flex:none}
+  .chip.sub{color:var(--muted);border-style:dashed}
+  .chip.ai{border-style:dashed;border-color:var(--rich-2)}
+  .chip.ai small{display:block;width:max-content;font-size:10.5px;font-weight:900;color:#fff;background:var(--rich-2);border-radius:999px;padding:1px 7px;margin-bottom:3px}
+  .chip.ai.on small{background:var(--rich)}
+  .chip.shake{animation:shake .3s}
+  @keyframes shake{25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+  .free{display:block;width:100%;margin-top:8px;min-height:50px;border:1.5px dashed var(--stroke);border-radius:14px;padding:12px 14px;font-size:15.5px;background:#fff;outline:none}
+  .free:focus{border-style:solid;border-color:var(--rich)}
+  .free::placeholder{color:var(--dim);font-weight:700}
+  .row{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-top:10px}
+  .row.center{justify-content:center}
+  .btn{min-height:54px;padding:0 20px;border:none;border-radius:16px;background:var(--rich);color:#fff;font-weight:800;font-size:16.5px;display:inline-flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;box-shadow:0 4px 12px rgba(109,75,195,.28)}
+  .btn svg{width:20px;height:20px}
+  .btn:disabled{background:var(--rich-soft);color:var(--rich-2);box-shadow:none;cursor:default}
+  .btn.ghost{background:#fff;color:var(--rich-ink);border:1.5px solid var(--rich-2);box-shadow:none}
+  .btn.plain{background:var(--bg-b);color:var(--muted);box-shadow:none}
+  .btn.sm{min-height:46px;padding:0 16px;font-size:15px}
+  .btn.wide{flex:1}
+  .btn.full{width:100%}
+  .btn.text{background:none;box-shadow:none;color:var(--muted);padding:0 12px;min-width:84px;font-size:15px}
+  .lnk{background:none;border:none;color:var(--muted);font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:10px 6px;min-height:40px}
+  .inrow{position:relative}
+  .input{display:block;width:100%;min-height:52px;max-height:160px;border:1.5px solid var(--stroke);border-radius:18px;padding:13px 60px 13px 16px;font-size:17px;line-height:1.5;outline:none;resize:none;background:#fff}
+  .input:focus{border-color:var(--rich);box-shadow:0 0 0 4px rgba(109,75,195,.12)}
+  .input.sm{min-height:48px;font-size:16px;padding:11px 14px;border-radius:14px}
+  .send{position:absolute;right:6px;bottom:6px;width:44px;height:44px;border-radius:14px;border:none;background:var(--rich);color:#fff;display:flex;align-items:center;justify-content:center}
+  .send:disabled{background:var(--rich-soft);color:var(--rich-2)}
+  .send svg{width:22px;height:22px}
+  .lab{font-size:13.5px;font-weight:800;color:var(--muted);margin:12px 0 6px}
+  .cnt-sm{font-size:12.5px;color:var(--dim);font-variant-numeric:tabular-nums;margin-left:auto}
+  .scale{display:grid;grid-template-columns:repeat(10,1fr);gap:5px}
+  .scale button{height:50px;border-radius:12px;border:1.5px solid var(--stroke);background:#fff;font-weight:800;font-size:16px;padding:0}
+  .scale button:active,.scale button.on{background:var(--rich);border-color:var(--rich);color:#fff}
+  .scale-lab{display:flex;justify-content:space-between;font-size:12.5px;color:var(--dim);margin-top:5px;padding:0 2px}
+  .login{display:grid;gap:10px}
+  .login .input{padding-right:16px}
+  .err{font-size:14px;color:var(--err);min-height:1em}
+  .wait{display:flex;align-items:center;gap:10px;justify-content:center;font-size:15px;color:var(--muted);min-height:54px}
+  .spin{width:20px;height:20px;border:2.5px solid var(--rich-soft);border-top-color:var(--rich);border-radius:50%;animation:rot .8s linear infinite}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  .hint{font-size:12.5px;color:var(--dim);margin-top:6px}
+  /* 写真をえらぶタイル */
+  .photo-tile{width:100%;min-height:118px;border:2px dashed var(--rich-2);border-radius:18px;background:var(--rich-soft);color:var(--rich-ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
+  .photo-tile svg{width:30px;height:30px}
+  .photo-tile b{font-size:17px}
+  .photo-tile small{font-size:12.5px;color:var(--muted);font-weight:700}
+
+  /* ---------- トースト・シート ---------- */
+  .toast{position:fixed;left:50%;top:84px;transform:translateX(-50%) translateY(-10px);background:var(--text);color:#fff;padding:11px 18px;border-radius:999px;font-size:14.5px;font-weight:700;opacity:0;pointer-events:none;transition:.2s;z-index:60;max-width:90vw;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%)}
+  .modal{position:fixed;inset:0;z-index:50;background:rgba(20,16,30,.5);display:none;align-items:flex-end;justify-content:center}
+  .modal.show{display:flex}
+  .sheet{background:#fff;width:100%;max-width:640px;max-height:90vh;overflow:auto;border-radius:24px 24px 0 0;padding:16px 16px calc(20px + env(safe-area-inset-bottom))}
+  .sheet-hd{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+  .sheet-hd b{font-size:18px}
+  .sheet-hd .icon-btn{margin-left:auto}
+  .sheet p{margin:0 0 12px;font-size:15px;color:var(--muted);line-height:1.7}
+  .draft{border-radius:16px;padding:14px 16px;font-size:17px;line-height:1.85;white-space:pre-wrap;color:var(--text);background:var(--rich-soft)}
+  .mat{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0 4px}
+  .mat span{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:700;border-radius:999px;padding:6px 12px;background:var(--bg-b);color:var(--dim)}
+  .mat span.on{color:var(--rich-ink);background:var(--rich-soft)}
+  .mat span i{font-style:normal}
+  .sec-h{font-size:14px;font-weight:900;color:var(--rich-ink);margin:16px 0 8px}
+  .ex{display:flex;gap:12px;border-radius:16px;padding:10px;background:var(--bg);margin-top:8px}
+  .ex img{width:84px;height:84px;object-fit:cover;border-radius:12px;flex:none;background:var(--bg-b)}
+  .ex p{margin:0;font-size:15px;line-height:1.65;white-space:pre-wrap;color:var(--text)}
+  @media (min-width:700px){ .modal{align-items:center} .sheet{border-radius:24px;max-height:86vh} }
+  @media (max-height:640px){ .brand small{display:none} .appbar-in{min-height:52px;padding-top:4px;padding-bottom:4px} .pv-in{padding:6px 16px} .dock-in{max-height:calc(100vh - 120px);max-height:calc(100dvh - 120px)} }
+  @media (max-width:360px){ .brand small{display:none} .brand{font-size:16px} .ring-lab small{display:none} .chips{grid-template-columns:1fr} }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="appbar-in">
+    <div class="brand">DROP<i>.</i> Coach<small>投稿づくりチャット</small></div>
+    <div class="ringbox" id="ringBox" role="progressbar" aria-valuemin="0" aria-valuemax="4" aria-valuenow="0" aria-label="すすみぐあい">
+      <div class="ring" id="ring"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="rt" cx="22" cy="22" r="18"/><circle class="rf" id="ringFill" cx="22" cy="22" r="18"/></svg><b id="ringNum">0/4</b></div>
+      <div class="ring-lab" id="ringLab">はじめ<small>しつもん 4つ</small></div>
+    </div>
+    <span class="staff-flag" id="staffFlag" hidden>STAFF</span>
+    <button type="button" class="icon-btn" id="menuBtn" aria-label="メニュー" aria-expanded="false"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>
+  </div>
+  <nav class="menu" id="menu" hidden>
+    <button type="button" id="mBig">文字を大きく</button>
+    <button type="button" id="mExamples">ほかの人の例</button>
+    <button type="button" id="mAbout">このチャットについて</button>
+    <button type="button" id="mRestart">最初からやり直す</button>
+    <button type="button" id="mProfile">「あなたについて」を答え直す</button>
+    <button type="button" id="mLogout" hidden>ログアウト</button>
+  </nav>
+  <button type="button" class="pv" id="pvBar" hidden aria-label="いまの投稿イメージを見る">
+    <span class="pv-in"><span class="pv-k">あなたの投稿</span><span class="pv-t" id="pvText"></span><span class="pv-dots" id="pvDots"></span><span class="pv-open">見る</span></span>
+  </button>
+</header>
+
+<main class="chat" id="chat" aria-live="polite">
+  <div id="msgs"></div>
+  <div id="after"></div>
+</main>
+
+<footer class="dock" id="dock"><div class="dock-in" id="dockIn"></div></footer>
+<input type="file" id="file" accept="image/*" hidden />
+<div class="toast" id="toast" role="status"></div>
+
+<div class="modal" id="modal" aria-hidden="true">
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="sheet-hd"><b id="modalTitle"></b><button type="button" class="icon-btn" id="modalX" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <div id="sheetBody"></div>
+  </div>
+</div>
+
+<!-- 見本投稿の控え：json/sample_drop.json を読めないとき（file:// で直接開いたときなど）に使う。
+     json/sample_drop.json を更新したら、ここも同じ内容に更新すること（README の手順） -->
+<script type="application/json" id="sampleFallback">{"mart":"sample_drop","source":"CULTURE_SNACK_DROP_投稿例集_v4（2026/11/12）","note":"運営作成の模範投稿（架空）。DROP.Coach（サンプル参照版）の比較材料。写真は json/sample_img/。line_roles は各行の役割（V2 チャット版の「完成イメージ」で表示。見たもの／誰と・きっかけ／心に残ったところ／気持ち／次にしたいこと）","record_count":8,"records":[{"artwork_id":"model-v4-1-1","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/1-1.jpg","image_file_path":"json/sample_img/1-1.jpg","sentence":"隣のビルの経理さん、週末は豆本作家！\nこんな人がいたなんて\n毎日通う品川を身近に感じる\n同僚にも教えたい！\n来年は私も出展してみたい","account_id":"","account_name":"運営作成 ①-1 豆本（来場者）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-1-2","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/1-2.jpg","image_file_path":"json/sample_img/1-2.jpg","sentence":"会社員バンド、ボーカルは平日SE！\n働きながらここまでやれるんだ\n刺激もらった〜\n押し入れのギター、また弾きたくなる\n帰ったら弦を張り替えよう","account_id":"","account_name":"運営作成 ①-2 会社員バンド（来場者）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-2-1","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/2-1.jpg","image_file_path":"json/sample_img/2-1.jpg","sentence":"平日は銀行員、今日はカレー屋さん！\n並んでくれた人と辛さの話で盛り上がる\n同じビルなのに初めて話した\n来週ランチ行く約束\nまた屋台出したくなる","account_id":"","account_name":"運営作成 ②-1 カレー屋台（出展した社員）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-2-2","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/2-2.jpg","image_file_path":"json/sample_img/2-2.jpg","sentence":"ランタンづくり、隣は近所の大学生\n不器用な私に教えてくれた\nひと回り下なのに意外と話が合う\n通勤中に会ったら声かけようかな\n品川に知り合いが増えた","account_id":"","account_name":"運営作成 ②-2 ランタンづくり（来場者）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-3-1","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/3-1.jpg","image_file_path":"json/sample_img/3-1.jpg","sentence":"部長がコーヒー淹れてた！\n「何が好き？」って聞かれた\n会社じゃ話したことなかった\n仕事以外の話、していいんだと思えた\nチームメンバーにも聞いてみたい","account_id":"","account_name":"運営作成 ③-1 部長のコーヒー（出展企業の社員）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-3-2","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/3-2.jpg","image_file_path":"json/sample_img/3-2.jpg","sentence":"企業ブースの社員さん、週末は落語家\n上司っぽい人が一番前で笑ってた\n趣味を応援しあえる職場っていいな\n私も社内で話してみたい\nまずは自分の趣味から","account_id":"","account_name":"運営作成 ③-2 社員の落語（来場者）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-p1","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/p1.jpg","image_file_path":"json/sample_img/p1.jpg","sentence":"すぐ帰るつもりの仕事帰り\n焼き芋につられて会場をひと回り\nベンチで隣の人と「寒いですね」\n聞けば同じ会社の人だった\n品川の夜、ちょっと好きになる","account_id":"","account_name":"運営作成 ＋1 焼き芋（仕事帰りにふらっと）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"},{"artwork_id":"model-v4-p2","post_collab_event_name":"culture-snack-2026","post_dated_at":"","post_date":"","image_file_path_thumbnail":"json/sample_img/p2.jpg","image_file_path":"json/sample_img/p2.jpg","sentence":"子どもが手品に釘づけ！\nスタンプ集めそっちのけ\n演じてたのは近所の会社の人\n私にはとても無理だけど\n来年も家族で応援しに来たい","account_id":"","account_name":"運営作成 ＋2 手品（家族でスタンプラリー）","gender":"","age_group":"","age_group_half":"","is_operation_member":true,"sample_note":"CULTURE SNACK×みんまちDROP 投稿例集 v4 の模範投稿（架空・運営作成）"}]}</script>
+<!-- 選択肢と重みの初期値（json/coach_settings_default.json と同じ）。運営が「チャットの設定」で保存した設定があれば、そちらを使う -->
+<script type="application/json" id="defaultSettings">{"schema":"drop_coach_settings_v1","note":"初期値。運営は分析画面（drop_coach_dashboard.html）の「チャットの設定」で変更・保存する。保存した設定は記録用 GAS に入り、全員のチャットに反映される","rank":{"feel":[1,0.6,0.45,0.35],"why":[1,0.75,0.5,0.25],"next":[1,0.8],"find":[1,0.8]},"why_q_default":"{話題}の、とくに印象に残ったのは、どこですか？","feel":[{"id":"oishii","label":"おいしい","val":1,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"{話題}の、どこがおいしかったですか？","targets":[{"label":"味","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"香り","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"見た目","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"作った人のこだわり","layer":"人","w":{"c1":0.2,"c2":0.3,"c3":0,"att":0}},{"label":"食べた場所の雰囲気","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.3}}]},{"id":"tanoshii","label":"たのしい","val":1,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"なにがたのしかったですか？","targets":[{"label":"体験・ワークショップ","layer":"コンテンツ","w":{"c1":0.3,"c2":0,"c3":0,"att":0}},{"label":"音楽・演奏","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"話したこと","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}},{"label":"いっしょに行った人","layer":"人","w":{"c1":0,"c2":0,"c3":0.3,"att":0}},{"label":"その場の雰囲気","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.3}}]},{"id":"kawaii","label":"かわいい","val":1,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"どこがかわいかったですか？","targets":[{"label":"商品","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"ショッパー（袋）","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"お店の飾りつけ","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.2}},{"label":"お店の人","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}}]},{"id":"sugoi","label":"すごい","val":1,"w":{"c1":0.3,"c2":0,"c3":0,"att":0},"q":"{話題}の、どこがすごかったですか？","targets":[{"label":"技・うまさ","layer":"コンテンツ","w":{"c1":0.3,"c2":0,"c3":0,"att":0}},{"label":"細かさ・作りこみ","layer":"コンテンツ","w":{"c1":0.2,"c2":0,"c3":0,"att":0}},{"label":"作った人・演じた人","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}},{"label":"平日とのギャップ","layer":"人","w":{"c1":0.2,"c2":0,"c3":0.2,"att":0}}]},{"id":"kirei","label":"きれい","val":1,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"どこがきれいでしたか？","targets":[{"label":"色","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"形・デザイン","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"飾りつけ・照明","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.2}},{"label":"品川の景色","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.5}}]},{"id":"hokkori","label":"ほっこり","val":1,"w":{"c1":0,"c2":0,"c3":0,"att":0.2},"q":"なにに、ほっこりしましたか？","targets":[{"label":"お店の人とのやりとり","layer":"人","w":{"c1":0,"c2":0.3,"c3":0.2,"att":0}},{"label":"子ども・家族づれ","layer":"人","w":{"c1":0,"c2":0,"c3":0,"att":0.2}},{"label":"味・あたたかさ","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"その場の雰囲気","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.3}}]},{"id":"igai","label":"意外","val":0.3,"w":{"c1":0,"c2":0.2,"c3":0.2,"att":0},"q":"なにが意外でしたか？","targets":[{"label":"作った人の本業","layer":"人","w":{"c1":0,"c2":0.5,"c3":0,"att":0}},{"label":"出会った人","layer":"人","w":{"c1":0,"c2":0.5,"c3":0,"att":0}},{"label":"品物・作品","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"品川にこんな場所","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.5}}]},{"id":"shigeki","label":"刺激をもらった","val":0.8,"w":{"c1":0.5,"c2":0,"c3":0,"att":0},"q":"なにに刺激をもらいましたか？","targets":[{"label":"挑戦している姿","layer":"人","w":{"c1":0.5,"c2":0,"c3":0,"att":0}},{"label":"作った人の生き方","layer":"人","w":{"c1":0.5,"c2":0,"c3":0,"att":0}},{"label":"技・発想","layer":"コンテンツ","w":{"c1":0.5,"c2":0,"c3":0,"att":0}},{"label":"話したこと","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}}]},{"id":"futsuu","label":"ふつう","val":0,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"","targets":[]},{"id":"zannen","label":"いまいち","val":-1,"w":{"c1":0,"c2":0,"c3":0,"att":0},"q":"どこがいまいちでしたか？","targets":[{"label":"待ち時間・混雑","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"案内のわかりにくさ","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"値段","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"品ぞろえ","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}}]}],"why_default":[{"label":"味・香り","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"見た目・色・形","layer":"コンテンツ","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"label":"手づくり感・技","layer":"コンテンツ","w":{"c1":0.3,"c2":0,"c3":0,"att":0}},{"label":"作った人・演じた人","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}},{"label":"話したこと","layer":"人","w":{"c1":0,"c2":0.3,"c3":0,"att":0}},{"label":"平日とのギャップ","layer":"人","w":{"c1":0.2,"c2":0,"c3":0.2,"att":0}},{"label":"その場の雰囲気","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.3}},{"label":"品川の景色・街","layer":"空間","w":{"c1":0,"c2":0,"c3":0,"att":0.5}}],"who":[{"id":"maker","label":"作った人・お店の人と話した","w":{"c1":0.3,"c2":0.5,"c3":0,"att":0}},{"id":"work","label":"職場の人（上司・同僚）と","w":{"c1":0,"c2":0.3,"c3":0.7,"att":0}},{"id":"otherco","label":"ちがう会社の人と話した","w":{"c1":0,"c2":1,"c3":0,"att":0}},{"id":"local","label":"近所の人・学生と話した","w":{"c1":0,"c2":1,"c3":0,"att":0.3}},{"id":"family","label":"家族・友だちと","w":{"c1":0,"c2":0,"c3":0,"att":0.3}},{"id":"alone","label":"ひとりで","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"id":"other","label":"その他","w":{"c1":0,"c2":0,"c3":0,"att":0}}],"next":[{"id":"try","label":"自分もやってみたい","w":{"c1":1,"c2":0,"c3":0,"att":0}},{"id":"again","label":"あの人とまた話したい","w":{"c1":0,"c2":1,"c3":0,"att":0}},{"id":"work","label":"職場でも話してみたい","w":{"c1":0,"c2":0,"c3":1,"att":0}},{"id":"tell","label":"誰かに教えたい","w":{"c1":0,"c2":0,"c3":0,"att":0.7}},{"id":"revisit","label":"また来たい","w":{"c1":0,"c2":0,"c3":0,"att":1}},{"id":"walk","label":"品川をもっと歩きたい","w":{"c1":0,"c2":0,"c3":0,"att":1}},{"id":"none","label":"とくにない","w":{"c1":0,"c2":0,"c3":0,"att":0}}],"find":[{"id":"unexpected","label":"作った人・演じた人の意外な一面","w":{"c1":0.3,"c2":0.5,"c3":0,"att":0}},{"id":"newpeople","label":"ふだん話さない人と話せた","w":{"c1":0,"c2":1,"c3":0,"att":0}},{"id":"coworker","label":"職場の人の知らない一面","w":{"c1":0,"c2":0,"c3":1,"att":0}},{"id":"newlike","label":"新しい「好き」が見つかった","w":{"c1":0.7,"c2":0,"c3":0,"att":0}},{"id":"town","label":"品川がちょっと身近になった","w":{"c1":0,"c2":0,"c3":0,"att":1}},{"id":"none","label":"とくにない","w":{"c1":0,"c2":0,"c3":0,"att":0}}],"face":[{"id":"worker","label":"品川で働く会社員","w":{"c1":0,"c2":0.5,"c3":0,"att":0}},{"id":"shop","label":"近所のお店の人","w":{"c1":0,"c2":0.3,"c3":0,"att":0.3}},{"id":"student","label":"学生","w":{"c1":0,"c2":0.5,"c3":0,"att":0}},{"id":"pro","label":"作家・アーティストが本業","w":{"c1":0,"c2":0,"c3":0,"att":0}},{"id":"unknown","label":"わからない","w":{"c1":0,"c2":0,"c3":0,"att":0}}],"profile":[{"id":"worker","label":"品川で働いている"},{"id":"resident","label":"品川の近くに住んでいる"},{"id":"exhibitor","label":"出展・出演している"},{"id":"staff","label":"運営・スタッフ"},{"id":"student","label":"学生"},{"id":"visitor","label":"遊びに来た（品川以外から）"},{"id":"other","label":"その他"}]}</script>
+<script>
+"use strict";
+/* =====================================================================
+   DROP. Coach — 投稿づくりチャット v3.1（drop_coach_chat.html）  2026/11/13
+   ---------------------------------------------------------------------
+   2026/11/13 の改良会議（README と docs の会議メモ）で決めた作り
+   - 聞いてから聞く：ひとことを受けて返し、ひとことに書かれた気持ち・人は先に選んでおく。問いの言い方もひとことの話題を使う
+   - 問いは 4 つ：気持ち → どこが → だれと → このあと（＋端末ごとに 1 回「あなたについて」）。点数は聞かず、気持ちから向きを計算
+   - 「どこが」の候補は気持ちごとに運営が設定（例：かわいい → 商品／ショッパー／お店の飾りつけ／お店の人）。近い順に選び、1・0.75・0.5・0.25 の重みで記録
+   - 選択肢・重みは運営が分析画面の「チャットの設定」で変えられる（記録用 GAS から配る）
+   - 上部の「あなたの投稿」バーで、答えるたびに投稿が育つのを見せる（深掘りのゴールが見える）。見本は「ほかの人の例」としてここから
+   - AI は 2 回・待たせない：ひとことの直後に裏でヒント（話題・写真から見える候補）、最後に投稿文（分析用の読み取りも）
+   - 最後は「AI が整えた文／自分の言葉の文」を本人が選べる。ハッシュタグは付けない設定から始める
+   - 文字・ボタンを大きく。メニューから「文字を大きく」。いつでも「ここまでで投稿文をつくる」
+   設定
+   - GAS_URL : 仕上げ用 GAS（gas/DROP_COACH_GPT.gs v9）の /exec URL
+   - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v8）の /exec URL。記録と「チャットの設定」の配布
+   - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
+===================================================================== */
+const APP_VERSION = "chat-v3.2 (2026-11-13)";
+const CONFIG = {
+  GAS_URL: "https://script.google.com/macros/s/AKfycbw4Z6_8PsnpD-rsyWM4j0spAWosP5wwALRy3reD6r8iShnCt0_Zioef3NEVkBx6ln457Q/exec",   // 00_GAS/DROP_COACH2.0/DROP_COACH_GPT
+  LOG_URL: "https://script.google.com/macros/s/AKfycbyTHPDVzPHB76Xt8GmZaiW3q_i4x9H2fishpnrWn1TbMGFCGzYIgPqLAzOetsrNMVokEA/exec",   // 00_GAS/DROP_COACH2.0/DROP_COACH_LOG
+  DATA_SOURCES: ["json/sample_drop.json"],
+  EVENT: "culture-snack-2026",
+  LOGIN_AT_START: true,       // GAS 設定済み・未ログインなら最初に 1 回だけ名前とパスワードを聞く
+  ALLOW_NO_LOGIN: false,      // true にすると「ログインせずに使う（AI・記録なし）」を出す（全員分を記録する方針のため false）
+  AUTO_AI: true,              // 投稿文の段階に入ったら自動で AI が投稿文を作る（失敗したら自分の言葉の文を使う）
+  AI_MAX: 3,                  // 1 セッションで投稿文を AI で作る上限（最初の 1 回＋「AI でもう一案」2 回）
+  HINT_ON: true,              // ひとことの直後に裏で AI のヒントを 1 回呼ぶ（話題・「どこが」の写真からの候補）
+  ASK_SCORE: false,           // 体験そのものの点数（10 点満点）を聞く。既定は聞かない（選んだ気持ちから「気持ちの向き」を計算）
+  ASK_PROFILE: true,          // 「あなたについて」を聞く（この端末で 1 回だけ）
+  SHUFFLE: true,              // 選択肢の表示順をシャッフル（「ふつう」「いまいち」「ひとりで」「とくにない」は末尾に固定）。表示順は記録する
+  HASHTAGS_ON: false,         // 投稿文にハッシュタグを付ける（初期値。付けたい人だけ画面でオン）
+  MAX_TAGS: 3, FIXED_TAGS: [],
+  SEND_SAMPLES: false,        // 見本投稿の本文を AI に送る（見本 8 例はプロンプトの 6 章に入っているので、ふだんは送らない。見本を足したときだけ true）
+  SEND_SAMPLE_IMAGES: false,  // 見本投稿の写真も AI に渡す（待ち時間が長くなる）
+  DROP_URL: "",               // DROP の投稿画面の URL（入れるとコピー後に「DROP を開く」ボタンを出す）
+  BOT_DELAY: 420, TIMEOUT_MS: 90000, SETTINGS_TIMEOUT_MS: 8000,
+  IMG_MAX_EDGE: 512, IMG_QUALITY: 0.8, PREVIEW_EDGE: 1080, MAX_MB: 30,
+  MAX_TEXT1: 100, MAX_DETAIL: 30, MAX_FREE: 20, MAX_FINAL: 300,
+  RESUME_HOURS: 6,
+  KEYS: { SESSION: "dropChatV3Session", PHOTO: "dropChatV3Photo", BIG: "dropChatV3Big", HISTORY: "dropChatV3History", SETTINGS: "dropChatV3Settings", POSTS: "dropChatV3Posts",
+          TOKEN: "dropChatV2Token", LOG_TOKEN: "dropChatV2LogToken", NAME: "dropChatV2Name", PW: "dropChatV2Pw", PROFILE: "dropChatV2Profile" }
+};
+
+/* =====================================================================
+   選択肢と重み（設定）
+   - 選択肢の言葉・KPI の重み・気持ちの向き・「どこが」の候補・選んだ順の重みは「設定」から作る
+     運営が分析画面（drop_coach_dashboard.html）の「チャットの設定」で変えて保存 → 記録用 GAS（action:"settings"）から全員に配られる
+     読めないときは、この端末に残っている前回の設定 → 初期値（json/coach_settings_default.json と同じ。下の defaultSettings）
+   - w：KPI の重み（c1=①挑戦, c2=②属性横断, c3=③信頼・心理的安全性, att=街への愛着）／val：気持ちの向き（-1〜1）
+   - layer：共起ネットワークのノードの層（人／コンテンツ／空間）
+   - BASE は画面の動き（ひとことの読み取りの言葉・投稿文のつなぎ方）で、設定では変えない
+     fixed：シャッフルせず末尾／neutral：中立（投稿文にしない）／negative：ネガティブ／hidden：画面に出さない（自由記述の受け皿）
+===================================================================== */
+const DEFAULT_SETTINGS = (() => { try { return JSON.parse(document.getElementById("defaultSettings").textContent); } catch (e) { return null; } })();
+const BASE = {
+  who: {
+    maker:   { ph: "例：隣のビルの経理さん、平日はSEの会社員", key: "作家|店主|お店の人|作った人|出展者|出演者|演者|作り手|職人", line: d => d ? `作ったのは${d}` : "作った人と話せた" },
+    work:    { ph: "例：総務部の部長、となりの部署の後輩", key: "部長|課長|上司|同僚|先輩|後輩|チーム|社内|職場|会社の人", line: d => d ? `${d}と一緒に` : "職場の人と一緒に" },
+    otherco: { ph: "例：同じビルの銀行の営業さん", key: "他社|別の会社|違う会社|ちがう会社|隣のビル", line: d => d ? `${d}と話した` : "ちがう会社の人と話した" },
+    local:   { ph: "例：近所の大学の学生さん、商店街のお店の人", key: "近所|学生|地元", line: d => d ? `${d}と話した` : "近所の人と話した" },
+    family:  { ph: "例：小学生の娘、学生時代の友だち", key: "子ども|子供|家族|娘|息子|夫|妻|友だち|友達|友人", line: d => d ? `${d}と一緒に` : "" },
+    alone:   { neutral: true, fixed: true, key: "ひとりで|一人で|1人で", line: () => "" },
+    other:   { free: true, fixed: true, line: (d, v) => v || "" }
+  },
+  feel: {
+    oishii:   { tag: "#おいしい", ex: "おいしい！",     withE: "{e}がおいしい！",     key: "おいし|美味|うま[いか]" },
+    tanoshii: { tag: "#たのしい", ex: "たのしい！",     withE: "{e}がたのしい！",     key: "たのし|楽し" },
+    kawaii:   { tag: "#かわいい", ex: "かわいい！",     withE: "{e}がかわいい！",     key: "かわい|可愛" },
+    sugoi:    { tag: "#すごい",   ex: "すごすぎる！",   withE: "{e}がすごい！",       key: "すご[いかく]|凄|感動" },
+    kirei:    { tag: "#きれい",   ex: "きれい！",       withE: "{e}がきれい！",       key: "きれい|綺麗|キレイ|美し" },
+    hokkori:  { tag: "#ほっこり", ex: "ほっこり",       withE: "{e}にほっこり",       key: "ほっこり|あったか|あったま|温か|癒" },
+    igai:     { tag: "#意外",     ex: "意外な発見！",   withE: "{e}に意外な発見",     key: "意外|びっくり|驚" },
+    shigeki:  { tag: "#刺激",     ex: "刺激をもらった", withE: "{e}に刺激をもらった", key: "刺激|憧れ|あこが" },
+    futsuu:   { neutral: true, fixed: true },
+    zannen:   { negative: true, fixed: true, ex: "ちょっと残念", withE: "{e}がちょっと残念", key: "残念|いまいち|イマイチ|微妙" }
+  },
+  next: {
+    try: { say: "私もやってみたい" }, again: { say: "また話したい" }, work: { say: "職場でも話してみたい" }, tell: { say: "誰かに教えたい！" },
+    revisit: { say: "また来たい！" }, walk: { say: "品川をもっと歩きたい" }, none: { neutral: true, fixed: true, say: "" }
+  },
+  // 今日の発見（任意）：見本投稿の「こんな人がいたなんて」にあたる行。say が投稿文でのことば
+  find: {
+    unexpected: { say: "こんな人がいたなんて" }, newpeople: { say: "ふだん話さない人と話せた" }, coworker: { say: "職場の人の知らない一面を見た" },
+    newlike: { say: "新しい「好き」が見つかった" }, town: { say: "品川がちょっと身近になった" }, none: { neutral: true, fixed: true, say: "" }
+  },
+  // その人のふだん（任意）：見本投稿の「平日は銀行員、今日はカレー屋さん！」のギャップ
+  face: {
+    worker: { say: "ふだんは品川で働く会社員" }, shop: { say: "ふだんは近所のお店の人" }, student: { say: "ふだんは学生さん" },
+    pro: { say: "作家・アーティストが本業" }, unknown: { neutral: true, fixed: true, say: "" }
+  },
+  profile: { other: { free: true, fixed: true } },
+  why: {   // 候補の言葉ごとの、投稿文での言い方・ハッシュタグ（ラベルで対応）
+    "味・香り": { say: "味わい" }, "見た目・色・形": { say: "見た目" }, "手づくり感・技": { say: "手づくり感" }, "作った人・演じた人": { say: "作った人" },
+    "平日とのギャップ": { tag: "#B面" }, "品川の景色・街": { say: "品川の景色", tag: "#品川" }, "品川の景色": { tag: "#品川" }
+  }
+};
+const FREE_ITEM = {   // 自由記述の受け皿（画面には出さない）
+  feel: { id: "other", label: "自由記述", free: true, hidden: true, val: null, ex: "{v}", withE: "{e}が{v}", w: {} },
+  next: { id: "other", label: "自由記述", free: true, hidden: true, say: "{v}", w: {} },
+  find: { id: "other", label: "自由記述", free: true, hidden: true, say: "{v}", w: {} },
+  face: { id: "other", label: "自由記述", free: true, hidden: true, say: "{v}", w: {} }
+};
+const reEsc = t => String(t).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+/** 設定にしかない（運営が足した）選択肢の動き */
+function customBase(kind, x) {
+  if (kind === "feel") return { tag: "#" + x.label, ex: x.label + "！", withE: "{e}が" + x.label + "！", key: reEsc(x.label) };
+  if (kind === "who") return { ph: "例：会社・部署・立場などで", key: reEsc(x.label.replace(/(と|と話した)$/, "")), line: d => d ? `${d}と` : x.label };
+  if (kind === "next" || kind === "find") return { say: x.label };
+  if (kind === "face") return { say: "ふだんは" + x.label };
+  return {};
+}
+const W0 = () => ({ c1: 0, c2: 0, c3: 0, att: 0 });
+/** 設定の形をそろえる（欠けている所は初期値で補う・数値は範囲内に） */
+function normSettings(raw) {
+  const d = DEFAULT_SETTINGS || {}, s = raw && typeof raw === "object" ? raw : {};
+  const num = (v, lo, hi, def) => { const n = Number(v); return isFinite(n) ? Math.min(hi, Math.max(lo, n)) : def; };
+  const w = v => { const o = W0(); if (v && typeof v === "object") Object.keys(o).forEach(k => { o[k] = num(v[k], 0, 1, 0); }); return o; };
+  const lab = v => String(v || "").replace(/\s+/g, " ").trim().slice(0, 24);
+  const list = (a, def, f) => (Array.isArray(a) && a.length ? a : def || []).map(f).filter(x => x && x.label);
+  const tg = t => ({ label: lab(t.label), layer: ["人", "コンテンツ", "空間"].includes(t.layer) ? t.layer : "コンテンツ", w: w(t.w), off: !!t.off });
+  const rank = (a, def) => (Array.isArray(a) && a.length ? a : def).slice(0, 6).map(v => num(v, 0, 1, 0));
+  const r = s.rank || {}, dr = { feel: [1, .6, .45, .35], why: [1, .75, .5, .25], next: [1, .8], find: [1, .8], ...(d.rank || {}) };
+  const opt = (a, def) => list(a, def, x => ({ id: String(x.id || ""), label: lab(x.label), w: w(x.w), off: !!x.off }));
+  return {
+    rank: { feel: rank(r.feel, dr.feel), why: rank(r.why, dr.why), next: rank(r.next, dr.next), find: rank(r.find, dr.find) },
+    find: opt(s.find, d.find), face: opt(s.face, d.face),
+    why_q_default: lab(s.why_q_default || d.why_q_default || "とくに印象に残ったのは、どこですか？").slice(0, 60) || "とくに印象に残ったのは、どこですか？",
+    feel: list(s.feel, d.feel, x => ({ id: String(x.id || ""), label: lab(x.label), val: num(x.val, -1, 1, 0), w: w(x.w), off: !!x.off, q: String(x.q || "").slice(0, 60), targets: (Array.isArray(x.targets) ? x.targets : []).map(tg).filter(t => t.label) })),
+    why_default: list(s.why_default, d.why_default, tg),
+    who: list(s.who, d.who, x => ({ id: String(x.id || ""), label: lab(x.label), w: w(x.w), off: !!x.off })),
+    next: list(s.next, d.next, x => ({ id: String(x.id || ""), label: lab(x.label), w: w(x.w), off: !!x.off })),
+    profile: list(s.profile, d.profile, x => ({ id: String(x.id || ""), label: lab(x.label), off: !!x.off }))
+  };
+}
+let V = {}, ORDER_W = {}, SETTINGS = null, SETTINGS_VER = "初期値";
+function applySettings(raw, ver) {
+  const s = normSettings(raw);
+  // 初期値の選択肢でも、運営が表示名を変えたら、投稿文でのつなぎ方は新しい表示名に合わせる（中立などの性質はそのまま）
+  const defLabel = (kind, id) => (((DEFAULT_SETTINGS || {})[kind] || []).find(d => d.id === id) || {}).label;
+  const mk = (kind, x) => {
+    const base = (BASE[kind] || {})[x.id];
+    if (!base) return { ...customBase(kind, x), ...x, w: x.w || W0() };
+    if (defLabel(kind, x.id) === x.label) return { ...base, ...x, w: x.w || W0() };
+    const c = customBase(kind, x);
+    return { ...base, ...c, key: base.key ? base.key + "|" + c.key : c.key, ...(kind === "feel" && base.negative ? { ex: base.ex, withE: base.withE } : {}), ...(base.neutral ? { line: base.line, say: base.say } : {}), ...x, w: x.w || W0() };
+  };
+  V = {
+    who: s.who.filter(x => !x.off).map(x => mk("who", x)),
+    feel: s.feel.filter(x => !x.off).map(x => mk("feel", x)).concat([FREE_ITEM.feel]),
+    next: s.next.filter(x => !x.off).map(x => mk("next", x)).concat([FREE_ITEM.next]),
+    find: s.find.filter(x => !x.off).map(x => mk("find", x)).concat([FREE_ITEM.find]),
+    face: s.face.filter(x => !x.off).map(x => mk("face", x)).concat([FREE_ITEM.face]),
+    profile: s.profile.filter(x => !x.off).map(x => ({ ...(BASE.profile[x.id] || {}), ...x }))
+  };
+  ORDER_W = { ...s.rank };
+  SETTINGS = s; SETTINGS_VER = ver || "初期値";
+}
+applySettings(DEFAULT_SETTINGS, "初期値");
+const SOFT_LABEL = { c1: "①挑戦", c2: "②属性横断", c3: "③心理的安全性", att: "愛着" };
+const ACT_LABEL = { watch: "見た・聴いた", eat: "食べた・飲んだ", make: "作った・体験した", buy: "買った", talk: "話した", host: "出展・出演・お手伝い", stroll: "ぶらぶら回った" };
+
+/* ---------- 共通 ---------- */
+const $ = id => document.getElementById(id);
+const esc = t => String(t ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const now = () => Date.now();
+const r2 = n => Math.round(n * 100) / 100;
+const uniq = a => [...new Set(a)];
+const oneLine = s => String(s || "").replace(/\s+/g, " ").trim();
+const uid = () => {
+  try { if (crypto.randomUUID) return crypto.randomUUID().replace(/-/g, "").slice(0, 20); } catch (e) {}
+  return (Date.now().toString(36) + Math.random().toString(36).slice(2, 12)).slice(0, 20);
+};
+const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const store = area => ({
+  get(k, d) { try { const v = window[area].getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { window[area].setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
+  del(k) { try { window[area].removeItem(k); } catch (e) {} }
+});
+const LS = store("localStorage"), SS = store("sessionStorage");
+const STAFF = new URLSearchParams(location.search).get("staff") === "1";
+const item = (kind, id) => (V[kind] || []).find(x => x.id === id);
+const ICON = {
+  camera: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>',
+  send: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+  copy: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>',
+  spark: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/></svg>',
+  open: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"/></svg>'
+};
+
+/* ---------- 状態 ---------- */
+let S = null;                                   // 1 回分のチャット。localStorage に保存して再読み込みしても続きから
+let PHOTO = { img: "", imgAi: "", w: 0, h: 0 };  // 写真は sessionStorage（大きいため）
+let SAMPLES = [];
+const RT = { busy: false, typing: false, rendered: 0, sel: [], who: null, freeText: {}, gen: 0 };   // 画面だけの一時状態
+
+function newSession() {
+  return {
+    v: 32, sid: uid(), started: new Date().toISOString(), t0: now(),
+    msgs: [], cur: null, phase: "ask",
+    det: { feels: [], who: "", next: false, subject: "" },          // ひとことから読み取ったもの
+    ans: { text1: "", who: null, why: [], feel: [], find: [], face: [], next: [], profile: null, score: null },
+    asked: [], done: [], skipped: [], order: {}, times: {}, early: false, noLogin: false,
+    hint: null, previewOpens: 0, exViews: [],
+    composed: "", aiText: "", chosen: "自分の言葉", edits: {}, tagsOn: CONFIG.HASHTAGS_ON, tagOff: [],
+    ai: null, aiCount: 0, aiOk: null, aiStale: false, aiError: "",
+    copied: 0, logged: false, loggedKey: null, abandonSent: false
+  };
+}
+function save() { if (S) LS.set(CONFIG.KEYS.SESSION, S); }
+
+/* =====================================================================
+   ひとことの読み取り（画面内の簡易な辞書。外れても選び直せる）
+   - 気持ち：V.feel の key に当たる言葉 → 気持ちの問いで先に選んでおく
+   - だれと：V.who の key に当たる言葉 → だれとの問いで先に選んでおく
+   - 話題：最初の気持ちの言葉より前（例「コーヒーおいしかった」→「コーヒー」）。問いの言い方に使う。AI のヒントが届けばそちらを優先
+===================================================================== */
+function detect(text) {
+  const t = String(text || "");
+  const feels = [], pos = [];
+  V.feel.forEach(f => { if (!f.key) return; const m = t.match(new RegExp(f.key)); if (m) { feels.push(f.id); pos.push(m.index); } });
+  const w = V.who.find(x => x.key && new RegExp(x.key).test(t));
+  const next = /たい|また来|来年|次は|やってみ|行こう|しよう/.test(t);
+  // ネガティブな手がかり（「いいですね！」と返さないため。気持ちの選択までは決めない）
+  const negCue = /残念|いまいち|イマイチ|微妙|がっかり|つまらな|寒|暑|疲れ|待た|待っ|並ん|混ん|高い|高かった|わかりにく|分かりにく|迷っ|うるさ|狭|ひど|最悪|不満|足りな/.test(t);
+  let subject = "";
+  if (pos.length && Math.min(...pos) > 0) {
+    subject = t.slice(0, Math.min(...pos)).replace(/^(この|その|あの|写真の|今日の)/, "");
+    for (let k = 0; k < 3; k++) subject = subject.replace(/[\s、。,.!！?？〜~…]+$/, "").replace(/(が|は|も|を|の|って|で|に|と)$/, "");
+    if (subject.length > 12 || /[たてだる]$/.test(subject)) subject = "";
+  }
+  return { feels, who: w ? w.id : "", next, subject, negCue };
+}
+const subjectOf = () => (S.hint && S.hint.subject) || S.det.subject || "";
+
+/* =====================================================================
+   問い
+===================================================================== */
+const whoItem = () => (S.ans.who ? item("who", S.ans.who.id) : null);
+const hasPhoto = () => S.done.includes("photo") && !S.skipped.includes("photo");
+function firstFeel() {   // いちばん大事な気持ち（選んだもの → ひとことから読み取ったもの）
+  const f = S.ans.feel.find(x => { const it = item("feel", x.id); return it && !it.neutral; });
+  if (f) return { ...item("feel", f.id), v: f.label };
+  const d = S.det.feels.map(id => item("feel", id)).find(it => it && !it.neutral);
+  return d ? { ...d, v: d.label } : null;
+}
+/** 「どこが」の候補：いちばん大事な気持ちに候補が設定されていればそれ、なければ共通の候補 */
+function whyList() {
+  const f = firstFeel();
+  const list = f && (f.targets || []).some(t => !t.off) ? f.targets : SETTINGS.why_default;
+  return list.filter(t => !t.off).map(t => ({ id: "t:" + t.label, label: t.label, layer: t.layer || "コンテンツ", w: t.w || W0(), ...(BASE.why[t.label] || {}) }));
+}
+const whyFor = () => { const f = firstFeel(); return f && (f.targets || []).some(t => !t.off) ? f.label : ""; };
+/** 問い文の {話題} を、ひとことの話題に置きかえる（話題がなければ「{話題}の、」ごと消す） */
+function fillQ(tpl) {
+  const s = subjectOf();
+  return s ? tpl.replace(/\{話題\}/g, s) : tpl.replace(/\{話題\}(の、?|、)?/g, "").replace(/^[、\s]+/, "");
+}
+function preNote(kind) {
+  if (kind === "who" && S.det.who && S.ans.who == null) return `ひとことから「${item("who", S.det.who).label}」を選んでおきました。違っていたら変えてください`;
+  if (kind === "feel" && S.det.feels.length) return `ひとことから「${S.det.feels.map(id => item("feel", id).label).join("・")}」を選んでおきました。ほかにもあれば足してください`;
+  return "";
+}
+const STEPS = [
+  { id: "login", kind: "login", count: false,
+    when: () => CONFIG.LOGIN_AT_START && anyGas() && !S.noLogin && !getCreds() && !hasTokens(),
+    q: () => "はじめに、名前（ニックネームでOK）と、運営からお知らせしたパスワードを入れてください。この端末では1回だけです",
+    sub: () => "答えは、イベントの効果を確かめる分析にだけ使います。投稿文は、あなたがコピーしてDROPに投稿するまで公開されません" },
+  { id: "photo", kind: "photo", count: false, q: () => "投稿する写真を1枚えらんでください（写真なしでも大丈夫です）" },
+  { id: "text1", kind: "text", required: true, max: CONFIG.MAX_TEXT1, multiline: true,
+    q: () => hasPhoto() ? "この写真のこと、ひとことどうぞ。思ったままで大丈夫です" : "今日のこと、ひとことどうぞ。思ったままで大丈夫です",
+    sub: () => "これが投稿文のもとになります。マイクで話して入力もできます",
+    ph: () => hasPhoto() ? "例：コーヒーおいしかった" : "例：豆本かわいい！" },
+  { id: "feel", kind: "multi", opts: "feel", max: 4, freePh: "ほかの言葉で",
+    q: () => S.det.feels.length ? "ほかにも、どんな気持ちになりましたか？" : "どんな気持ちになりましたか？（いくつでも）",
+    sub: () => preNote("feel") },
+  { id: "why", kind: "multi", opts: "why", max: 4, freePh: "ほかにあれば、ひとことで",
+    q: () => { const f = firstFeel(); return fillQ((f && f.q) || SETTINGS.why_q_default || "とくに印象に残ったのは、どこですか？"); },
+    sub: () => (S.hint && (S.hint.why_options || []).length ? (hasPhoto() ? "写真から見つけた候補もあります" : "AI の案もあります") : "") },
+  { id: "score", kind: "scale", count: false, when: () => CONFIG.ASK_SCORE,
+    q: () => (subjectOf() ? `「${subjectOf()}」の体験そのものは` : "今日のその体験そのものは") + "、10点満点で何点ですか？",
+    sub: () => "※このチャットの点数ではありません" },
+  { id: "who", kind: "who", opts: "who", q: () => "そのとき、だれと一緒でしたか？", sub: () => preNote("who") },
+  // ここまでが「最低限」（何・どう・なぜ・誰と）。この先は任意：そのまま流れで聞き、各問いに「ここで投稿文をつくる」を同じ大きさで出す
+  { id: "find", kind: "multi", opts: "find", max: 2, optional: true, freePh: "ほかにあれば、ひとことで", when: () => !S.declined,
+    q: () => "今日、なにか発見はありましたか？", sub: () => "投稿の見どころになります" },
+  { id: "face", kind: "multi", opts: "face", max: 1, optional: true, freePh: "例：平日は隣のビルの経理さん", when: () => !S.declined && faceNeeded(),
+    q: () => "その人は、ふだん（平日）は何をしている人でしたか？（わかる範囲で）",
+    sub: () => "「平日は〇〇、今日は〇〇！」のようなギャップが、投稿のいちばんの見どころになります" },
+  { id: "next", kind: "multi", opts: "next", max: 2, optional: true, freePh: "ほかにあれば（例：友だちを誘う）", when: () => !S.declined,
+    q: () => "さいごに、このあと、どうしたいですか？", sub: () => "投稿の締めくくりになります" },
+  { id: "profile", kind: "single", opts: "profile", count: false,
+    when: () => CONFIG.ASK_PROFILE && !LS.get(CONFIG.KEYS.PROFILE, null),
+    q: () => "さいごに、あなたについて教えてください（この端末では1回だけ聞きます）" }
+];
+const STEP_LABEL = { login: "ログイン", photo: "写真", text1: "ひとこと", who: "だれと", why: "どこが", feel: "気持ち", score: "点数", find: "今日の発見", face: "その人のふだん", next: "このあと", profile: "あなたについて" };
+/** 「その人のふだん」を聞くのは、人と関わったとき（作った人・ちがう会社・近所の人と話した、または「こんな人がいたなんて」）で、まだ「どんな人」を書いていないとき */
+function faceNeeded() {
+  const w = S.ans.who && S.ans.who.id;
+  if (S.ans.who && S.ans.who.detail) return false;
+  return ["maker", "otherco", "local"].includes(w) || S.ans.find.some(x => x.id === "unexpected");
+}
+const OPT_STEPS = ["find", "face", "next"];
+const optRemaining = () => STEPS.filter(st => st.optional && !S.done.includes(st.id) && applicable(st)).length;
+const stepName = id => STEP_LABEL[id] || id || "";
+const stepOf = id => STEPS.find(s => s.id === id);
+const applicable = st => !st.when || st.when();
+function nextStepAfter(id) {
+  const i = id ? STEPS.findIndex(s => s.id === id) : -1;
+  for (let k = i + 1; k < STEPS.length; k++) { const st = STEPS[k]; if (!S.done.includes(st.id) && applicable(st)) return st; }
+  return null;
+}
+function remainingSteps() { return STEPS.filter(st => !S.done.includes(st.id) && !["login", "photo"].includes(st.id) && applicable(st)); }
+function answeredCount() { return S.done.filter(id => { const st = stepOf(id); return st && st.count !== false && !S.skipped.includes(id); }).length; }
+
+/* ---------- 表示 ---------- */
+function renderMsgs() {
+  const box = $("msgs"), n = S.msgs.length;
+  box.innerHTML = S.msgs.map((m, i) => msgHtml(m, (RT.rendered > 0 && i >= RT.rendered) || (RT.rendered === 0 && i === n - 1))).join("") +
+    (RT.typing ? `<div class="msg bot typing"><div class="avatar">D<i>.</i></div><div class="bubble"><i></i><i></i><i></i>${RT.typingText ? `<em>${esc(RT.typingText)}</em>` : ""}</div></div>` : "");
+  RT.rendered = n;
+  bindCards(); renderProgress(); renderPreviewBar(); scrollEnd();
+}
+function msgHtml(m, isNew) {
+  if (m.qid && S.phase === "ask" && m.qid === S.cur && !S.done.includes(m.qid)) return "";   // いまの問いは回答シートの頭に出す
+  const cls = "msg " + m.who + (isNew ? " new" : "");
+  if (m.who === "me") {
+    if (m.photo) return `<div class="${cls}"><div class="bubble photo">${PHOTO.img ? `<img src="${esc(PHOTO.img)}" alt="えらんだ写真">` : '<span class="nophoto">写真（この画面では表示できません）</span>'}</div></div>`;
+    return `<div class="${cls}"><div class="bubble${m.muted ? " muted" : ""}">${esc(m.text)}</div></div>`;
+  }
+  const av = m.ai ? '<div class="avatar ai">AI</div>' : '<div class="avatar">D<i>.</i></div>';
+  if (m.card === "compose") return `<div class="${cls} wide">${composeCardHtml()}</div>`;
+  if (m.card === "stamp") return `<div class="${cls} wide">${stampCardHtml()}</div>`;
+  return `<div class="${cls}">${av}<div class="bubble">${esc(m.text)}${m.sub ? `<span class="sub">${esc(m.sub)}</span>` : ""}</div></div>`;
+}
+function scrollEnd() { requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" })); }
+const PROG_STEPS = ["text1", "feel", "why", "who"];   // 最低限の 4 つ（このあと は任意なので数えない）
+function renderProgress() {
+  const total = PROG_STEPS.length, fin = S.phase === "compose";
+  const done = fin ? total : PROG_STEPS.filter(id => S.done.includes(id)).length;
+  const ring = $("ring"), C = 2 * Math.PI * 18;
+  $("ringFill").style.strokeDashoffset = String(C * (1 - done / total));
+  $("ringNum").textContent = fin || done === total ? "✓" : `${done}/${total}`;
+  ring.classList.toggle("done", fin || done === total);
+  $("ringLab").innerHTML = fin ? "完成！<small>投稿文ができました</small>" : done === 0 ? `はじめ<small>しつもん ${total}つ</small>` : done === total ? `そろいました<small>${optRemaining() ? `任意 あと${optRemaining()}つ` : "あとは任意"}</small>` : `あと${total - done}つ<small>しつもん</small>`;
+  $("ringBox").setAttribute("aria-valuenow", String(done));
+  if (RT.lastDone != null && RT.lastDone !== done) { ring.classList.remove("pulse"); void ring.offsetWidth; ring.classList.add("pulse"); }
+  RT.lastDone = done;
+}
+function bot(text, extra = {}) {
+  const g = RT.gen;
+  return new Promise(res => {
+    RT.typing = true; renderMsgs();
+    setTimeout(() => {
+      if (g !== RT.gen) return res(false);
+      RT.typing = false; S.msgs.push({ who: "bot", text, ...extra }); renderMsgs(); save(); res(true);
+    }, CONFIG.BOT_DELAY);
+  });
+}
+function me(text, extra = {}) { S.msgs.push({ who: "me", text, ...extra }); renderMsgs(); save(); }
+let toastTimer = null;
+function toast(t) { const el = $("toast"); el.textContent = t; el.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(() => el.classList.remove("show"), 2200); }
+function dock(html, act, head) { $("dockIn").innerHTML = (head ? `<div class="dock-head">${head}</div>` : "") + `<div class="dock-scroll" id="dockScroll">${html}</div>` + (act ? `<div class="dock-act">${act}</div>` : ""); syncDockH(); if (!document.body.classList.contains("editing")) scrollEnd(); }   // 回答エリアの高さが変わっても最後の問いが隠れないように
+function lockDock() { RT.busy = true; dock(`<div class="wait"><span class="spin"></span></div>`); }
+function syncDockH() { document.documentElement.style.setProperty("--dockH", $("dock").offsetHeight + "px"); }
+if ("ResizeObserver" in window) new ResizeObserver(syncDockH).observe($("dock"));
+
+/* ---------- 投稿イメージ（上部のバーとシート） ---------- */
+const MATERIALS = [
+  { key: "text1", label: "ひとこと",         done: () => !!S.ans.text1 },
+  { key: "feel",  label: "気持ち",           done: () => S.ans.feel.length > 0 || S.det.feels.length > 0 },
+  { key: "why",   label: "どこが",           done: () => S.ans.why.length > 0 },
+  { key: "who",   label: "だれと",           done: () => !!S.ans.who || (!!S.det.who && !S.done.includes("who")) },
+  { key: "find",  label: "発見",             done: () => S.ans.find.some(x => x.id !== "none") || S.ans.face.some(x => x.id !== "unknown") },
+  { key: "next",  label: "このあと",         done: () => S.ans.next.length > 0 || S.det.next }
+];
+function renderPreviewBar() {
+  const show = !!S && S.phase === "ask" && S.done.includes("text1");
+  $("pvBar").hidden = !show;
+  if (!show) return;
+  $("pvText").textContent = composeText().replace(/\n/g, " ／ ");
+  $("pvDots").innerHTML = MATERIALS.map(m => `<i class="${m.done() ? "on" : ""}" title="${esc(m.label)}"></i>`).join("");
+}
+function openPreview() {
+  if (!S || !S.done.includes("text1")) return;
+  S.previewOpens = (S.previewOpens || 0) + 1; save();
+  const n = MATERIALS.filter(m => m.done()).length;
+  openSheet("いまの投稿イメージ", `
+    <p>答えるたびに、あなたの投稿がこう育っていきます。最後に AI が読みやすく整えます（AI の文と、自分の言葉の文は、あとで選べます）。</p>
+    <div class="draft">${esc(composeText())}</div>
+    <div class="sec-h">入っているもの（${n} / ${MATERIALS.length}）</div>
+    <div class="mat">${MATERIALS.map(m => `<span class="${m.done() ? "on" : ""}"><i>${m.done() ? "✓" : "・"}</i>${esc(m.label)}</span>`).join("")}</div>
+    <p style="margin-top:8px;font-size:13.5px">全部そろわなくても大丈夫です。いつでも「ここまでで投稿文をつくる」で終われます。</p>
+    <div class="row"><button type="button" class="btn ghost wide" id="shEx">ほかの人の例</button><button type="button" class="btn wide" id="shBack">チャットにもどる</button></div>
+    <div id="shExList"></div>`);
+  $("shBack").addEventListener("click", closeModal);
+  $("shEx").addEventListener("click", () => { $("shEx").hidden = true; $("shExList").innerHTML = examplesHtml(); logExView("投稿イメージから"); });
+}
+$("pvBar").addEventListener("click", openPreview);
+/** ほかの人の例：ひとことを書く前は見せない（最初の言葉が例に引きずられないように）。ラベル（①-1 など）は出さない */
+function examplesHtml() {
+  return `<div class="sec-h">ほかの人の例（運営が作った見本・架空）</div><p style="font-size:13.5px">言い回しはまねしなくて大丈夫です。</p>` +
+    shuffle(SAMPLES).map(p => `<div class="ex">${p.img ? `<img src="${esc(p.img)}" alt="" loading="lazy" onerror="this.style.display='none'">` : ""}<p>${esc(p.s)}</p></div>`).join("");
+}
+function logExView(from) { S.exViews = (S.exViews || []).concat([{ step: S.phase === "compose" ? "投稿文" : stepName(S.cur), from, at_sec: Math.round((now() - S.t0) / 1000) }]); save(); }
+function openExamples() {
+  if (!S || !S.done.includes("text1")) { toast("最初のひとことを書いたあとで見られます"); return; }
+  if (!SAMPLES.length) { toast("例を読み込めませんでした"); return; }
+  openSheet("ほかの人の例", examplesHtml() + `<div class="row"><button type="button" class="btn full" id="shBack">もどる</button></div>`);
+  $("shBack").addEventListener("click", closeModal);
+  logExView("メニュー・投稿文");
+}
+function openSheet(title, html) {
+  $("modalTitle").textContent = title; $("sheetBody").innerHTML = html;
+  $("modal").classList.add("show"); $("modal").setAttribute("aria-hidden", "false"); $("modal").querySelector(".sheet").scrollTop = 0;
+}
+function closeModal() { $("modal").classList.remove("show"); $("modal").setAttribute("aria-hidden", "true"); }
+$("modalX").addEventListener("click", closeModal);
+$("modal").addEventListener("click", e => { if (e.target === $("modal")) closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+
+/* =====================================================================
+   チャットの進行
+===================================================================== */
+async function ask(st) {
+  const g = RT.gen;
+  S.cur = st.id; S.phase = "ask";
+  if (!S.asked.includes(st.id)) S.asked.push(st.id);
+  S.times[st.id] = { shown: now() };
+  if (st.opts && SET.pending) { await Promise.race([SET.pending, new Promise(r => setTimeout(r, CONFIG.SETTINGS_TIMEOUT_MS))]); if (g !== RT.gen) return; }
+  if (st.id === "why") S.whyFor = whyFor();
+  if (st.optional && !S.optIntro) {   // 最低限がそろったことを伝えてから、そのまま任意の問いへ
+    S.optIntro = true;
+    if (!await bot("これで投稿文がつくれます！", { sub: "よければ、もう少しだけ聞かせてください（任意・タップで答えられます）。見本のような投稿に近づきます。いつでも「ここで投稿文をつくる」で終われます" })) return;
+  }
+  if (st.opts) prepareOrder(st);
+  setSelFromAns(st);
+  const sub = st.sub ? st.sub() : "";
+  await bot(st.q(), sub ? { sub, qid: st.id } : { qid: st.id });
+  if (g !== RT.gen) return;
+  RT.busy = false; renderDock(); save();
+}
+async function advance(fromId, g = RT.gen) {
+  if (g !== RT.gen) return;
+  const n = nextStepAfter(fromId);
+  if (n) await ask(n); else await toCompose(false);
+}
+function markDone(st) { if (!S.done.includes(st.id)) S.done.push(st.id); const t = S.times[st.id]; if (t) t.answered = now(); }
+async function answered(st, display, extra) {
+  markDone(st); S.skipped = S.skipped.filter(x => x !== st.id);
+  if (display != null) me(display, extra);
+  lockDock(); await advance(st.id);
+}
+async function skipStep(st) {
+  if (RT.busy) return;
+  if (st.id === "profile") LS.set(CONFIG.KEYS.PROFILE, { id: "none", label: "答えない" });
+  if (!S.skipped.includes(st.id)) S.skipped.push(st.id);
+  markDone(st); me("とばす", { muted: true }); lockDock(); await advance(st.id);
+}
+async function exitEarly() {
+  if (RT.busy) return;
+  S.early = true; me("ここまでで投稿文をつくる", { muted: true }); lockDock(); await toCompose(true);
+}
+function prepareOrder(st) {
+  if (S.order[st.id]) return;
+  const list = (st.id === "why" ? whyList() : V[st.opts]).filter(x => !x.hidden);
+  const body = list.filter(x => !x.fixed), tail = list.filter(x => x.fixed);
+  S.order[st.id] = (CONFIG.SHUFFLE ? shuffle(body) : body).concat(tail).map(x => x.id);
+}
+function optionsOf(st) {
+  if (st.id === "why") {
+    const list = whyList(), base = (S.order.why || []).map(id => list.find(x => x.id === id)).filter(Boolean);
+    list.forEach(x => { if (!base.includes(x)) base.push(x); });
+    const ai = ((S.hint && S.hint.why_options) || []).filter(l => !base.some(b => b.label === l)).map(l => ({ id: "ai:" + l, label: l, ai: true, layer: "コンテンツ", w: W0() }));
+    return ai.concat(base);
+  }
+  return (S.order[st.id] || V[st.opts].map(x => x.id)).map(id => item(st.opts, id)).filter(x => x && !x.hidden);
+}
+/** 選択の初期値：答えたことがあればそれ。初めての問いは、ひとことから読み取ったものを先に選んでおく */
+function setSelFromAns(st) {
+  RT.freeText[st.id] = "";
+  if (st.kind === "who") {
+    RT.who = S.ans.who ? { ...S.ans.who } : (S.det.who ? { id: S.det.who, label: item("who", S.det.who).label, detail: "", pre: true } : null);
+    return;
+  }
+  if (st.kind !== "multi") { RT.sel = []; return; }
+  const a = S.ans[st.id] || [];
+  if (a.length) {
+    RT.sel = a.filter(x => x.id !== "other").map(x => ({ ...x }));
+    const f = a.find(x => x.id === "other"); RT.freeText[st.id] = f ? f.label : "";
+  } else if (st.id === "feel" && S.det.feels.length) {
+    RT.sel = S.det.feels.map(id => ({ id, label: item("feel", id).label, pre: true }));
+  } else RT.sel = [];
+}
+
+/* ---------- 回答エリア ---------- */
+function renderDock() {
+  if (!S) return;
+  if (S.phase === "compose") return renderComposeDock();
+  const st = stepOf(S.cur);
+  if (!st) { dock(""); return; }
+  const rest = remainingSteps().length;
+  const canExit = S.done.includes("text1") && st.kind !== "login" && rest > 0;
+  // 回答シート：頭（何問目・どう答えるか・ここまでで投稿文へ）／選択肢（スクロール）／ボタン（いつも同じ場所）
+  const core = PROG_STEPS.indexOf(st.id);
+  const badge = st.optional ? '<span class="q-step opt">任意</span>' : core >= 0 ? `<span class="q-step">しつもん ${core + 1}/${PROG_STEPS.length}</span>` : st.id === "profile" ? '<span class="q-step opt">さいごに</span>' : "";
+  const ins = { who: "1つえらぶ", single: "1つえらぶ", text: st.required ? "必ず書いてください（短くてOK）" : "", photo: "1枚えらぶ", scale: "1〜10", login: "この端末で1回だけ" }[st.kind]
+    ?? (st.kind === "multi" ? (st.max === 1 ? "1つえらぶ" : `${st.optional ? "" : "近い順に・"}${st.max}つまで`) : "");
+  const qm = [...S.msgs].reverse().find(m => m.qid === st.id);
+  const head = st.kind === "gate" ? "" : `<div class="q-meta">${badge}<span class="q-ins">${esc(ins)}</span>${canExit && !st.optional && st.kind !== "login" ? `<button type="button" class="lnk" id="dExit">ここで投稿文へ</button>` : ""}</div>
+    ${qm ? `<div class="q-title">${esc(qm.text)}</div>${qm.sub ? `<div class="q-sub">${esc(qm.sub)}</div>` : ""}` : ""}`;
+  const skipBtn = `<button type="button" class="btn text" id="dSkip">とばす</button>`;
+  const okBtn = (on, n) => `<button type="button" class="btn wide" id="dOk" ${on ? "" : "disabled"}>次へ${n ? `（${n}）` : ""}</button>`;
+  const tile = (o, on, mark) => `<button type="button" class="chip${on ? " on" : ""}${o.ai ? " ai" : ""}${o.free ? " sub" : ""}${String(o.label).length > 10 ? " wide" : ""}" data-id="${esc(o.id)}" aria-pressed="${!!on}"><span>${o.ai ? `<small>${hasPhoto() ? "写真から" : "AIの案"}</small>` : ""}${esc(o.label)}</span>${mark || ""}</button>`;
+  let html = "", act = "";
+  if (st.kind === "login") {
+    html = loginHtml("はじめる") + (CONFIG.ALLOW_NO_LOGIN ? `<div class="row center"><button type="button" class="lnk" id="dNoLogin">ログインせずに使う（AI・記録なし）</button></div>` : "");
+  } else if (st.kind === "photo") {
+    html = `<button type="button" class="photo-tile" id="dPhoto">${ICON.camera}<b>写真をえらぶ</b><small>カメラ・アルバムから</small></button><div class="err" id="dErr"></div>`;
+    act = `<div class="row center" style="margin-top:0"><button type="button" class="lnk" id="dNoPhoto">写真なしで進む</button></div>`;
+  } else if (st.kind === "text") {
+    html = `<div class="inrow"><textarea class="input" id="dIn" rows="2" maxlength="${st.max}" placeholder="${esc(st.ph ? st.ph() : "")}" enterkeyhint="send"></textarea><button type="button" class="send" id="dSend" aria-label="送る" disabled>${ICON.send}</button></div>
+      <div class="row" style="margin-top:6px"><span class="cnt-sm" id="dCnt">0 / ${st.max}</span></div>${st.required ? "" : `<div class="row">${skipBtn}</div>`}`;
+  } else if (st.kind === "who") {
+    const sel = RT.who, it = sel ? item("who", sel.id) : null;
+    html = `<div class="chips">${optionsOf(st).map(o => tile(o, sel && sel.id === o.id, sel && sel.id === o.id ? '<span class="ck">✓</span>' : "")).join("")}</div>
+      ${it && (it.ph || it.free) ? `<div class="lab">${it.free ? "だれと一緒でしたか？（会社・部署・立場などで）" : "どんな人でしたか？ 会社・部署・立場などで（任意・名前は書かなくてOK）"}</div><input class="input sm" id="dDetail" maxlength="${CONFIG.MAX_DETAIL}" placeholder="${esc(it.free ? "例：取引先の営業さん、サークルの仲間" : it.ph)}" value="${esc(it.free ? (sel.label === it.label ? "" : sel.label) : (sel.detail || ""))}" enterkeyhint="done" />` : ""}`;
+    act = `<div class="row">${skipBtn}${okBtn(!!sel)}</div>`;
+  } else if (st.kind === "single") {
+    html = `<div class="chips">${optionsOf(st).map(o => tile(o, false)).join("")}</div><div id="dFreeBox"></div>`;
+    act = `<div class="row center" style="margin-top:0"><button type="button" class="lnk" id="dSkip">${st.id === "profile" ? "答えない" : "とばす"}</button></div>`;
+  } else if (st.kind === "multi") {
+    const sel = RT.sel, fv = RT.freeText[st.id] || "", n = sel.length + (fv.trim() ? 1 : 0);
+    html = `<div class="chips">${optionsOf(st).map(o => { const k = sel.findIndex(x => x.id === o.id); return tile(o, k >= 0, k >= 0 ? `<span class="ord">${st.max === 1 ? "✓" : k + 1}</span>` : ""); }).join("")}</div>
+      <input class="free" id="dFreeM" maxlength="${CONFIG.MAX_FREE}" placeholder="＋ ${esc(st.freePh || "ほかのことばで")}" value="${esc(fv)}" enterkeyhint="done" />
+      <div class="hint" id="dMax" hidden>${st.max ? `選べるのは${st.max}つまでです` : ""}</div>`;
+    act = st.optional
+      ? `<div class="row"><button type="button" class="btn ghost wide" id="dOptDone">投稿文をつくる</button><button type="button" class="btn wide${n ? "" : " ghost"}" id="dOk">${n ? `次へ（${n}）` : "とばす"}</button></div><div class="hint" style="text-align:center">任意の問い：あと${optRemaining()}つ（えらぶと「次へ」になります）</div>`
+      : `<div class="row">${skipBtn}${okBtn(n, n)}</div>`;
+  } else if (st.kind === "gate") {
+    html = `<button type="button" class="btn full" id="dGateGo">${ICON.spark}投稿文をつくる</button>`;
+    act = `<div class="row"><button type="button" class="btn ghost wide sm" id="dGateMore">もう1つ答える（任意）</button></div>`;
+  } else if (st.kind === "scale") {
+    html = `<div class="scale">${Array.from({ length: 10 }, (_, i) => `<button type="button" data-v="${i + 1}">${i + 1}</button>`).join("")}</div>
+      <div class="scale-lab"><span>1 イマイチ</span><span>5 ふつう</span><span>10 最高</span></div>`;
+    act = `<div class="row">${skipBtn}</div>`;
+  }
+  dock(html, act, head);
+  bindDock(st);
+}
+function loginHtml(label) {
+  return `<form class="login" id="dLogin" autocomplete="on">
+    <input class="input" id="lName" name="username" autocomplete="nickname" maxlength="40" placeholder="名前（ニックネームでOK）" value="${esc(getName())}" />
+    <input class="input" id="lPw" name="password" type="password" autocomplete="current-password" placeholder="パスワード（運営からお知らせしたもの）" />
+    <div class="err" id="lErr"></div>
+    <button type="submit" class="btn full" id="lGo">${esc(label)}</button>
+  </form>`;
+}
+function bindDock(st) {
+  const on = (id, fn) => { const el = $(id); if (el) el.addEventListener("click", fn); };
+  on("dSkip", () => skipStep(st));
+  on("dExit", exitEarly);
+  if (st.kind === "login") {
+    bindLogin(async () => { markDone(st); me("ログインしました", { muted: true }); lockDock(); await advance(st.id); });
+    on("dNoLogin", async () => { if (RT.busy || !CONFIG.ALLOW_NO_LOGIN) return; S.noLogin = true; markDone(st); me("ログインせずに使う", { muted: true }); lockDock(); await advance(st.id); });
+  }
+  if (st.kind === "photo") {
+    on("dPhoto", () => $("file").click());
+    on("dNoPhoto", async () => { if (RT.busy) return; S.skipped.push("photo"); markDone(st); me("写真なしで進む", { muted: true }); lockDock(); await advance(st.id); });
+  }
+  if (st.kind === "text") {
+    const ta = $("dIn"), send = $("dSend");
+    const sync = () => { ta.style.height = "auto"; ta.style.height = Math.min(150, ta.scrollHeight) + "px"; send.disabled = !ta.value.trim(); $("dCnt").textContent = `${ta.value.length} / ${st.max}`; syncDockH(); };
+    ta.addEventListener("input", sync);
+    ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing && !matchMedia("(pointer:coarse)").matches) { e.preventDefault(); send.click(); } });
+    send.addEventListener("click", async () => {
+      if (RT.busy) return;
+      const v = ta.value.replace(/\r\n?/g, "\n").replace(/\n{2,}/g, "\n").trim().slice(0, st.max);
+      if (!v) return;
+      if (st.id === "text1") {
+        S.ans.text1 = v; S.det = detect(v);
+        markDone(st); me(v); lockDock();
+        fireHint();   // 裏で AI のヒント（待たない）
+        const g = RT.gen, d = S.det, short = v.length > 22 ? v.slice(0, 21) + "…" : v;
+        const neg = d.negCue || d.feels.some(id => { const it = item("feel", id) || {}; return it.negative || (typeof it.val === "number" && it.val < 0); });
+        const pos = !neg && d.feels.some(id => { const it = item("feel", id) || {}; return typeof it.val === "number" && it.val > 0; });
+        const n = PROG_STEPS.filter(id => !S.done.includes(id)).length;
+        if (!await bot((neg ? `「${short}」、正直に教えてくれてありがとうございます。` : pos ? `「${short}」、いいですね！` : `「${short}」、ありがとうございます。`) + `あと${n}つだけ、タップで聞かせてください`, { sub: "答えるたびに、上の「あなたの投稿」が育っていきます。とばしても大丈夫です" })) return;
+        await advance(st.id, g);
+        return;
+      }
+      await answered(st, v);
+    });
+    if (st.id === "text1" && S.ans.text1) { ta.value = S.ans.text1; sync(); }
+    if (!matchMedia("(pointer:coarse)").matches) ta.focus();
+  }
+  if (st.kind === "who") {
+    $("dockIn").querySelectorAll(".chip").forEach(b => b.addEventListener("click", async () => {
+      if (RT.busy) return;
+      const o = item("who", b.dataset.id);
+      if (o.neutral) { RT.who = { id: o.id, label: o.label, detail: "", pre: false }; return finishWho(st); }   // ひとりで → すぐ次へ
+      RT.who = { id: o.id, label: o.label, detail: "", pre: false };
+      renderDock(); const d = $("dDetail"); if (d && !matchMedia("(pointer:coarse)").matches) d.focus();
+    }));
+    const d = $("dDetail");
+    if (d) d.addEventListener("keydown", e => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); $("dOk").click(); } });
+    on("dOk", () => finishWho(st));
+  }
+  if (st.kind === "single") {
+    $("dockIn").querySelectorAll(".chip").forEach(b => b.addEventListener("click", async () => {
+      if (RT.busy) return;
+      const o = item(st.opts, b.dataset.id);
+      if (o.free) {
+        $("dFreeBox").innerHTML = `<div class="inrow" style="margin-top:10px"><input class="input" id="dFree" maxlength="${CONFIG.MAX_FREE}" placeholder="自分の言葉で" enterkeyhint="done" /><button type="button" class="send" id="dFreeOk" aria-label="決定">${ICON.send}</button></div>`;
+        const f = $("dFree"); f.focus(); syncDockH();
+        const go = () => { const v = oneLine(f.value).slice(0, CONFIG.MAX_FREE); if (v) pickSingle(st, o, v); };
+        $("dFreeOk").addEventListener("click", go);
+        f.addEventListener("keydown", e => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); go(); } });
+        return;
+      }
+      pickSingle(st, o, o.label);
+    }));
+  }
+  if (st.kind === "multi") {
+    const fi = $("dFreeM");
+    const syncOk = () => { const n = RT.sel.length + (fi.value.trim() ? 1 : 0), ok = $("dOk"); ok.disabled = !n && !st.optional; ok.textContent = n ? `次へ（${n}）` : st.optional ? "とばす" : "次へ"; if (st.optional) ok.classList.toggle("ghost", !n); };
+    fi.addEventListener("input", () => { RT.freeText[st.id] = fi.value; syncOk(); });
+    fi.addEventListener("keydown", e => { if (e.key === "Enter" && !e.isComposing) { e.preventDefault(); fi.blur(); if (!$("dOk").disabled) $("dOk").click(); } });
+    $("dockIn").querySelectorAll(".chip").forEach(b => b.addEventListener("click", () => {
+      if (RT.busy) return;
+      const o = optionsOf(st).find(x => x.id === b.dataset.id); if (!o) return;
+      const k = RT.sel.findIndex(x => x.id === o.id);
+      if (k >= 0) { RT.sel.splice(k, 1); renderDock(); return; }
+      if (st.max === 1 && RT.sel.length) RT.sel = [];
+      if (st.max && RT.sel.length >= st.max) { b.classList.add("shake"); const m = $("dMax"); if (m) { m.hidden = false; m.style.color = "var(--err)"; } setTimeout(() => b.classList.remove("shake"), 320); return; }
+      if (o.neutral) RT.sel = [];
+      else RT.sel = RT.sel.filter(x => !(item(st.opts, x.id) || {}).neutral);
+      RT.sel.push({ id: o.id, label: o.label, ...(o.ai ? { src: "AI候補" } : {}), ...(st.id === "why" ? { layer: o.layer, w: o.w, say: o.say, tag: o.tag } : {}) });
+      renderDock();
+    }));
+    on("dOk", async () => {
+      if (RT.busy) return;
+      const fv = oneLine(fi.value).replace(/^[#＃]/, "").slice(0, CONFIG.MAX_FREE);
+      let list = RT.sel.map(x => ({ ...x }));
+      if (fv) { list = list.filter(x => !(item(st.opts, x.id) || {}).neutral); list.push({ id: "other", label: fv, src: "自分で", ...(st.id === "why" ? { layer: "コンテンツ", w: W0() } : {}) }); }
+      if (!list.length) { if (st.optional) skipStep(st); return; }
+      list.forEach(x => { if (!x.src) x.src = "選択肢"; });
+      S.ans[st.id] = list;
+      await answered(st, list.map(x => x.label).join("　"));
+    });
+  }
+  if (st.optional) on("dOptDone", async () => { if (RT.busy) return; S.declined = true; markDone(st); if (!S.skipped.includes(st.id)) S.skipped.push(st.id); me("ここで投稿文をつくる", { muted: true }); lockDock(); await advance(st.id); });
+  if (st.kind === "gate") {
+    on("dGateGo", async () => { if (RT.busy) return; S.extra = "投稿文へ"; S.declined = true; markDone(st); me("投稿文をつくる", { muted: true }); lockDock(); await advance(st.id); });
+    on("dGateMore", async () => { if (RT.busy) return; S.extra = "答えた"; markDone(st); me("もう1つ答える", { muted: true }); lockDock(); await advance(st.id); });
+  }
+  if (st.kind === "scale") {
+    $("dockIn").querySelectorAll(".scale button").forEach(b => b.addEventListener("click", async () => {
+      if (RT.busy) return;
+      S.ans.score = Number(b.dataset.v); b.classList.add("on");
+      await answered(st, `${S.ans.score}点`);
+    }));
+  }
+}
+async function finishWho(st) {
+  if (RT.busy || !RT.who) return;
+  const it = item("who", RT.who.id), d = $("dDetail");
+  const v = d ? oneLine(d.value).slice(0, CONFIG.MAX_DETAIL) : "";
+  if (it.free) { if (!v) { if (d) d.focus(); return; } S.ans.who = { id: it.id, label: v, detail: "", pre: false }; }
+  else S.ans.who = { id: it.id, label: it.label, detail: it.ph ? v : "", pre: !!RT.who.pre && it.id === S.det.who };
+  await answered(st, S.ans.who.label + (S.ans.who.detail ? `（${S.ans.who.detail}）` : ""));
+}
+async function pickSingle(st, o, label) {
+  const v = { id: o.id, label };
+  if (st.id === "profile") { S.ans.profile = v; LS.set(CONFIG.KEYS.PROFILE, v); }
+  await answered(st, label);
+}
+
+/* ---------- 写真 ---------- */
+function drawToDataUrl(src, w, h, edge, quality) {
+  const k = Math.min(1, edge / Math.max(w, h));
+  const c = document.createElement("canvas");
+  c.width = Math.max(1, Math.round(w * k)); c.height = Math.max(1, Math.round(h * k));
+  const ctx = c.getContext("2d");
+  ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.drawImage(src, 0, 0, c.width, c.height);
+  return c.toDataURL("image/jpeg", quality);
+}
+/** 端末の画像ファイルをデコード（EXIF の向きを反映）。createImageBitmap で読めない形式は <img> で再試行 */
+async function decodeFile(file) {
+  if ("createImageBitmap" in window) {
+    try { const b = await createImageBitmap(file, { imageOrientation: "from-image" }); return { el: b, w: b.width, h: b.height, close: () => b.close && b.close() }; }
+    catch (e) { /* <img> で再試行 */ }
+  }
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = () => rej(new Error("decode error")); i.src = url; });
+    return { el: img, w: img.naturalWidth, h: img.naturalHeight, close: () => URL.revokeObjectURL(url) };
+  } catch (e) { URL.revokeObjectURL(url); throw e; }
+}
+$("file").addEventListener("change", async () => {
+  const file = $("file").files && $("file").files[0];
+  $("file").value = "";
+  if (!file || !S || S.cur !== "photo" || RT.busy) return;
+  const err = m => { const el = $("dErr"); if (el) el.textContent = m; };
+  if (file.type && !/^image\//.test(file.type)) { err("画像ファイルを選んでください"); return; }
+  if (file.size > CONFIG.MAX_MB * 1024 * 1024) { err(`画像が大きすぎます（${CONFIG.MAX_MB}MB まで）`); return; }
+  lockDock();
+  try {
+    const src = await decodeFile(file);
+    try {
+      if (!src.w || !src.h) throw new Error("empty image");
+      PHOTO = { sid: S.sid, img: drawToDataUrl(src.el, src.w, src.h, CONFIG.PREVIEW_EDGE, 0.85), imgAi: drawToDataUrl(src.el, src.w, src.h, CONFIG.IMG_MAX_EDGE, CONFIG.IMG_QUALITY), w: src.w, h: src.h };
+    } finally { src.close(); }
+  } catch (e) { console.warn(e); RT.busy = false; renderDock(); err("この写真を読み込めませんでした。JPEG / PNG の写真を選んでください"); return; }
+  if (!SS.set(CONFIG.KEYS.PHOTO, PHOTO)) console.warn("写真を一時保存できませんでした（容量超過）");
+  markDone(stepOf("photo")); S.skipped = S.skipped.filter(x => x !== "photo");
+  me("", { photo: true });
+  await advance("photo", RT.gen);
+});
+
+/* =====================================================================
+   ヒント：ひとことを送った直後に裏で 1 回だけ AI を呼ぶ（待たない）
+   - subject：問いの言い方に使う話題（「コーヒーの、どこがおいしかったですか？」）
+   - why_options：「どこが？」の問いに「写真から」として出す候補（届いていれば）
+===================================================================== */
+async function fireHint() {
+  if (!CONFIG.HINT_ON || !gasOn() || !S || (S.hint && S.hint.status !== "待ち") || RT.hintBusy) return;
+  const g = RT.gen, sid = S.sid, t0 = now();
+  RT.hintBusy = true;
+  S.hint = { status: "待ち" }; save();
+  try {
+    if (!getToken(CONFIG.KEYS.TOKEN) && !await autoLogin()) { S.hint = { status: "ログインなし" }; save(); return; }
+    const body = { action: "hint", variant: "chat", token: getToken(CONFIG.KEYS.TOKEN), context: { event: CONFIG.EVENT, sample_total: SAMPLES.length }, target: { text: S.ans.text1 } };
+    if (PHOTO.imgAi) body.target.image_data = PHOTO.imgAi;
+    const res = await post(body, CONFIG.GAS_URL);
+    if (g !== RT.gen || !S || S.sid !== sid) return;
+    const sec = Math.round((now() - t0) / 100) / 10;
+    S.hint = res.ok && res.result ? { status: "OK", cached: !!res.cached, elapsed_sec: sec, ...res.result } : { status: res.code || "ERROR", message: res.message || "", elapsed_sec: sec };
+    save();
+    if (S.phase === "ask" && S.cur === "why" && !RT.busy) renderDock();   // 「どこが？」を表示中なら候補を足す
+    if (S.phase === "ask") renderPreviewBar();
+  } finally { RT.hintBusy = false; }
+}
+
+/* =====================================================================
+   投稿文（自分の言葉の文＝画面で即時に組み立て／AI が整えた文）
+===================================================================== */
+function composeText() {
+  // 自分の言葉の文：見本の流れ（つかみ → 人・ギャップ → どこが → 気づき → 次の一歩）で、本人の答えだけをつなぐ（5〜6 行まで）
+  const A = S.ans, t1raw = String(A.text1 || "");
+  const head = t1raw.split(/\n/).map(s => s.replace(/[。．]+$/g, "").trim()).filter(Boolean).slice(0, 2);
+  const f = firstFeel();
+  const t1HasFeel = f && f.key ? new RegExp(f.key).test(t1raw) : false;
+  const fill = (tpl, e) => String(tpl || "").replace("{e}", e).replace("{v}", f ? f.v : "");
+  // 人とギャップ（「作った人は、ふだんは品川で働く会社員！」）
+  const w = whoItem(), people = [];
+  const wl = w && w.line ? w.line(A.who.detail, A.who.label) : "";
+  const fc = A.face.find(x => !(item("face", x.id) || {}).neutral);
+  if (fc) {
+    const it = item("face", fc.id), say = it && !it.free ? it.say : fc.label;
+    const nm = w && ["otherco", "local"].includes(w.id) ? "話した人" : "作った人";
+    if (wl && !(w && ["maker", "otherco", "local"].includes(w.id))) people.push(wl);
+    people.push(`${nm}は、${say}！`);
+  } else if (wl) people.push(wl);
+  // どこが
+  const whys = A.why.map(x => x.say || x.label).filter(Boolean).slice(0, 2).join("と");
+  let whyLine = "";
+  if (whys) whyLine = t1HasFeel ? (f.negative ? `気になったのは${whys}` : `とくに${whys}！`) : f && f.withE ? fill(f.withE, whys) : `印象に残ったのは${whys}`;
+  else if (f && !t1HasFeel && f.ex) whyLine = fill(f.ex, "");
+  // 気づき（今日の発見）・次の一歩
+  const finds = A.find.map(x => { const it = item("find", x.id); if (it && it.neutral) return ""; return it && !it.free ? it.say : x.label; }).filter(Boolean).slice(0, 2);
+  const nexts = A.next.map(n => { const it = item("next", n.id); if (!it || it.neutral) return ""; return (it.free ? n.label : it.say || "").replace("{v}", n.label); }).filter(Boolean).slice(0, 2);
+  // 2 番目以降に選んだ気持ち（ひとことに無いもの）は、行に余裕があるときだけ
+  const f2 = A.feel.map(x => ({ ...item("feel", x.id), v: x.label })).find(x => x && x.id !== (f && f.id) && !x.neutral && !(x.key && new RegExp(x.key).test(t1raw)));
+  const body = [...head, ...people, whyLine, ...finds];
+  if (f2 && f2.ex && body.filter(Boolean).length + nexts.length < 5) body.push(String(f2.ex).replace("{v}", f2.v));
+  return uniq(body.concat(nexts).map(s => String(s || "").trim()).filter(Boolean)).slice(0, 6).join("\n");
+}
+function autoTags() {
+  const t = [];
+  S.ans.feel.forEach(x => { const it = item("feel", x.id); if (it && it.tag && !it.neutral && !it.negative) t.push(it.tag); });
+  S.ans.why.forEach(x => { if (x.tag) t.push(x.tag); });
+  return uniq(t).slice(0, CONFIG.MAX_TAGS).concat(CONFIG.FIXED_TAGS || []);
+}
+const activeTags = () => (S.tagsOn ? autoTags().filter(t => !S.tagOff.includes(t)) : []);
+const baseOf = c => (c === "AI" ? S.aiText : S.composed);
+const bodyOf = c => (S.edits && S.edits[c] != null ? S.edits[c] : baseOf(c)) || "";
+const isEdited = () => S.edits && S.edits[S.chosen] != null && S.edits[S.chosen].trim() !== String(baseOf(S.chosen) || "").trim();
+function finalText() {
+  const body = bodyOf(S.chosen).replace(/\r\n?/g, "\n").trim(), tags = activeTags();
+  return (body + (tags.length ? "\n" + tags.join(" ") : "")).trim();
+}
+async function toCompose(early) {
+  const g = RT.gen;
+  S.phase = "compose"; S.cur = null; S.early = !!early;
+  S.composed = composeText();
+  S.msgs = S.msgs.filter(m => m.card !== "compose");
+  renderPreviewBar();
+  const useAI = CONFIG.AUTO_AI && gasOn() && (S.aiCount || 0) < CONFIG.AI_MAX && !isEdited();
+  if (!useAI && S.chosen === "AI" && !S.aiText) S.chosen = "自分の言葉";
+  if (useAI && !await bot(early ? "ここまでの答えで、投稿文をつくります" : "ありがとうございます！ 答えをもとに投稿文をつくります")) return;
+  await finishCompose(useAI, g);
+}
+async function finishCompose(useAI, g = RT.gen) {
+  if (useAI) {
+    const r = await runAI();
+    if (g !== RT.gen) return;
+    if (r === "login") { RT.loginFor = "compose"; RT.busy = false; await bot("投稿文をつくるために、名前とパスワードを入れてください（この端末では1回だけ）"); renderComposeDock(); save(); return; }
+    if (r === "ok") { if (!await bot((S.ai.result && S.ai.result.headline) || "投稿文ができました", { ai: true, sub: "上が AI が整えた文です。「自分の言葉の文」に切り替えたり、自由に直したりできます" })) return; }
+    else { S.chosen = "自分の言葉"; if (!await bot(`AI で整えられなかったので、あなたの言葉をつないだ文にしました（${S.aiError || "不明なエラー"}）。このまま使っても、直してもOKです`)) return; }
+  } else {
+    const lead = !String(bodyOf(S.chosen)).trim() ? "まだ文がありません。下の枠に、ひとことだけでも書いてみてください"
+      : isEdited() ? "直してくれた文は、そのままにしています" : "投稿文ができました。そのまま使っても、自由に直してもOKです";
+    if (!await bot(lead)) return;
+  }
+  S.msgs.push({ who: "bot", card: "compose" });
+  RT.busy = false;
+  renderMsgs(); renderComposeDock(); renderStaff(); save();
+  sendLog("finish");
+}
+function composeCardHtml() {
+  const tags = autoTags(), len = finalText().length;
+  const cav = S.chosen === "AI" && S.ai && S.ai.result ? (S.ai.result.caveats || []).map(c => `<div class="note warn">※ ${esc(c)}</div>`).join("") : "";
+  return `<div class="card" id="composeCard">
+    <div class="card-hd"><span class="post-label">あなたの投稿</span><span class="cnt" style="margin-left:auto;font-size:12.5px;color:var(--dim)">このままコピーして DROP へ</span></div>
+    ${S.aiText ? `<div class="seg" role="tablist"><button type="button" role="tab" data-v="AI" class="${S.chosen === "AI" ? "on" : ""}" aria-selected="${S.chosen === "AI"}">AI が整えた文</button><button type="button" role="tab" data-v="自分の言葉" class="${S.chosen === "自分の言葉" ? "on" : ""}" aria-selected="${S.chosen === "自分の言葉"}">自分の言葉の文</button></div>` : ""}
+    ${PHOTO.img ? `<img class="post-photo" src="${esc(PHOTO.img)}" alt="えらんだ写真">` : ""}
+    <textarea id="cText" rows="5" maxlength="${CONFIG.MAX_FINAL}" aria-label="投稿文（タップして直せます）">${esc(bodyOf(S.chosen))}</textarea>
+    <div class="card-foot"><span class="cnt" id="cCnt">${len} 字・文をタップして直せます</span><label class="switch"><input type="checkbox" id="cTagsOn" ${S.tagsOn ? "checked" : ""}>ハッシュタグをつける</label></div>
+    ${S.tagsOn && tags.length ? `<div class="tags">${tags.map(t => `<button type="button" class="tag${S.tagOff.includes(t) ? " off" : ""}" data-tag="${esc(t)}">${esc(t)}</button>`).join("")}</div><div class="hint">タグを押すと外せます</div>` : ""}
+    ${cav}
+  </div>`;
+}
+function bindCards() {
+  bindRate();
+  const ta = $("cText");
+  if (ta) {
+    const grow = () => { ta.style.height = "auto"; ta.style.height = Math.max(140, ta.scrollHeight) + "px"; };
+    grow();
+    ta.addEventListener("input", () => { S.edits = S.edits || {}; S.edits[S.chosen] = ta.value; $("cCnt").textContent = finalText().length + " 字・文をタップして直せます"; grow(); save(); renderStaff(); });
+    ta.addEventListener("focus", () => document.body.classList.add("editing"));
+    ta.addEventListener("blur", () => setTimeout(() => document.body.classList.remove("editing"), 60));
+  }
+  document.querySelectorAll("#composeCard .seg button").forEach(b => b.addEventListener("click", () => { if (S.chosen === b.dataset.v) return; S.chosen = b.dataset.v; refreshCompose(); }));
+  document.querySelectorAll("#composeCard .tag").forEach(b => b.addEventListener("click", () => { const t = b.dataset.tag; S.tagOff = S.tagOff.includes(t) ? S.tagOff.filter(x => x !== t) : S.tagOff.concat(t); refreshCompose(); }));
+  const tg = $("cTagsOn"); if (tg) tg.addEventListener("change", () => { S.tagsOn = tg.checked; if (S.tagsOn) S.tagOff = []; refreshCompose(); });
+}
+function refreshCompose() { const card = $("composeCard"); if (card) { card.outerHTML = composeCardHtml(); bindCards(); } save(); renderStaff(); }
+function renderComposeDock() {
+  if (RT.aiWait) { dock(`<div class="wait"><span class="spin"></span><span>AI が投稿文を整えています… <b id="aiSec">0</b> 秒</span></div>`); return; }
+  if (RT.loginFor) {
+    dock(`${loginHtml("ログインして投稿文をつくる")}<div class="row center"><button type="button" class="lnk" id="dCancel">AI を使わずに続ける</button></div>`);
+    bindLogin(async () => { RT.loginFor = null; lockDock(); await finishCompose(true); });
+    $("dCancel").addEventListener("click", async () => { RT.loginFor = null; lockDock(); await finishCompose(false); });
+    return;
+  }
+  const canRedo = gasOn() && (S.aiCount || 0) < CONFIG.AI_MAX && (S.aiOk === false || S.aiStale);
+  const canMore = gasOn() && S.aiOk && !S.aiStale && (S.aiCount || 0) < CONFIG.AI_MAX;   // AI の文ができたあと「もう一案」
+  const rest = remainingSteps().filter(st => st.id !== "profile");
+  if (S.copied) {   // コピーしたあと：いちばん目立つボタンを「次の 1 本」に
+    dock(`<button type="button" class="btn full" id="dNext">${ICON.camera}次の写真で、もう1本つくる</button>
+      <div class="row"><button type="button" class="btn ghost wide sm" id="dCopy">${ICON.copy}もう一度コピー</button>${CONFIG.DROP_URL ? `<a class="btn ghost wide sm" href="${esc(CONFIG.DROP_URL)}" target="_blank" rel="noopener">${ICON.open}DROP を開く</a>` : ""}</div>
+      <div class="row center"><button type="button" class="lnk" id="dEx">ほかの人の例</button></div>`);
+    $("dNext").addEventListener("click", () => restart());
+    $("dCopy").addEventListener("click", copyFinal);
+    $("dEx").addEventListener("click", openExamples);
+    return;
+  }
+  dock(`<button type="button" class="btn full" id="dCopy">${ICON.copy}コピーして DROP に投稿へ</button>
+    <div class="row">
+      ${canRedo ? `<button type="button" class="btn ghost wide sm" id="dAI">${ICON.spark}AI で整え直す</button>` : ""}
+      ${canMore ? `<button type="button" class="btn ghost wide sm" id="dAI2">${ICON.spark}AI でもう一案（あと${CONFIG.AI_MAX - S.aiCount}回）</button>` : ""}
+      ${S.early && rest.length ? `<button type="button" class="btn ghost wide sm" id="dResume">つづきを答える（あと${rest.length}つ）</button>` : ""}
+    </div>
+    <div class="row center"><button type="button" class="lnk" id="dEx">ほかの人の例</button><button type="button" class="lnk" id="dRestart">最初から</button></div>`);
+  $("dCopy").addEventListener("click", copyFinal);
+  const ai = $("dAI"); if (ai) ai.addEventListener("click", () => redoAI(false));
+  const ai2 = $("dAI2"); if (ai2) ai2.addEventListener("click", () => redoAI(true));
+  const rs = $("dResume"); if (rs) rs.addEventListener("click", resume);
+  $("dEx").addEventListener("click", openExamples);
+  $("dRestart").addEventListener("click", () => restart());
+}
+async function redoAI(another) {
+  if (RT.busy || RT.aiWait) return;
+  S.msgs = S.msgs.filter(m => m.card !== "compose");
+  if (S.edits) delete S.edits.AI;
+  if (another && S.aiText) S.aiPrev = (S.aiPrev || []).concat([S.aiText]).slice(-3);   // 前の案（記録用）
+  RT.forceAI = !!another;   // 同じ答えでも別の案になるよう、GAS のキャッシュを使わない
+  me(another ? "AI でもう一案" : "AI で整え直す", { muted: true }); lockDock();
+  await finishCompose(true);
+}
+async function resume() {
+  if (RT.busy) return;
+  S.early = false; if (S.aiOk) S.aiStale = true;
+  me("つづきを答える", { muted: true }); lockDock();
+  const n = nextStepAfter(null);
+  if (n) await ask(n); else await toCompose(false);
+}
+/* ---------- もう 1 本つくりたくなる仕掛け：投稿スタンプ（この端末で、今日コピーした本数） ---------- */
+const STAMP_SLOTS = 5;
+function postStats() { const p = LS.get(CONFIG.KEYS.POSTS, null), d = new Date().toISOString().slice(0, 10); return p && p.date === d ? p : { date: d, n: 0, total: (p && p.total) || 0 }; }
+function countPost() { const p = postStats(); p.n++; p.total = (p.total || 0) + 1; LS.set(CONFIG.KEYS.POSTS, p); return p.n; }
+function stampCardHtml() {
+  const n = S.postNo || postStats().n, k = ((n - 1) % STAMP_SLOTS) + 1, round = Math.ceil(n / STAMP_SLOTS);
+  const msg = n === 1 ? "1本目、完成です！ ほかのブースや気づいたことでも、ひとこと残してみませんか？"
+    : k === STAMP_SLOTS ? `${n}本目！ スタンプがそろいました。たくさんの声をありがとうございます`
+    : n === 3 ? "3本目！ もう DROP 名人です。ほかに気になったところはありますか？" : `${n}本目、完成です！ 気づいたことがあれば、もう1本どうですか？`;
+  const head = S.ai && S.ai.status === "OK" && S.ai.result && S.ai.result.headline && S.chosen === "AI" ? S.ai.result.headline : "";
+  return `<div class="card stamp"><div class="card-hd"><b>今日の投稿スタンプ${round > 1 ? `（${round}枚目）` : ""}</b><span class="stamp-n">${n}本</span></div>
+    <div class="stamps" role="img" aria-label="${STAMP_SLOTS}つのうち${k}つ">${Array.from({ length: STAMP_SLOTS }, (_, i) => `<i class="${i < k ? "on" : ""}">${i < k ? i + 1 + (round - 1) * STAMP_SLOTS : ""}</i>`).join("")}</div>
+    <p class="stamp-msg">${esc(msg)}</p>${head ? `<p class="stamp-ai"><span>AI より</span>${esc(head)}</p>` : ""}${rateHtml()}</div>`;
+}
+/* ---------- このチャットの使いごこち（5 段階・任意）と運営へのひとこと ---------- */
+const RATE_LAB = ["", "つかいにくい", "ややつかいにくい", "ふつう", "つかいやすい", "とてもつかいやすい"];
+function rateHtml() {
+  if (S.ratingSent) return `<div class="rate"><p class="rate-done">感想をありがとうございました！ 運営で、チャットの改善に使います</p></div>`;
+  return `<div class="rate"><p class="rate-q">このチャット（投稿づくり）の使いごこちは？<small>任意・5段階</small></p>
+    <div class="rate-btns">${[1, 2, 3, 4, 5].map(v => `<button type="button" data-rate="${v}" class="${S.rating === v ? "on" : ""}" aria-label="${v}：${RATE_LAB[v]}">${v}</button>`).join("")}</div>
+    <div class="rate-lab"><span>1 つかいにくい</span><span>5 とてもつかいやすい</span></div>
+    ${S.rating ? `<p class="rate-sel">${S.rating}：${RATE_LAB[S.rating]}</p><textarea id="rateCm" rows="2" maxlength="200" placeholder="運営へのひとこと（任意）例：問いが多かった、写真の候補が便利だった">${esc(S.ratingComment || "")}</textarea>
+      <div class="row"><button type="button" class="btn sm wide" id="rateSend">送る</button></div>` : ""}</div>`;
+}
+function bindRate() {
+  document.querySelectorAll(".rate-btns button").forEach(b => b.addEventListener("click", () => {
+    S.rating = Number(b.dataset.rate); save(); refreshStamp(); scrollEnd(); sendLog("feedback");
+    const c = $("rateCm"); if (c && !matchMedia("(pointer:coarse)").matches) c.focus();
+  }));
+  const c = $("rateCm"); if (c) {
+    c.addEventListener("input", () => { S.ratingComment = c.value; save(); });
+    c.addEventListener("focus", () => document.body.classList.add("editing"));
+    c.addEventListener("blur", () => setTimeout(() => document.body.classList.remove("editing"), 60));
+  }
+  const sbtn = $("rateSend"); if (sbtn) sbtn.addEventListener("click", () => { S.ratingComment = oneLine(($("rateCm") || {}).value || "").slice(0, 200); S.ratingSent = true; save(); refreshStamp(); sendLog("feedback"); toast("送りました。ありがとうございました"); });
+}
+function refreshStamp() { const el = document.querySelector(".card.stamp"); if (el) { el.outerHTML = stampCardHtml(); bindRate(); } }
+async function copyFinal() {
+  const text = finalText();
+  if (!text) { toast("文が空です"); return; }
+  let ok = false;
+  try { await navigator.clipboard.writeText(text); ok = true; }
+  catch (e) { try { const t = document.createElement("textarea"); t.value = text; t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select(); ok = document.execCommand("copy"); t.remove(); } catch (e2) {} }
+  if (!ok) { toast("コピーできませんでした。文を長押ししてコピーしてください"); return; }
+  const first = !S.copied;
+  S.copied++;
+  if (first) S.postNo = countPost();
+  save();
+  if (first) {
+    await bot("コピーしました！ DROP に貼りつけて、写真と一緒に投稿してください");
+    S.msgs.push({ who: "bot", card: "stamp" }); renderMsgs(); save();
+  } else toast("コピーしました");
+  renderComposeDock();
+  sendLog("copy");
+}
+
+/* =====================================================================
+   AI（仕上げ用 GAS → Azure OpenAI）
+===================================================================== */
+const gasOn = () => !!CONFIG.GAS_URL && /^https:\/\//.test(CONFIG.GAS_URL);
+const logOn = () => !!CONFIG.LOG_URL && /^https:\/\//.test(CONFIG.LOG_URL);
+const anyGas = () => gasOn() || logOn();
+function getToken(key) { const t = LS.get(key, null); if (t && t.token && t.exp > now() + 30000) return t.token; LS.del(key); return null; }
+function setToken(token, sec, key) { LS.set(key, { token, exp: now() + sec * 1000 }); }
+const hasTokens = () => (!gasOn() || !!getToken(CONFIG.KEYS.TOKEN)) && (!logOn() || !!getToken(CONFIG.KEYS.LOG_TOKEN));
+const getName = () => LS.get(CONFIG.KEYS.NAME, "") || "";
+/* 名前・パスワードはこの端末に保存（パスワードは平文で localStorage に入る点に注意。メニューのログアウトで削除） */
+function getCreds() { const n = getName(), pw = LS.get(CONFIG.KEYS.PW, ""); return n && pw ? { name: n, pw } : null; }
+async function post(body, url, timeoutMs) {
+  const ms = timeoutMs || CONFIG.TIMEOUT_MS, ctrl = new AbortController(), to = setTimeout(() => ctrl.abort(), ms);
+  try {
+    // text/plain で送るとプリフライトが発生せず GAS でも CORS エラーにならない
+    const res = await fetch(url, { method: "POST", redirect: "follow", signal: ctrl.signal, headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(body) });
+    if (!res.ok) throw new Error("HTTP " + res.status);
+    return await res.json();
+  } catch (e) {
+    if (e.name === "AbortError") return { ok: false, code: "TIMEOUT", message: `応答がありませんでした（${ms / 1000} 秒）` };
+    return { ok: false, code: "NETWORK", message: "接続できませんでした（" + e.message + "）" };
+  } finally { clearTimeout(to); }
+}
+async function doLogin(name, pw) {
+  const [a, b] = await Promise.all([
+    gasOn() ? post({ action: "login", name, password: pw }, CONFIG.GAS_URL) : Promise.resolve(null),
+    logOn() ? post({ action: "login", name, password: pw }, CONFIG.LOG_URL) : Promise.resolve(null)
+  ]);
+  if (a && !a.ok) return { ok: false, code: a.code, message: a.message || "認証に失敗しました" };
+  if (b && !b.ok) return { ok: false, code: b.code, message: "記録用の認証に失敗しました：" + (b.message || "不明なエラー") };
+  if (a) setToken(a.token, a.expires_in, CONFIG.KEYS.TOKEN);
+  if (b) setToken(b.token, b.expires_in, CONFIG.KEYS.LOG_TOKEN);
+  LS.set(CONFIG.KEYS.NAME, name); LS.set(CONFIG.KEYS.PW, pw);
+  syncMenu();
+  return { ok: true };
+}
+async function autoLogin() {
+  const c = getCreds(); if (!c) return false;
+  const r = await doLogin(c.name, c.pw);
+  if (!r.ok && r.code === "AUTH") LS.del(CONFIG.KEYS.PW);
+  return r.ok;
+}
+function bindLogin(onOk) {
+  const f = $("dLogin"); if (!f) return;
+  f.addEventListener("submit", async e => {
+    e.preventDefault();
+    if (RT.loginBusy) return;
+    const name = oneLine($("lName").value).slice(0, 40), pw = $("lPw").value;
+    if (!name) { $("lErr").textContent = "名前を入れてください"; $("lName").focus(); return; }
+    if (!pw) { $("lErr").textContent = "パスワードを入れてください"; $("lPw").focus(); return; }
+    RT.loginBusy = true; $("lGo").disabled = true; $("lErr").textContent = "確認しています…";
+    const r = await doLogin(name, pw);
+    RT.loginBusy = false;
+    if (!r.ok) { $("lGo").disabled = false; $("lErr").textContent = r.message; $("lPw").focus(); return; }
+    onOk();
+  });
+}
+function qaList() {
+  const A = S.ans, out = [], ok = id => S.done.includes(id) && !S.skipped.includes(id);
+  if (ok("feel") && A.feel.length) out.push({ q: "どんな気持ちになりましたか？（選んだ順）", a: A.feel.map(x => x.label).join("、") });
+  if (ok("why") && A.why.length) out.push({ q: stepOf("why").q() + "（近い順）", a: A.why.map(x => x.label + (x.src === "AI候補" ? "（AI の候補から選んだ）" : "")).join("、") });
+  if (ok("score") && A.score) out.push({ q: "体験そのものの点数（10点満点。文面には書かない）", a: A.score + "点" });
+  if (ok("who") && A.who) out.push({ q: "そのとき、だれと一緒でしたか？", a: A.who.label + (A.who.detail ? `（${A.who.detail}）` : "") });
+  if (ok("find") && A.find.length) out.push({ q: "今日、なにか発見はありましたか？（任意）", a: A.find.map(x => x.label).join("、") });
+  if (ok("face") && A.face.length) out.push({ q: "その人は、ふだん（平日）は何をしている人でしたか？（任意）", a: A.face.map(x => x.label).join("、") });
+  if (ok("next") && A.next.length) out.push({ q: "このあと、どうしたいですか？（任意）", a: A.next.map(x => x.label).join("、") });
+  return out;
+}
+/** 戻り値："ok"｜"login"（ログインが必要）｜"error" */
+async function runAI() {
+  if (RT.aiWait || !gasOn()) return "error";
+  if (!getToken(CONFIG.KEYS.TOKEN)) { dock(`<div class="wait"><span class="spin"></span><span>ログインしています…</span></div>`); if (!await autoLogin()) return "login"; }
+  const g = RT.gen, t0 = now();
+  RT.aiWait = true; renderComposeDock();
+  RT.typing = true; RT.typingText = "投稿文を整えています"; renderMsgs();
+  const tick = setInterval(() => { const s = $("aiSec"); if (s) s.textContent = Math.floor((now() - t0) / 1000); }, 250);
+  const working = String(bodyOf("自分の言葉") || S.composed || "").trim();
+  const body = {
+    action: "coach", variant: "chat", force: !!RT.forceAI,
+    context: { event: CONFIG.EVENT, sample_total: SAMPLES.length },
+    target: { text: S.ans.text1 || working, source: S.ans.text1 ? "first" : "composed" },
+    answers: qaList(), working_text: working,
+    references: CONFIG.SEND_SAMPLES ? SAMPLES.map(p => ({ text: p.s, name: p.n })) : []
+  };
+  RT.forceAI = false;
+  const stop = () => { clearInterval(tick); RT.aiWait = false; RT.typing = false; RT.typingText = ""; };
+  if (!String(body.target.text || "").trim()) { stop(); S.aiOk = false; S.aiError = "文が空です"; return "error"; }
+  if (PHOTO.imgAi) body.target.image_data = PHOTO.imgAi;
+  if (CONFIG.SEND_SAMPLE_IMAGES) await attachSampleImages(body.references);
+  let res = await post({ ...body, token: getToken(CONFIG.KEYS.TOKEN) }, CONFIG.GAS_URL);
+  if (!res.ok && res.code === "AUTH") { LS.del(CONFIG.KEYS.TOKEN); if (await autoLogin()) res = await post({ ...body, token: getToken(CONFIG.KEYS.TOKEN) }, CONFIG.GAS_URL); }
+  stop();
+  if (g !== RT.gen) return "error";
+  S.ai = { status: res.ok ? "OK" : (res.code || "ERROR"), message: res.ok ? "" : (res.message || ""), cached: !!res.cached,
+    model: res.model || "", prompt_version: res.prompt_version || "", elapsed_sec: Math.round((now() - t0) / 100) / 10, images_used: res.images_used || 0, result: res.ok ? res.result : null };
+  if (res.ok && res.result && res.result.rewrite) {
+    S.aiCount = (S.aiCount || 0) + 1; S.aiOk = true; S.aiStale = false; S.aiError = "";
+    S.aiText = res.result.rewrite; S.chosen = "AI"; if (S.edits) delete S.edits.AI;
+    if (res.images_note) toast(res.images_note);
+    save(); return "ok";
+  }
+  S.aiOk = false; S.aiError = res.message || "不明なエラー"; save();
+  return res.code === "AUTH" ? "login" : "error";
+}
+async function attachSampleImages(refs) {
+  await Promise.all(refs.map((r, i) => new Promise(res => {
+    const p = SAMPLES[i]; if (!p || !p.img) return res();
+    const img = new Image();
+    img.onload = () => { try { r.image_data = drawToDataUrl(img, img.naturalWidth, img.naturalHeight, CONFIG.IMG_MAX_EDGE, CONFIG.IMG_QUALITY); } catch (e) {} res(); };
+    img.onerror = () => res(); img.src = p.img;
+  })));
+}
+
+/* =====================================================================
+   記録（分析用。gas/DROP_COACH_LOG.gs v7 が列に展開する）
+   - ノード：「層:タグ」（コンテンツ＝話題・どこが／人＝だれと・どこが／空間／感情＝気持ち／意向＝このあと）
+   - ソフト分類：選んだ答えの重み（V の w × 選んだ順の重み）を足して合計 1 にしたもの
+   - 気持ちの向き：選んだ気持ちの val を、選んだ順の重みで平均（-1〜1）
+   - コーチ関与：ひとことのみ／選択あり／AI仕上げ（効果測定で分けて扱う）
+===================================================================== */
+const rankW = (kind, i) => { const a = ORDER_W[kind] || []; return a.length ? (a[i] ?? a[a.length - 1]) : .3; };
+/** rank_w：選んだ順の重み（設定の値そのまま。例 1 / 0.75 / 0.5 / 0.25）・w：合計 1 にした重み */
+function weighted(list, kind) {
+  const ws = list.map((_, i) => rankW(kind, i)), sum = ws.reduce((a, b) => a + b, 0) || 1;
+  return list.map((x, i) => ({ id: x.id, label: x.label, src: x.src || "", pre: !!x.pre, rank_w: r2(ws[i]), w: r2(ws[i] / sum),
+    ...(kind === "feel" ? { val: (item("feel", x.id) || {}).val ?? null } : {}), ...(kind === "why" ? { layer: x.layer || "コンテンツ", kpi: x.w || W0() } : {}) }));
+}
+function softOf() {
+  const A = S.ans, raw = { c1: 0, c2: 0, c3: 0, att: 0 };
+  const add = (kind, id, k) => { const it = item(kind, id); if (!it || !it.w) return; Object.keys(it.w).forEach(d => { raw[d] += it.w[d] * k; }); };
+  if (A.who) add("who", A.who.id, 1);
+  A.why.forEach((x, i) => { const w = x.w || {}; Object.keys(raw).forEach(d => { raw[d] += (w[d] || 0) * rankW("why", i); }); });
+  A.feel.forEach((x, i) => add("feel", x.id, rankW("feel", i)));
+  A.next.forEach((x, i) => add("next", x.id, rankW("next", i)));
+  A.find.forEach((x, i) => add("find", x.id, rankW("find", i)));
+  A.face.forEach(x => add("face", x.id, 1));
+  const tot = Object.values(raw).reduce((a, b) => a + b, 0), share = {};
+  Object.keys(raw).forEach(k => { share[k] = tot ? r2(raw[k] / tot) : 0; raw[k] = r2(raw[k]); });
+  return { share, raw, total: r2(tot) };
+}
+function valenceOf() {
+  let s = 0, w = 0;
+  S.ans.feel.forEach((x, i) => { const v = (item("feel", x.id) || {}).val; if (typeof v !== "number") return; const k = rankW("feel", i); s += v * k; w += k; });
+  return w ? r2(s / w) : null;
+}
+function nodesOf() {
+  const A = S.ans, n = [], subj = subjectOf();
+  if (subj) n.push("コンテンツ:" + subj);
+  if (A.who) n.push("人:" + (A.who.id === "other" ? "その他" : A.who.label));
+  A.why.forEach(x => n.push((x.layer || "コンテンツ") + ":" + x.label));
+  A.feel.forEach(x => n.push("感情:" + x.label));
+  A.find.forEach(x => { if (x.id !== "none") n.push("発見:" + x.label); });
+  A.face.forEach(x => { if (x.id !== "unknown") n.push("人:" + x.label); });
+  A.next.forEach(x => n.push("意向:" + x.label));
+  return uniq(n);
+}
+function coachLevel() {
+  if (S.aiOk && S.chosen === "AI") return "AI仕上げ";
+  return ["feel", "why", "who", "find", "face", "next"].some(id => S.done.includes(id) && !S.skipped.includes(id)) ? "選択あり" : "ひとことのみ";
+}
+/** 任意の問い：答えた（1 つ以上）／投稿文へ（任意の最初で終えた）／空（最低限の前に終わった） */
+function optState() {
+  if (!S.optIntro) return "";
+  return OPT_STEPS.some(id => S.done.includes(id) && !S.skipped.includes(id)) ? "答えた" : "投稿文へ";
+}
+function buildRecord(end) {
+  const A = S.ans, soft = softOf(), stepSec = {};
+  Object.keys(S.times).forEach(k => { const t = S.times[k]; if (t.answered && t.shown) stepSec[k] = r2((t.answered - t.shown) / 1000); });
+  const lastAsked = S.asked.filter(id => id !== "login").slice(-1)[0] || "";
+  const h = S.hint || {};
+  return {
+    schema: "drop_chat_v3", app_version: APP_VERSION, session_id: S.sid, end,
+    started_at: S.started, ended_at: new Date().toISOString(), duration_sec: r2((now() - S.t0) / 1000),
+    answered: answeredCount(),
+    last_step: S.phase === "compose" ? (S.early ? "途中で投稿文へ（" + stepName(lastAsked) + "）" : "最後まで") : stepName(lastAsked),
+    early: S.early, has_photo: hasPhoto(),
+    text1: A.text1,
+    detected: { ...S.det, feel_labels: S.det.feels.map(id => (item("feel", id) || {}).label || id), who_label: S.det.who ? item("who", S.det.who).label : "" },
+    subject: subjectOf(),
+    answers: {
+      who: A.who ? { id: A.who.id, label: A.who.label, detail: A.who.detail || "", pre: !!A.who.pre } : { id: "", label: "", detail: "" },
+      why: weighted(A.why, "why"), feel: weighted(A.feel, "feel"), next: weighted(A.next, "next"), find: weighted(A.find, "find"),
+      face: A.face.length ? { id: A.face[0].id, label: A.face[0].label, src: A.face[0].src || "" } : { id: "", label: "" },
+      profile: A.profile || LS.get(CONFIG.KEYS.PROFILE, null) || { id: "", label: "" },
+      score: A.score
+    },
+    valence: valenceOf(),
+    skipped: S.skipped.slice(),
+    hashtags: S.phase === "compose" ? activeTags() : [],
+    nodes: nodesOf(), soft: soft.share, soft_raw: soft.raw, soft_total: soft.total,
+    texts: { composed: S.composed, ai: S.aiText, ai_prev: S.aiPrev || [], ai_count: S.aiCount || 0, final: S.phase === "compose" ? finalText() : "", chosen: S.chosen, edited: isEdited() },
+    coach_level: coachLevel(),
+    ai: S.ai ? { status: S.ai.status, message: S.ai.message, cached: S.ai.cached, model: S.ai.model, prompt_version: S.ai.prompt_version, elapsed_sec: S.ai.elapsed_sec, result: S.ai.result } : { status: "" },
+    hint: { status: h.status || "", elapsed_sec: h.elapsed_sec, cached: !!h.cached, subject: h.subject || "", why_options: h.why_options || [] },
+    example_views: S.exViews || [], preview_opens: S.previewOpens || 0,
+    why_for: S.whyFor || "", settings_version: SETTINGS_VER,
+    extra: optState(), chat_rating: S.rating || null, chat_comment: S.ratingComment || "", post_no: S.postNo || (postStats().n + (S.copied ? 0 : 1)),
+    order: S.order, step_sec: stepSec, big_text: document.documentElement.classList.contains("big")
+  };
+}
+async function sendLog(end) {
+  if (!S) return;
+  const rec = buildRecord(end);
+  if (STAFF) pushHistory(rec);
+  if (!logOn()) return;
+  const key = end + "|" + rec.texts.final + "|" + (rec.chat_rating || "") + "|" + rec.chat_comment;
+  if (S.loggedKey === key) return;
+  let tok = getToken(CONFIG.KEYS.LOG_TOKEN);
+  if (!tok && await autoLogin()) tok = getToken(CONFIG.KEYS.LOG_TOKEN);
+  if (!tok) return;
+  let r = await post({ action: "log", token: tok, session: rec }, CONFIG.LOG_URL);
+  if (!r.ok && r.code === "AUTH") { LS.del(CONFIG.KEYS.LOG_TOKEN); if (await autoLogin()) r = await post({ action: "log", token: getToken(CONFIG.KEYS.LOG_TOKEN), session: rec }, CONFIG.LOG_URL); }
+  if (r.ok) { S.logged = true; S.loggedKey = key; save(); } else console.warn("記録できませんでした", r);
+  renderStaff();
+}
+/* 画面を閉じたとき：答えが 1 つ以上あって未記録なら「途中離脱」として送る */
+window.addEventListener("pagehide", () => {
+  if (!S || S.logged || S.abandonSent || !S.ans.text1 || !logOn()) return;
+  const tok = getToken(CONFIG.KEYS.LOG_TOKEN); if (!tok) return;
+  try {
+    const body = JSON.stringify({ action: "log", token: tok, session: buildRecord("abandon") });
+    if (navigator.sendBeacon(CONFIG.LOG_URL, new Blob([body], { type: "text/plain;charset=utf-8" }))) { S.abandonSent = true; save(); }
+  } catch (e) {}
+});
+
+/* ---------- スタッフ用（?staff=1） ---------- */
+function pushHistory(rec) {
+  const h = LS.get(CONFIG.KEYS.HISTORY, []), i = h.findIndex(x => x.session_id === rec.session_id);
+  if (i >= 0) h[i] = rec; else h.push(rec);
+  LS.set(CONFIG.KEYS.HISTORY, h.slice(-300));
+}
+function renderStaff() {
+  const box = $("after");
+  if (!STAFF || !S || S.phase !== "compose") { box.innerHTML = ""; return; }
+  const rec = buildRecord("preview"), s = rec.soft, n = LS.get(CONFIG.KEYS.HISTORY, []).length;
+  box.innerHTML = `<div class="card staff">
+    <div class="card-hd"><b>分析用の記録（スタッフ用）</b></div>
+    <table>
+      <tr><td>関与・時間</td><td>${esc(rec.coach_level)}・${rec.answered}問・${Math.round(rec.duration_sec)}秒</td></tr>
+      <tr><td>読み取り</td><td>${esc(JSON.stringify(rec.detected))}</td></tr>
+      <tr><td>ノード</td><td>${esc(rec.nodes.join("｜") || "−")}</td></tr>
+      <tr><td>気持ちの向き</td><td>${rec.valence ?? "−"}</td></tr>
+      <tr><td>ソフト分類</td><td><div class="bars">${Object.keys(SOFT_LABEL).map(k => `<span>${SOFT_LABEL[k]}</span><s><u style="width:${Math.round(s[k] * 100)}%"></u></s><span>${s[k].toFixed(2)}</span>`).join("")}</div></td></tr>
+      ${rec.ai.status === "OK" && rec.ai.result ? `<tr><td>AI 読み取り</td><td>${esc((rec.ai.result.category || {}).label || "")}／${esc(ACT_LABEL[rec.ai.result.act] || "")}／${esc((rec.ai.result.content || []).join("・"))}／向き ${rec.ai.result.sentiment}</td></tr>` : ""}
+      <tr><td>ヒント</td><td>${esc(rec.hint.status)} ${rec.hint.elapsed_sec ?? ""}秒 ${esc(rec.hint.subject)} ${esc((rec.hint.why_options || []).join("・"))}</td></tr>
+    </table>
+    <details style="margin-top:8px"><summary style="font-size:13px;cursor:pointer">記録 JSON</summary><pre>${esc(JSON.stringify(rec, null, 1))}</pre></details>
+    <div class="row"><button type="button" class="btn sm ghost" id="sJson">JSON をコピー</button><button type="button" class="btn sm ghost" id="sCsv">この端末の記録を CSV で保存（${n}件）</button></div>
+  </div>`;
+  $("sJson").addEventListener("click", async () => { try { await navigator.clipboard.writeText(JSON.stringify(rec)); toast("コピーしました"); } catch (e) { toast("コピーできませんでした"); } });
+  $("sCsv").addEventListener("click", downloadCsv);
+}
+function downloadCsv() {
+  const h = LS.get(CONFIG.KEYS.HISTORY, []);
+  if (!h.length) { toast("まだ記録がありません"); return; }
+  const L = a => (a || []).map(x => x.label).join("、");
+  const cols = [["セッションID", r => r.session_id], ["開始", r => r.started_at], ["終了", r => r.end], ["所要秒", r => r.duration_sec], ["回答数", r => r.answered],
+    ["写真", r => (r.has_photo ? "あり" : "なし")], ["最初のひとこと", r => r.text1], ["話題", r => r.subject], ["だれと", r => r.answers.who.label], ["どんな人", r => r.answers.who.detail],
+    ["どこが", r => L(r.answers.why)], ["気持ち", r => L(r.answers.feel)], ["気持ちの向き", r => r.valence ?? ""], ["このあと", r => L(r.answers.next)],
+    ["属性", r => (r.answers.profile || {}).label || ""], ["ノード", r => r.nodes.join("｜")], ["ソフト①", r => r.soft.c1], ["ソフト②", r => r.soft.c2], ["ソフト③", r => r.soft.c3], ["ソフト愛着", r => r.soft.att],
+    ["最終文面", r => r.texts.final], ["採用", r => r.texts.chosen], ["手で編集", r => (r.texts.edited ? "あり" : "なし")], ["コーチ関与", r => r.coach_level]];
+  const cell = v => { const s = String(v ?? ""); return /[",\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s; };
+  const csv = "﻿" + [cols.map(c => c[0]).join(","), ...h.map(r => cols.map(c => cell(c[1](r))).join(","))].join("\r\n");
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = `drop_chat_v3_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a); a.click(); a.remove();
+}
+
+/* ---------- メニュー ---------- */
+async function loadSamples() {
+  for (const s of CONFIG.DATA_SOURCES) {
+    try { const r = await fetch(s, { cache: "no-cache" }); if (!r.ok) throw new Error("HTTP " + r.status); return await r.json(); } catch (e) { /* 次へ */ }
+  }
+  try { return JSON.parse($("sampleFallback").textContent); } catch (e) { return { records: [] }; }
+}
+const hasTokensAny = () => !!(LS.get(CONFIG.KEYS.TOKEN, null) || LS.get(CONFIG.KEYS.LOG_TOKEN, null));
+function syncMenu() { $("mLogout").hidden = !(getCreds() || hasTokensAny()); $("mBig").textContent = document.documentElement.classList.contains("big") ? "文字を標準にもどす" : "文字を大きく"; }
+$("menuBtn").addEventListener("click", () => { const m = $("menu"); m.hidden = !m.hidden; $("menuBtn").setAttribute("aria-expanded", String(!m.hidden)); syncMenu(); });
+const closeMenu = () => { $("menu").hidden = true; $("menuBtn").setAttribute("aria-expanded", "false"); };
+document.addEventListener("click", e => { if (!$("menu").hidden && !e.target.closest("#menu") && !e.target.closest("#menuBtn")) closeMenu(); });
+$("mBig").addEventListener("click", () => { const b = !document.documentElement.classList.contains("big"); document.documentElement.classList.toggle("big", b); LS.set(CONFIG.KEYS.BIG, b); syncMenu(); syncDockH(); });
+$("mExamples").addEventListener("click", () => { closeMenu(); openExamples(); });
+$("mAbout").addEventListener("click", () => {
+  closeMenu();
+  openSheet("このチャットについて", `
+    <p>DROP に投稿する文を、いくつかの問いに答えながら一緒につくるチャットです。問いはとばせますし、いつでも「ここまでで投稿文をつくる」で終われます。</p>
+    <p><b>AI について：</b>写真とあなたの答えをもとに、AI が文を読みやすく整えます。あなたが書いていない出来事や気持ちは足さないようにしています。最後に「AI が整えた文」と「自分の言葉の文」から選べます。</p>
+    <p><b>答えの使い道：</b>答えと投稿文は、CULTURE SNACK の効果を確かめる分析にだけ使います。投稿文は、あなたがコピーして DROP に投稿するまで公開されません。名前は分析画面にだけ表示されます。</p>
+    <div class="row"><button type="button" class="btn full" id="shBack">もどる</button></div>`);
+  $("shBack").addEventListener("click", closeModal);
+});
+$("mRestart").addEventListener("click", () => { closeMenu(); restart(); });
+$("mProfile").addEventListener("click", () => {
+  closeMenu(); LS.del(CONFIG.KEYS.PROFILE); toast("次の投稿のさいごに、もう一度聞きます");
+  if (S && S.phase === "ask") { S.done = S.done.filter(x => x !== "profile"); renderProgress(); }
+});
+$("mLogout").addEventListener("click", () => { closeMenu(); [CONFIG.KEYS.TOKEN, CONFIG.KEYS.LOG_TOKEN, CONFIG.KEYS.PW].forEach(k => LS.del(k)); syncMenu(); toast("ログアウトしました（保存したパスワードも削除しました）"); });
+async function restart() {
+  if (S && !S.logged && S.ans.text1 && S.phase === "compose") sendLog("reset");
+  closeModal(); start();
+}
+
+/* ---------- 設定（選択肢と重み）を記録用 GAS から読む ---------- */
+const SET = { pending: null, next: null };
+const optionStepsStarted = () => !!S && ["feel", "why", "who", "next"].some(id => S.asked.includes(id));
+function loadSettings() {
+  const cached = LS.get(CONFIG.KEYS.SETTINGS, null);
+  if (cached && cached.settings) applySettings(cached.settings, cached.version);
+  if (!logOn()) return;
+  SET.pending = post({ action: "settings" }, CONFIG.LOG_URL, CONFIG.SETTINGS_TIMEOUT_MS).then(r => {
+    SET.pending = null;
+    if (!r || !r.ok) return;   // 古い GAS（設定に未対応）・通信エラー → いまの設定のまま
+    const ver = r.settings ? String(r.version || "") : "初期値";
+    if (r.settings) LS.set(CONFIG.KEYS.SETTINGS, { settings: r.settings, version: ver }); else LS.del(CONFIG.KEYS.SETTINGS);
+    if (ver === SETTINGS_VER) return;
+    if (optionStepsStarted()) SET.next = { settings: r.settings, version: ver };   // 答えている途中は変えず、次のチャットから
+    else applySettings(r.settings || DEFAULT_SETTINGS, ver);
+  });
+}
+
+/* ---------- 起動 ---------- */
+function warmLogin() { if (anyGas() && getCreds() && !hasTokens()) autoLogin().catch(() => {}); }
+async function start() {
+  RT.gen++; RT.typing = false; RT.typingText = "";
+  SS.del(CONFIG.KEYS.PHOTO); PHOTO = { img: "", imgAi: "", w: 0, h: 0 };
+  if (SET.next) { applySettings(SET.next.settings || DEFAULT_SETTINGS, SET.next.version); SET.next = null; }
+  S = newSession(); RT.rendered = 0; RT.busy = true; RT.aiWait = false; RT.loginFor = null;
+  save(); renderMsgs(); renderStaff(); lockDock(); warmLogin();
+  const g = RT.gen;
+  const ps = postStats();
+  const hello = ps.n > 0 ? [`おかえりなさい！ ${ps.n + 1}本目をつくりましょう`, { sub: "写真とひとことのあと、タップで3つ答えるだけです" }]
+    : ["こんにちは！ DROP の投稿文を、チャットで一緒につくります", { sub: "写真とひとことのあと、タップで3つ答えるだけ。あとは任意です" }];
+  if (!await bot(hello[0], hello[1])) return;
+  await advance(null, g);
+}
+function restore() {
+  const s = LS.get(CONFIG.KEYS.SESSION, null);
+  if (!s || s.v !== 32 || !s.sid || now() - (s.t0 || 0) > CONFIG.RESUME_HOURS * 3600e3 || s.copied) return false;
+  S = s; S.msgs = (S.msgs || []).filter(m => m && m.who);
+  const p = SS.get(CONFIG.KEYS.PHOTO, null);
+  if (p && p.sid === S.sid && /^data:image\/jpeg;base64,/.test(p.img || "")) PHOTO = p;
+  RT.rendered = S.msgs.length; renderMsgs(); renderStaff(); warmLogin();
+  if (S.hint && S.hint.status === "待ち") { S.hint = null; if (S.ans.text1 && S.phase === "ask") fireHint(); }
+  if (S.phase === "compose") {
+    if (!S.msgs.some(m => m.card === "compose")) { lockDock(); finishCompose(false); return true; }
+    renderComposeDock(); return true;
+  }
+  const st = stepOf(S.cur);
+  if (!st || !applicable(st)) { lockDock(); advance(S.cur ? S.cur : null); return true; }
+  if (st.opts) prepareOrder(st);
+  setSelFromAns(st);
+  RT.busy = false; renderDock();
+  return true;
+}
+(async () => {
+  $("staffFlag").hidden = !STAFF;
+  if (LS.get(CONFIG.KEYS.BIG, false)) document.documentElement.classList.add("big");
+  syncMenu();
+  loadSettings();
+  const json = await loadSamples();
+  SAMPLES = (Array.isArray(json) ? json : (json.records || [])).map(r => ({
+    id: r.artwork_id, n: r.account_name || "", s: String(r.sentence || "").trim(), img: r.image_file_path || r.image_file_path_thumbnail || ""
+  })).filter(p => p.s);
+  if (!restore()) start();
+})();
+</script>
+</body>
+</html>
