@@ -1,9 +1,17 @@
 /**
- * DROP Coach V2（チャット版）— 投稿文の仕上げ用 Google Apps Script（Web アプリ）  v9.1（2026/11/13・チャット画面 v3.2 用）
+ * DROP Coach V3（チャット版）— 投稿文の仕上げ用 Google Apps Script（Web アプリ）  v10（2026/11/16・チャット画面 v4 用）
  * ------------------------------------------------------------
- * V2.0 リポジトリ（DROP_Dashboard_Shinagawa2.0）の drop_coach_chat.html（チャット）から呼ばれる。
- * ★ V1（DROP_Dashboard_Shinagawa1.0）の GAS とは別のプロジェクトとして新しく作り、別にデプロイすること。
- *   プロンプトも V2 リポジトリの prompt/drop_coach_chat.md を読む（V1 の GAS・プロンプト・シートには一切影響しない）。
+ * V3.0 リポジトリ（DROP_Dashboard_Shinagawa3.0）の drop_coach_chat.html（チャット）から呼ばれる。
+ * ★ V2（DROP_Dashboard_Shinagawa2.0）の GAS とは別のプロジェクトとして新しく作り、別にデプロイすること。
+ *   プロンプトも V3 リポジトリの prompt/ を読む（V1・V2 の GAS・プロンプト・シートには一切影響しない）。
+ *
+ * ■ v10 の変更（2026/11/16・チャット画面 v4 用）
+ *   - hint：候補を増やした（気持ち・どこが・今日の発見・しめ の候補を、写真とひとことから最大 6 つずつ）。画面の「迷ったらヒント」に出す
+ *   - reflect（新規）：「そうそう！」の候補。本人のことば（ひとこと・気持ち・どこが）だけから、言いたかったことを 3 通りの 1 行にする
+ *     プロンプトは prompt/drop_coach_reflect.md（PROMPT_URL_CHAT と同じフォルダ。別の場所なら PROMPT_URL_REFLECT）
+ *   - coach：投稿文を 1 行ずつ（lines：本文＋言いかえ 2 つ）返す。rewrite は lines から GAS が作る（画面は今までどおり rewrite も使える）
+ *     自分のことばで答えた問いは、画面が送った選択肢（options）に AI が当てはめて mapped で返す（分析用）
+ *   - AI の呼び出しは 1 本あたり 3 回（hint・reflect・coach）。DAILY_LIMIT の既定値を 400 → 1200 に変更
  *
  * ■ 役割
  *   チャットで集めた「最初のひとこと（T）」「選んだ答え」「画面で組み立てた文面」「写真」を受け取り、
@@ -45,26 +53,33 @@
  *     → { ok:true, cached, elapsed_ms, model, prompt_version, generated_at, images_used, images_note, result:{…} }
  *   { "action":"hint", "token":"...", "variant":"chat", "context":{…},
  *     "target":{ "text":"最初のひとこと", "image_data":"data:…"(任意) } }
- *     → { ok:true, cached, elapsed_ms, model, prompt_version, result:{ subject:"コーヒー", why_options:[…] } }
+ *     → { ok:true, cached, elapsed_ms, model, prompt_version, result:{ subject, feel_options[], why_options[], find_options[], shime_options[] } }
+ *   { "action":"reflect", "token":"...", "variant":"chat", "context":{…},
+ *     "target":{ "text":"最初のひとこと" }, "answers":[{ "q":"気持ち", "a":"…" }, { "q":"どこが", "a":"…" }] }
+ *     → { ok:true, cached, elapsed_ms, model, prompt_version, result:{ options:["…","…","…"] } }
+ *   coach の追加入力 "options":{ "feel":[…], "why":[…], "who":[…], "find":[…], "face":[…], "next":[…] }（自分のことばで答えた問いの選択肢）
+ *     → result に lines:[{ text, alts:[…] }] と mapped:{ feel[], why[], who, find[], face, next[] } が増える
  *   エラー → { ok:false, code:"AUTH|LOCKED|LIMIT|BUSY|BAD_REQUEST|CONFIG|AI|SERVER", message:"..." }
  *
  * ■ スクリプトプロパティ
- *   必須  APP_PASSWORD        … 画面で入力するパスワード（V2 ログ用 GAS と同じ値にする）
+ *   必須  APP_PASSWORD        … 画面で入力するパスワード（V3 ログ用 GAS と同じ値にする）
  *         AZURE_API_KEY_LUNA  … Azure OpenAI の API キー（※リポジトリには絶対に書かない）
- *         PROMPT_URL_CHAT     … V2 リポジトリの prompt/drop_coach_chat.md の URL（同じフォルダの drop_coach_hint.md もヒント用に読む）
- *                               例 https://github.com/obayashi-smartcity/DROP_Dashboard_Shinagawa2.0/blob/main/prompt/drop_coach_chat.md
+ *         PROMPT_URL_CHAT     … V3 リポジトリの prompt/drop_coach_chat.md の URL（同じフォルダの drop_coach_hint.md・drop_coach_reflect.md も読む）
+ *                               例 https://github.com/obayashi-smartcity/DROP_Dashboard_Shinagawa3.0/blob/main/prompt/drop_coach_chat.md
  *                               （github.com の blob URL は raw URL に自動変換。リポジトリが非公開なら raw の取得に失敗するので注意）
  *   任意（括弧内は既定値）
  *     REASONING_EFFORT (none) / MAX_OUTPUT_TOKENS (2000) / TOKEN_TTL_SEC (21600) / RESULT_CACHE_SEC (21600)
- *     PROMPT_CACHE_SEC (300) / DAILY_LIMIT (400) / MAX_FAILS (30) / MAX_REFS (10) / MAX_TEXT (300)
- *     PROMPT_URL_HINT（未設定なら PROMPT_URL_CHAT と同じフォルダの drop_coach_hint.md）/ HINT_MAX_OUTPUT_TOKENS (800)
+ *     PROMPT_CACHE_SEC (300) / DAILY_LIMIT (1200) / MAX_FAILS (30) / MAX_REFS (10) / MAX_TEXT (300)
+ *     PROMPT_URL_HINT・PROMPT_URL_REFLECT（未設定なら PROMPT_URL_CHAT と同じフォルダの drop_coach_hint.md・drop_coach_reflect.md）
+ *     HINT_MAX_OUTPUT_TOKENS (1000) / REFLECT_MAX_OUTPUT_TOKENS (500)
+ *     DAILY_LIMIT の目安：参加者数 × 1 人あたりの本数 × 3（hint・reflect・coach）より大きく
  *     ENABLE_IMAGES (true) / MAX_IMAGES (9) / MAX_IMAGE_BYTES (1500000) / IMAGE_DETAIL (low)
  *
  * ■ 新規作成とデプロイ（V1 とは別プロジェクト）
- *   1) https://script.google.com →「新しいプロジェクト」→ 名前を「DROP Coach V2 chat」などにする
+ *   1) https://script.google.com →「新しいプロジェクト」→ 名前を「DROP Coach V3 chat」などにする
  *   2) このファイルの中身をすべて貼り付けて保存（貼り付け後「&g」+「t;」「&l」+「t;」で検索し 0 件であることを確認）
  *   3) プロジェクトの設定 → スクリプト プロパティ に上の「必須」3 つを追加
- *   4) エディタで checkSetup() を実行（初回は権限を承認）→ ログに「★」が無いことを確認 → testChat() で疎通確認
+ *   4) エディタで checkSetup() を実行（初回は権限を承認）→ ログに「★」が無いことを確認 → testHint()・testReflect()・testChat() で疎通確認
  *   5) デプロイ → 新しいデプロイ → 種類「ウェブアプリ」／次のユーザーとして実行「自分」／アクセスできるユーザー「全員」
  *   6) 表示された /exec の URL を drop_coach_chat.html の CONFIG.GAS_URL に貼る
  *   コードを更新したとき：貼り替え → デプロイを管理 → 編集 → バージョン「新バージョン」（URL は変わらない）
@@ -79,7 +94,7 @@ const AZURE_MODEL = {
   api_version: '2025-04-01-preview',
   secret: 'AZURE_API_KEY_LUNA'
 };
-const SERVICE_VERSION = 9.1;
+const SERVICE_VERSION = 10;
 const RAW_GITHUB_BASE = 'https://raw.githubusercontent.com';
 const DEFAULTS = {
   REASONING_EFFORT: 'none',
@@ -87,8 +102,9 @@ const DEFAULTS = {
   TOKEN_TTL_SEC: 21600,
   RESULT_CACHE_SEC: 21600,
   PROMPT_CACHE_SEC: 300,
-  DAILY_LIMIT: 400,
-  HINT_MAX_OUTPUT_TOKENS: 800,
+  DAILY_LIMIT: 1200,
+  HINT_MAX_OUTPUT_TOKENS: 1000,
+  REFLECT_MAX_OUTPUT_TOKENS: 500,
   MAX_FAILS: 30,
   MAX_REFS: 10,
   MAX_TEXT: 300,
@@ -99,8 +115,9 @@ const DEFAULTS = {
 };
 const CACHE_MAX_SEC = 21600;
 const FAIL_WINDOW_SEC = 900;
-const KEY = { FAIL: 'chat_auth_fail', PROMPT: 'chat_prompt_v9_', TOKEN: 'chat_tok_', RESULT: 'chat_res91_', HINT: 'chat_hint91_', QUOTA: 'chat_count_' };
-const LIMITS = { ANSWERS: 10, Q: 100, A: 150, WORKING: 400, CAVEATS: 2, NAME: 40, CONTEXT: 60 };
+const KEY = { FAIL: 'chat_auth_fail', PROMPT: 'chat_prompt_v10_', TOKEN: 'chat_tok_', RESULT: 'chat_res10_', HINT: 'chat_hint10_', REFLECT: 'chat_refl10_', QUOTA: 'chat_count_' };
+const LIMITS = { ANSWERS: 14, Q: 100, A: 200, WORKING: 400, CAVEATS: 2, NAME: 40, CONTEXT: 60, OPT_N: 24, OPT_LEN: 24, LINES: 6, ALTS: 2 };
+const OPTION_KEYS = ['feel', 'why', 'who', 'find', 'face', 'next'];   // coach の options・mapped の問い（自分のことばで答えた問いだけ）
 const LEVELS = ['低', '中', '高'];
 const MATCHES = ['一致', '一部一致', '不一致'];
 /* コクヨ KPI（3 つのカルチャー変革）による判定。D は「当てはまらない」 */
@@ -149,6 +166,7 @@ function doPost(e) {
       case 'login': return handleLogin_(req);
       case 'coach': return handleCoach_(req);
       case 'hint':  return handleHint_(req);
+      case 'reflect': return handleReflect_(req);
       default:      throw new AppError('BAD_REQUEST', '不明な action です');
     }
   } catch (err) {
@@ -157,9 +175,9 @@ function doPost(e) {
     return fail_('SERVER', 'サーバーエラーが発生しました。管理者は GAS の実行ログを確認してください');
   }
 }
-/** ブラウザで GAS_URL を開くと疎通確認（version が 8 でなければ新しいバージョンが未デプロイ） */
+/** ブラウザで GAS_URL を開くと疎通確認（version が 10 でなければ新しいバージョンが未デプロイ） */
 function doGet() {
-  return json_({ ok: true, service: 'drop-coach-chat', version: SERVICE_VERSION, variants: ['chat'], actions: ['login', 'coach', 'hint'], images: boolProp_('ENABLE_IMAGES'), time: new Date().toISOString() });
+  return json_({ ok: true, service: 'drop-coach-chat', version: SERVICE_VERSION, variants: ['chat'], actions: ['login', 'coach', 'hint', 'reflect'], images: boolProp_('ENABLE_IMAGES'), time: new Date().toISOString() });
 }
 
 /* ============================ ログイン ============================ */
@@ -196,7 +214,7 @@ function handleCoach_(req) {
   }
   const apiKey = prop_(AZURE_MODEL.secret);
   if (!apiKey) throw new AppError('CONFIG', 'スクリプトプロパティ ' + AZURE_MODEL.secret + ' が未設定です');
-  if (req.variant && req.variant !== 'chat') throw new AppError('BAD_REQUEST', 'この GAS は variant "chat"（V2 チャット版）専用です');
+  if (req.variant && req.variant !== 'chat') throw new AppError('BAD_REQUEST', 'この GAS は variant "chat"（チャット版）専用です');
 
   const target = sanitizeTarget_(req.target);
   if (!target) throw new AppError('BAD_REQUEST', 'ひとこと（または組み立てた文面）が空です');
@@ -206,6 +224,7 @@ function handleCoach_(req) {
   const answers = sanitizeAnswers_(req.answers);
   const working = sanitizeText_(req.working_text, LIMITS.WORKING);
   const context = sanitizeContext_(req.context);
+  const options = sanitizeOptions_(req.options);
 
   const images = pickImages_([target].concat(references));
   const prompt = loadPrompt_('chat');
@@ -213,7 +232,7 @@ function handleCoach_(req) {
 
   const cache = CacheService.getScriptCache();
   const cacheKey = KEY.RESULT + sha256_(JSON.stringify([
-    model, prompt.version, context, target, references, answers, working,
+    model, prompt.version, context, target, references, answers, working, options,
     images.map(x => [x.id, sha256_(x.dataUrl).slice(0, 16)]), prop_('IMAGE_DETAIL')
   ]));
   if (!req.force) {
@@ -235,7 +254,8 @@ function handleCoach_(req) {
     ANSWERS: answers.length ? answers.map((x, i) => 'Q' + (i + 1) + ': ' + x.q + '\nA' + (i + 1) + ': ' + x.a).join('\n') : '（なし：選択肢には答えていない）',
     WORKING: working || '（なし）',
     REFERENCES: references.length ? JSON.stringify(references) : '（なし：SYSTEM の見本投稿を参考にする）',
-    IMAGE_IDS: images.length ? images.map(x => x.id).join(', ') : '（なし）'
+    IMAGE_IDS: images.length ? images.map(x => x.id).join(', ') : '（なし）',
+    OPTIONS: Object.keys(options).length ? Object.keys(options).map(k => k + '：' + options[k].join('／')).join('\n') : '（なし：自分のことばで答えた問いは無い）'
   };
   const userText = fillTemplate_(prompt.user, vars);
   const noImageNote = '\n\n※今回は画像が添付されていません。photo は match・summary とも空文字で返してください。';
@@ -274,7 +294,7 @@ function handleCoach_(req) {
     generated_at: new Date().toISOString(),
     images_used: imagesUsed,
     images_note: notes.join(' / '),
-    result: normalizeResult_(data, imagesUsed > 0 && images.some(x => x.id === 'T'))
+    result: normalizeResult_(data, imagesUsed > 0 && images.some(x => x.id === 'T'), options)
   };
   try {
     cache.put(cacheKey, JSON.stringify(payload), Math.min(numProp_('RESULT_CACHE_SEC'), CACHE_MAX_SEC));
@@ -337,11 +357,58 @@ function normalizeHint_(data) {
   const d = data && typeof data === 'object' ? data : {};
   const one = (v, n) => (typeof v === 'string' ? v.replace(/\s+/g, ' ').trim().slice(0, n) : '');
   const clean = v => v.replace(/[#＃「」『』。、！!？?]/g, '').trim();
-  const why = Array.isArray(d.why_options) ? [...new Set(d.why_options.map(x => clean(one(x, 12))).filter(Boolean))].slice(0, 3) : [];
+  const list = (v, n, len) => (Array.isArray(v) ? [...new Set(v.map(x => clean(one(x, len))).filter(Boolean))].slice(0, n) : []);
   return {
     subject: (s => (s.length > 12 ? '' : s))(clean(one(d.subject, 40))),   // 長すぎる話題は問いの言い方が不自然になるので使わない（画面の読み取りに任せる）
-    why_options: why
+    feel_options: list(d.feel_options, 6, 12),
+    why_options: list(d.why_options, 6, 14),
+    find_options: list(d.find_options, 6, 18),
+    shime_options: list(d.shime_options, 6, 18)
   };
+}
+
+/* ============================== そうそう！（v10） ============================== */
+/**
+ * 本人のことば（ひとこと・気持ち・どこが）だけから、「言いたかったのは、こういうこと？」の 1 行を 3 通り作る。
+ * 画面は「どこが」に答えた直後に裏で呼び、「だれと」に答えているあいだに用意する（失敗しても画面は止まらない）
+ * result = { options:[ 1 行 × 3 ] }
+ */
+function handleReflect_(req) {
+  const t0 = Date.now();
+  if (!checkToken_(req.token)) throw new AppError('AUTH', 'ログインの有効期限が切れました。パスワードを再入力してください');
+  const apiKey = prop_(AZURE_MODEL.secret);
+  if (!apiKey) throw new AppError('CONFIG', 'スクリプトプロパティ ' + AZURE_MODEL.secret + ' が未設定です');
+  const target = sanitizeTarget_(req.target);
+  if (!target) throw new AppError('BAD_REQUEST', 'ひとことが空です');
+  delete target._rejected; delete target.source; delete target.image_data;
+  const answers = sanitizeAnswers_(req.answers);
+  const context = sanitizeContext_(req.context);
+  const prompt = loadPrompt_('reflect');
+  const cache = CacheService.getScriptCache();
+  const cacheKey = KEY.REFLECT + sha256_(JSON.stringify([AZURE_MODEL.name, prompt.version, context, target, answers]));
+  const hit = cache.get(cacheKey);
+  if (hit && !req.force) { const saved = JSON.parse(hit); saved.cached = true; saved.elapsed_ms = Date.now() - t0; return json_(saved); }
+  if (!adjustDailyQuota_(+1)) throw new AppError('LIMIT', '本日の AI 回数の上限に達しました');
+  const userText = fillTemplate_(prompt.user, {
+    CONTEXT: JSON.stringify(context), TARGET: JSON.stringify(target),
+    ANSWERS: answers.length ? answers.map(x => x.q + '：' + x.a).join('\n') : '（なし）'
+  });
+  let data;
+  try {
+    data = callAzureOpenAI_(apiKey, [{ role: 'system', content: prompt.system }, { role: 'user', content: userText }], REFLECT_SCHEMA, 'drop_coach_reflect', numProp_('REFLECT_MAX_OUTPUT_TOKENS'));
+  } catch (err) {
+    adjustDailyQuota_(-1);
+    throw err;
+  }
+  const payload = { ok: true, cached: false, model: AZURE_MODEL.name, prompt_version: prompt.version, generated_at: new Date().toISOString(), result: normalizeReflect_(data) };
+  try { cache.put(cacheKey, JSON.stringify(payload), Math.min(numProp_('RESULT_CACHE_SEC'), CACHE_MAX_SEC)); } catch (e) { /* 無視 */ }
+  payload.elapsed_ms = Date.now() - t0;
+  return json_(payload);
+}
+function normalizeReflect_(data) {
+  const d = data && typeof data === 'object' ? data : {};
+  const line = v => (typeof v === 'string' ? v.replace(/[\r\n]+/g, ' ').replace(/[ \t　]*[#＃][^\s#＃]+/g, '').replace(/[。]+$/, '').trim().slice(0, 30) : '');
+  return { options: Array.isArray(d.options) ? [...new Set(d.options.map(line).filter(Boolean))].slice(0, 3) : [] };
 }
 
 /* ---------- 入力整形 ---------- */
@@ -382,11 +449,23 @@ function sanitizeAnswers_(raw) {
     .map(x => ({ q: str_(x.q, LIMITS.Q), a: str_(x.a, LIMITS.A) }))
     .filter(x => x.q && x.a);
 }
+/** 自分のことばで答えた問いの選択肢（AI が当てはめる先）。問いごとに最大 24 個・各 24 字 */
+function sanitizeOptions_(raw) {
+  const o = {};
+  if (!raw || typeof raw !== 'object') return o;
+  OPTION_KEYS.forEach(k => {
+    if (!Array.isArray(raw[k])) return;
+    const list = [...new Set(raw[k].map(x => str_(x, LIMITS.OPT_LEN)).filter(Boolean))].slice(0, LIMITS.OPT_N);
+    if (list.length) o[k] = list;
+  });
+  return o;
+}
 function sanitizeContext_(raw) {
   const c = raw && typeof raw === 'object' ? raw : {};
-  const o = { app: 'DROP.Coach V2（チャット版）' };
+  const o = { app: 'DROP.Coach V3（チャット版）' };
   if (c.event) o.event = str_(c.event, LIMITS.CONTEXT);
   if (c.sample_total !== undefined && isFinite(Number(c.sample_total))) o.sample_total = Number(c.sample_total);
+  if (c.voice === 'kansai' || c.voice === 'standard') o.voice = c.voice;   // v10：キャラクターの話し方（headline に使う）
   return o;
 }
 function sanitizeText_(raw, max) {
@@ -447,7 +526,7 @@ function buildUserContent_(userText, images) {
 
 /* ---------- 出力 ---------- */
 /** AI 出力を画面が想定する形に整える */
-function normalizeResult_(data, hasTargetImage) {
+function normalizeResult_(data, hasTargetImage, options) {
   const d = data && typeof data === 'object' ? data : {};
   const text = v => (typeof v === 'string' ? v.trim() : '');
   const list = (v, max) => (Array.isArray(v) ? v.filter(x => typeof x === 'string' && x.trim()).map(x => x.trim()).slice(0, max) : []);
@@ -461,6 +540,21 @@ function normalizeResult_(data, hasTargetImage) {
   const cat = Object.prototype.hasOwnProperty.call(CATEGORIES, d.category) ? d.category : '';
   const nouns = (v, max) => (Array.isArray(v) ? [...new Set(v.filter(x => typeof x === 'string').map(x => x.replace(/\s+/g, ' ').trim().slice(0, 12)).filter(Boolean))].slice(0, max) : []);
   const sent = Number(d.sentiment);
+  const tidy = v => (typeof v === 'string' ? v.replace(/[\r\n]+/g, ' ').replace(/[ \t　]*[#＃][^\s#＃]+/g, '').replace(/。+$/, '').trim().slice(0, 40) : '');
+  const lines = (Array.isArray(d.lines) ? d.lines : []).map(x => {
+    const t = tidy(x && x.text);
+    const alts = Array.isArray(x && x.alts) ? [...new Set(x.alts.map(tidy).filter(a => a && a !== t))].slice(0, LIMITS.ALTS) : [];
+    return { text: t, alts: alts };
+  }).filter(x => x.text).slice(0, LIMITS.LINES);
+  // 当てはめ：画面が送った選択肢にある言葉だけ残す（選択肢に無い言葉は捨てる）
+  const opt = options || {}, mp = obj(d.mapped);
+  const pick = (k, many) => {
+    const allow = opt[k] || [];
+    const raw = Array.isArray(mp[k]) ? mp[k] : (typeof mp[k] === 'string' && mp[k] ? [mp[k]] : []);
+    const got = [...new Set(raw.map(x => str_(x, LIMITS.OPT_LEN)).filter(x => allow.indexOf(x) >= 0))];
+    return many ? got.slice(0, 4) : (got[0] || '');
+  };
+  const mapped = { feel: pick('feel', true), why: pick('why', true), who: pick('who', false), find: pick('find', true), face: pick('face', false), next: pick('next', true) };
   return {
     category: { code: cat, label: cat ? CATEGORIES[cat].label : '' },
     soft: soft,
@@ -470,8 +564,10 @@ function normalizeResult_(data, hasTargetImage) {
     sentiment: isFinite(sent) ? Math.round(Math.min(1, Math.max(-1, sent)) * 100) / 100 : 0,
     level: LEVELS.indexOf(d.level) >= 0 ? d.level : '',
     elements: ELEMENT_KEYS.reduce((o, k) => { const v = Number(d.elements && d.elements[k]); o[k] = v === 1 || v === 2 ? v : 0; return o; }, {}),
-    // ハッシュタグは画面が付けるので、AI が付けてしまった行末のタグは外す
-    rewrite: text(d.rewrite).replace(/[ \t　]*[#＃][^\s#＃]+/g, '').replace(/^[ \t　]+|[ \t　]+$/gm, '').replace(/\n{2,}/g, '\n').trim(),
+    // 投稿文：1 行ずつ（本文＋言いかえ）。ハッシュタグは画面が付けるので、AI が付けてしまったタグは外す。rewrite は lines から作る
+    lines: lines,
+    rewrite: lines.map(x => x.text).join('\n'),
+    mapped: mapped,
     headline: text(d.headline),
     photo: hasTargetImage
       ? { match: MATCHES.indexOf(ph.match) >= 0 ? ph.match : '', summary: text(ph.summary) }
@@ -481,15 +577,16 @@ function normalizeResult_(data, hasTargetImage) {
 }
 
 /* ============================ プロンプト ============================ */
-/** kind：'chat'（投稿文）／'hint'（ヒント）。hint は PROMPT_URL_HINT、未設定なら PROMPT_URL_CHAT と同じフォルダの drop_coach_hint.md */
+/** kind：'chat'（投稿文）／'hint'（ヒント）／'reflect'（そうそう！）。hint・reflect は PROMPT_URL_HINT・PROMPT_URL_REFLECT、未設定なら PROMPT_URL_CHAT と同じフォルダの drop_coach_hint.md・drop_coach_reflect.md */
 function loadPrompt_(kind) {
-  kind = kind === 'hint' ? 'hint' : 'chat';
+  kind = kind === 'hint' || kind === 'reflect' ? kind : 'chat';
   const cache = CacheService.getScriptCache();
   const hit = cache.get(KEY.PROMPT + kind);
   if (hit) return JSON.parse(hit);
   const chatUrl = normalizePromptUrl_(prop_('PROMPT_URL_CHAT'));
+  const own = { hint: 'PROMPT_URL_HINT', reflect: 'PROMPT_URL_REFLECT' }[kind];
   const url = kind === 'chat' ? chatUrl
-    : (prop_('PROMPT_URL_HINT') ? normalizePromptUrl_(prop_('PROMPT_URL_HINT')) : chatUrl.replace(/[^/]*$/, 'drop_coach_hint.md'));
+    : (prop_(own) ? normalizePromptUrl_(prop_(own)) : chatUrl.replace(/[^/]*$/, 'drop_coach_' + kind + '.md'));
   const prompt = parsePrompt_(fetchPromptText_(url));
   cache.put(KEY.PROMPT + kind, JSON.stringify(prompt), Math.min(numProp_('PROMPT_CACHE_SEC'), CACHE_MAX_SEC));
   return prompt;
@@ -531,7 +628,7 @@ function fillTemplate_(tpl, vars) {
   });
 }
 function clearPromptCache() {
-  CacheService.getScriptCache().removeAll([KEY.PROMPT + 'chat', KEY.PROMPT + 'hint']);
+  CacheService.getScriptCache().removeAll([KEY.PROMPT + 'chat', KEY.PROMPT + 'hint', KEY.PROMPT + 'reflect']);
   console.log('プロンプトのキャッシュを削除しました');
 }
 
@@ -542,9 +639,19 @@ const OUTPUT_SCHEMA = (() => {
     type: 'object',
     additionalProperties: false,
     // 出力順＝考える順（文面を整えてから、その文面で判定する）
-    required: ['rewrite', 'category', 'soft', 'act', 'content', 'space', 'sentiment', 'elements', 'level', 'photo', 'headline', 'caveats'],
+    required: ['lines', 'mapped', 'category', 'soft', 'act', 'content', 'space', 'sentiment', 'elements', 'level', 'photo', 'headline', 'caveats'],
     properties: {
-      rewrite: str,
+      // 投稿文を 1 行ずつ。alts は同じ内容の言いかえ 2 つ（画面で行を押すと出る）
+      lines: {
+        type: 'array',
+        items: { type: 'object', additionalProperties: false, required: ['text', 'alts'], properties: { text: str, alts: { type: 'array', items: str } } }
+      },
+      // 自分のことばで答えた問いを、画面が送った選択肢に当てはめたもの（分析用。当てはまらなければ空）
+      mapped: {
+        type: 'object', additionalProperties: false,
+        required: OPTION_KEYS,
+        properties: { feel: { type: 'array', items: str }, why: { type: 'array', items: str }, who: str, find: { type: 'array', items: str }, face: str, next: { type: 'array', items: str } }
+      },
       category: { type: 'string', enum: Object.keys(CATEGORIES) },
       act: { type: 'string', enum: ACTS.concat(['']) },
       content: { type: 'array', items: str },
@@ -577,11 +684,20 @@ const OUTPUT_SCHEMA = (() => {
 const HINT_SCHEMA = {
   type: 'object',
   additionalProperties: false,
-  required: ['subject', 'why_options'],
+  required: ['subject', 'feel_options', 'why_options', 'find_options', 'shime_options'],
   properties: {
     subject: { type: 'string' },
-    why_options: { type: 'array', items: { type: 'string' } }
+    feel_options: { type: 'array', items: { type: 'string' } },
+    why_options: { type: 'array', items: { type: 'string' } },
+    find_options: { type: 'array', items: { type: 'string' } },
+    shime_options: { type: 'array', items: { type: 'string' } }
   }
+};
+const REFLECT_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['options'],
+  properties: { options: { type: 'array', items: { type: 'string' } } }
 };
 
 function callAzureOpenAI_(apiKey, messages, schema, name, maxTokens) {
@@ -685,6 +801,8 @@ function checkSetup() {
     (/\{\{\s*(TARGET|ANSWERS|WORKING)\s*\}\}/.test(p.user) ? '' : ' ★{{TARGET}}/{{ANSWERS}}/{{WORKING}} が見つかりません'));
   const h = loadPrompt_('hint');
   console.log('プロンプト（ヒント）version=' + h.version + ' system=' + h.system.length + '字 user=' + h.user.length + '字');
+  const r = loadPrompt_('reflect');
+  console.log('プロンプト（そうそう）version=' + r.version + ' system=' + r.system.length + '字 user=' + r.user.length + '字');
 }
 // 8x8 灰色の JPEG（モデル疎通用。内容の解析結果には意味がない）
 const TEST_JPEG = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBwgHBgoICAgLCgoLDhgQDg0NDh0VFhEYIx8lJCIfIiEmKzcvJik0KSEiMEExNDk7Pj4+JS5ESUM8SDc9Pjv/2wBDAQoLCw4NDhwQEBw7KCIoOzs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozs7Ozv/wAARCAAIAAgDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwDuqKKKAP/Z';
@@ -693,6 +811,13 @@ const TEST_JPEG = 'data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAoHBw
 function testHint() {
   const login = JSON.parse(handleLogin_({ password: prop_('APP_PASSWORD') }).getContent());
   const out = JSON.parse(handleHint_({ token: login.token, variant: 'chat', context: { event: 'test' }, target: { text: 'コーヒーおいしかった' } }).getContent());
+  console.log(out.ok ? 'OK ' + (out.elapsed_ms / 1000) + '秒 ' + JSON.stringify(out.result) : JSON.stringify(out));
+}
+/** そうそう！の経路確認（エディタから実行） */
+function testReflect() {
+  const login = JSON.parse(handleLogin_({ password: prop_('APP_PASSWORD') }).getContent());
+  const out = JSON.parse(handleReflect_({ token: login.token, variant: 'chat', force: true, context: { event: 'test' }, target: { text: 'ぽかぽか しあわせ' },
+    answers: [{ q: '気持ち', a: 'あったまった、ほっとした' }, { q: 'どこが', a: '湯気と香り' }] }).getContent());
   console.log(out.ok ? 'OK ' + (out.elapsed_ms / 1000) + '秒 ' + JSON.stringify(out.result) : JSON.stringify(out));
 }
 /** チャット版の経路確認（エディタから実行） */
@@ -706,8 +831,9 @@ function testChat() {
       { q: 'そのとき、だれと一緒でしたか？', a: '作った人・お店の人と話した（隣のビルの経理さん）' },
       { q: '豆本の、どこがかわいかったですか？', a: '手づくり感・技、小さな文字' },
       { q: 'どんな気持ちになりましたか？（選んだ順）', a: 'かわいい、刺激をもらった' },
-      { q: 'このあと、どうしたいですか？', a: '自分もやってみたい' }
+      { q: 'しめの1行（自分のことば）', a: '私もちょっと作ってみたい' }
     ],
+    options: { next: ['自分もやってみたい', 'また来たい', 'あの人とまた話したい', '今の気持ちでしめる', 'とくにない'] },
     working_text: '豆本かわいい！\n作ったのは隣のビルの経理さん\nとくに手づくり感！\n私もやってみたい',
     references: []
   }).getContent());

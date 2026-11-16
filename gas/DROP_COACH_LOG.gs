@@ -1,10 +1,19 @@
 /**
- * DROP Coach V2 フォルダ — 記録用 Google Apps Script（Web アプリ）  v8（2026/11/13・チャット画面 v3.1 用）
+ * DROP Coach V3 フォルダ — 記録用 Google Apps Script（Web アプリ）  v9（2026/11/16・チャット画面 v4 用）
  * ------------------------------------------------------------
  * drop_coach_chat.html（チャット）から直接呼ばれ、チャット 1 回分（1 セッション）を
  * Google スプレッドシートに 1 行追記する。drop_coach_dashboard.html（分析画面）からは管理者だけが読み出せる。
  * もう 1 つの役割：運営が分析画面の「チャットの設定」で保存した「選択肢と重み」を settings シートにためて、チャットに配る。
- * ★ V1 のログ用 GAS とは別のプロジェクト（00_GAS/DROP_COACH2.0/DROP_COACH_LOG）
+ * ★ V1・V2 のログ用 GAS とは別のプロジェクトとして新しく作る（記録先のスプレッドシートも V3 用に新しく作る）
+ *
+ * ■ v9 の変更（2026/11/16・チャット画面 v4 用）
+ *   - 既定のシート名を chat_v4 に（V3 用の新しいスプレッドシートに書く）
+ *   - 終了に「開始」を追加：チャットはログインのあと 1 行送る（ひとことを書く前にやめた人も数えるため）
+ *   - 列を 14 足した（会社の見え方の右）：端末ID／通算何本目（この端末でコピーした通算の本数）／
+ *     自分のことば：気持ち・どこが・だれと・今日の発見・その人のふだん・しめ（本人が書いたまま）／
+ *     答えの決め方（問いごとに：本人が確認・候補から・AI）／AIの当てはめ（自分のことばを AI が選択肢に当てはめた結果）／
+ *     そうそう（選んだ 1 行）・そうそうの選び方／行の言いかえ（投稿文の行を言いかえた回数）／会社の見え方（コピーのあと 1 日 1 回）
+ *   - 「このあと」の列には「しめの1行」の区分が入る（チャット v4 で問いの名前を変えた）
  *
  * ■ v8 の変更（2026/11/13）
  *   - チャットの設定（選択肢の言葉・KPI の重み・気持ちの向き・「どこが」の候補・選んだ順の重み）を GAS で預かる
@@ -28,7 +37,7 @@
  *
  * ■ アクション（POST / Content-Type: text/plain / body は JSON 文字列）
  *   { "action":"login", "name":"...", "password":"..." } → { ok:true, token, expires_in, admin }
- *   { "action":"log", "token":"...", "session":{ …チャット記録（drop_chat_v3 形式。HTML の buildRecord() を参照）… } } → { ok:true, sheet, row }
+ *   { "action":"log", "token":"...", "session":{ …チャット記録（drop_chat_v4 形式。HTML の buildRecord() を参照）… } } → { ok:true, sheet, row }
  *   { "action":"export", "token":"（管理者のトークン）", "limit":3000, "json":false } → { ok:true, sheet, header:[…], rows:[[…], …], total }
  *   { "action":"settings" } → { ok:true, version:"設定3", saved_at, saved_by, settings:{…}|null }（null ＝まだ保存がない → チャットは初期値）
  *   { "action":"save_settings", "token":"（管理者）", "settings":{…}, "note":"メモ", "base_version":"設定3" } → { ok:true, version:"設定4" }
@@ -37,12 +46,12 @@
  *
  * ■ スクリプトプロパティ
  *   必須  APP_PASSWORD   … 参加者用パスワード（仕上げ用 GAS と同じ値）
- *         LOG_SHEET_ID   … 記録先スプレッドシートの ID（V2 の LOG_DROP_COACH）。★ V1 の ID を入れないこと
+ *         LOG_SHEET_ID   … 記録先スプレッドシートの ID（V3 用に新しく作る）。★ V1・V2 の ID を入れないこと
  *   分析画面を使うなら  ADMIN_PASSWORD … 管理者用パスワード（APP_PASSWORD とは別の値にする）
- *   任意  LOG_SHEET_NAME (chat_v3) / SETTINGS_SHEET_NAME (settings) / TOKEN_TTL_SEC (21600) / MAX_FAILS (30) / MAX_LOGS_PER_TOKEN (300) / EXPORT_MAX_ROWS (5000)
+ *   任意  LOG_SHEET_NAME (chat_v4) / SETTINGS_SHEET_NAME (settings) / TOKEN_TTL_SEC (21600) / MAX_FAILS (30) / MAX_LOGS_PER_TOKEN (300) / EXPORT_MAX_ROWS (5000)
  *
  * ■ 更新のしかた
- *   貼り替え → スクリプトプロパティ（LOG_SHEET_NAME を chat_v3 に・ADMIN_PASSWORD を追加）→ setupTest() を 1 回実行（settings シートもできる）
+ *   新規：スクリプトプロパティ（APP_PASSWORD・LOG_SHEET_ID・ADMIN_PASSWORD）→ setupTest() を 1 回実行（chat_v4・settings シートができる）
  *   → デプロイを管理 → 編集 → 新バージョン（URL は変わらない）。LOG_URL?diag=1 をブラウザで開くと記録先の状態を確認できる
  */
 const LOG_HEADER = [
@@ -56,20 +65,26 @@ const LOG_HEADER = [
   // v8 で追加（記録JSON の右に足す。v7 のシートは見出しを自動で書き足す）
   'どこがの気持ち', 'どこがの重み', '設定版', '任意の問い', 'この端末で何本目',
   '今日の発見', 'その人のふだん', 'チャットの評価', '運営へのコメント',
-  'AI 何を', 'AI 誰の立場', 'AI なぜ', 'AI 変化', 'AI 次の一歩', '分析に使える'
+  'AI 何を', 'AI 誰の立場', 'AI なぜ', 'AI 変化', 'AI 次の一歩', '分析に使える',
+  // v9 で追加
+  '端末ID', '通算何本目',
+  '自分のことば：気持ち', '自分のことば：どこが', '自分のことば：だれと', '自分のことば：今日の発見', '自分のことば：その人のふだん', '自分のことば：しめ',
+  '答えの決め方', 'AIの当てはめ', 'そうそう', 'そうそうの選び方', '行の言いかえ', '会社の見え方'
 ];
-const END_LABEL = { copy: 'コピー', finish: '完了', abandon: '途中離脱', reset: 'やり直し', feedback: '感想' };
+const END_LABEL = { start: '開始', copy: 'コピー', finish: '完了', abandon: '途中離脱', reset: 'やり直し', feedback: '感想', pulse: '会社の見え方' };
 // 分析に使える投稿か：5 つの要素（AI の読み取り 0＝無い／1＝あいまい／2＝具体的）
 const ELEMENTS = [['what', '何を'], ['who', '誰の立場'], ['why', 'なぜ'], ['change', '変化'], ['next', '次の一歩']];
 /** 「分析に使える」：何を・なぜ が具体的（2）で、誰の立場が書けていて（1 以上）、変化か次の一歩のどちらかがある（1 以上） */
 function analyzable_(e) { const v = k => Number(e[k]) || 0; return v('what') >= 2 && v('why') >= 2 && v('who') >= 1 && (v('change') >= 1 || v('next') >= 1); }
+// 自分のことばで答える問い（記録の own・src・ai.result.mapped のキー）
+const OWN_KEYS = [['feel', '気持ち'], ['why', 'どこが'], ['who', 'だれと'], ['find', '今日の発見'], ['face', 'その人のふだん'], ['next', 'しめ']];
 const ACT_LABEL = { watch: '見た・聴いた', eat: '食べた・飲んだ', make: '作った・体験した', buy: '買った', talk: '話した', host: '出展・出演・お手伝い', stroll: 'ぶらぶら回った' };
-const DEFAULTS = { LOG_SHEET_NAME: 'chat_v3', SETTINGS_SHEET_NAME: 'settings', SETTINGS_CACHE_SEC: 300, TOKEN_TTL_SEC: 21600, MAX_FAILS: 30, MAX_LOGS_PER_TOKEN: 300, EXPORT_MAX_ROWS: 5000 };
+const DEFAULTS = { LOG_SHEET_NAME: 'chat_v4', SETTINGS_SHEET_NAME: 'settings', SETTINGS_CACHE_SEC: 300, TOKEN_TTL_SEC: 21600, MAX_FAILS: 30, MAX_LOGS_PER_TOKEN: 300, EXPORT_MAX_ROWS: 5000 };
 const CACHE_MAX_SEC = 21600;
 const FAIL_WINDOW_SEC = 900;
 const MAX_LEN = { NAME: 40, ID: 64, TEXT: 400, SHORT: 120, FIELD: 1000, ITEMS: 12, MSG: 300, META: 80, JSON_CELL: 45000 };
 const KEY = { FAIL: 'chatlog_auth_fail', TOKEN: 'chatlogtok_', SETTINGS: 'chatlog_settings_cur' };
-const SERVICE_VERSION = 8;
+const SERVICE_VERSION = 9;
 
 class AppError extends Error {
   constructor(code, message) { super(message); this.code = code; }
@@ -197,7 +212,7 @@ function handleExport_(req) {
   return json_({ ok: true, sheet: sh.getName(), header: header, rows: values, total: last - 1, truncated: from > 2 });
 }
 
-/** チャット記録（drop_chat_v3）→ 1 行。値はすべて検証・丸めてから書く */
+/** チャット記録（drop_chat_v4）→ 1 行。値はすべて検証・丸めてから書く */
 function buildRow_(name, s) {
   const o = v => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
   const t = (v, n) => clean_(typeof v === 'string' ? v : (typeof v === 'number' ? String(v) : ''), n || MAX_LEN.FIELD);
@@ -211,6 +226,7 @@ function buildRow_(name, s) {
 
   const a = o(s.answers), det = o(s.detected), soft = o(s.soft), ai = o(s.ai), ar = o(ai.result), as = o(ar.soft), texts = o(s.texts), hint = o(s.hint);
   const who = o(a.who);
+  const own = o(s.own), src = o(s.src), mapped = o(ar.mapped), rf = o(s.reflect);
   const sid = /^[A-Za-z0-9_-]{6,64}$/.test(String(s.session_id || '')) ? String(s.session_id) : '';
   const end = Object.prototype.hasOwnProperty.call(END_LABEL, s.end) ? END_LABEL[s.end] : t(s.end, 20);
   const aiState = ai.status === 'OK' ? (ai.cached ? 'OK（キャッシュ）' : 'OK') : t(ai.status, 20);
@@ -290,7 +306,17 @@ function buildRow_(name, s) {
     num(s.chat_rating, 1, 5),
     t(s.chat_comment, 300),
     ...ELEMENTS.map(([k]) => (ai.status === 'OK' ? num(o(ar.elements)[k], 0, 2) : '')),
-    ai.status === 'OK' && o(ar.elements).what != null ? (analyzable_(o(ar.elements)) ? 'はい' : 'いいえ') : ''
+    ai.status === 'OK' && o(ar.elements).what != null ? (analyzable_(o(ar.elements)) ? 'はい' : 'いいえ') : '',
+    // v9
+    /^[A-Za-z0-9_-]{6,64}$/.test(String(s.device_id || '')) ? String(s.device_id) : '',
+    num(s.post_total, 0, 9999),
+    ...OWN_KEYS.map(([k]) => t(own[k], MAX_LEN.SHORT)),
+    OWN_KEYS.filter(([k]) => src[k]).map(([k, l]) => l + '=' + t(src[k], 20)).join('／'),
+    OWN_KEYS.filter(([k]) => mapped[k] && (Array.isArray(mapped[k]) ? mapped[k].length : true)).map(([k, l]) => l + '=' + (Array.isArray(mapped[k]) ? strs(mapped[k], 30, 4).join('、') : t(mapped[k], 30))).join('／'),
+    t(rf.text, 60),
+    t(rf.how, 20),
+    num(s.line_swaps, 0, 99),
+    t(s.company_view, 20)
   ];
 }
 
@@ -519,7 +545,7 @@ function setupTest() {
   console.log('LOG_SHEET_NAME: ' + prop_('LOG_SHEET_NAME'));
   console.log('チャットの設定: ' + (currentSettings_().version || 'まだ保存なし（チャットは初期値を使う）') + '（シート「' + settingsSheet_().getName() + '」）');
   const w = appendRow_(buildRow_('テスト', {
-    schema: 'drop_chat_v3', session_id: 'test_' + Date.now(), end: 'finish', started_at: new Date().toISOString(), duration_sec: 42,
+    schema: 'drop_chat_v4', session_id: 'test_' + Date.now(), end: 'finish', started_at: new Date().toISOString(), duration_sec: 42,
     answered: 4, last_step: '最後まで', has_photo: false, text1: 'コーヒーおいしかった',
     detected: { feels: ['oishii'], feel_labels: ['おいしい'], who: '', next: false, subject: 'コーヒー' }, subject: 'コーヒー',
     why_for: 'おいしい', settings_version: '初期値',
@@ -528,7 +554,9 @@ function setupTest() {
     valence: 1, nodes: ['コンテンツ:コーヒー', '人:ひとりで', 'コンテンツ:味・香り', '感情:おいしい', '意向:また来たい'],
     soft: { c1: 0, c2: 0, c3: 0, att: 1 },
     texts: { composed: 'コーヒーおいしかった\nまた来たい！', ai: '', final: 'コーヒーおいしかった\nまた来たい！', chosen: '自分の言葉', edited: false },
-    coach_level: '選択あり', ai: { status: '' }, hint: { status: '' }, order: {}, step_sec: { who: 2.1 }, app_version: 'test'
+    coach_level: '選択あり', ai: { status: '' }, hint: { status: '' }, order: {}, step_sec: { who: 2.1 }, app_version: 'test',
+    device_id: 'test_device', post_total: 1, own: { feel: 'ほっとした', next: 'また来たい' }, src: { feel: '本人', who: '候補から', next: '本人が確認' },
+    reflect: { text: '香りだけで、もうしあわせ', how: '候補1' }, line_swaps: 0, company_view: ''
   }));
   console.log('書き込み OK: シート「' + w.sheet + '」 ' + w.row + ' 行目（テスト行は消して大丈夫です）');
 }
