@@ -114,17 +114,18 @@ V3 は V2（DROP_Dashboard_Shinagawa2.0）を複製して作りました。**GAS
 3. `checkSetup` → `testHint` → `testReflect` → `testChat` を実行してログを確認
 4. デプロイ → 新しいデプロイ → ウェブアプリ（同じ設定）→ /exec の URL を控える
 
-### 4. 画面に URL を貼る
+### 4. 画面に URL を貼る（2026-11-16 設定済み）
 - `drop_coach_chat.html` の `CONFIG.GAS_URL`（仕上げ用）と `CONFIG.LOG_URL`（記録用）
 - `drop_coach_dashboard.html` の `CONFIG.LOG_URL`（記録用）
 - push して、`LOG_URL?diag=1`（`sheet_ok`・`admin_password_set` が true）→ チャットで 1 回投稿 → 分析画面で 1 件出ること → 「チャットの設定」が開くことを確認
 - URL が空のあいだ、チャットは AI・記録なしで動き、分析画面は CSV とデモデータだけ使えます
+- GAS を「新しいデプロイ」で作り直すと URL が変わるので貼り直す（「デプロイを管理」→ 編集 → バージョン「新バージョン」なら URL は変わらない）
 
 ### 画面の設定（`drop_coach_chat.html` の `CONFIG`。エンジニア向け）
 
 | キー | 既定 | 内容 |
 |---|---|---|
-| `GAS_URL`・`LOG_URL` | 空 | V3 の 2 つの GAS の /exec URL |
+| `GAS_URL`・`LOG_URL` | V3 の URL（設定済み） | V3 の 2 つの GAS の /exec URL |
 | `VOICE` | kansai | キャラクターの話し方（kansai／standard） |
 | `AI_MAX` | 4 | 1 本の投稿で作れる AI の案の数（最初の 1 案＋「AI でもう一案」） |
 | `HINT_ON`・`REFLECT_ON` | true | ひとことの直後のヒント・「どこが」のあとの「そうそう！」 |

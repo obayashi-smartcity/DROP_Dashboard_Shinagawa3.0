@@ -357,9 +357,9 @@
 ===================================================================== */
 const APP_VERSION = "chat-v4.0 (2026-11-16)";
 const CONFIG = {
-  // ★ V3 用の GAS をデプロイしたら、その /exec の URL を貼る（V2 の URL は使わない：V2 の記録に混ざるため）。空のあいだは AI・記録なしで動く
-  GAS_URL: "",   // 仕上げ用 GAS（DROP_COACH_GPT v10）
-  LOG_URL: "",   // 記録用 GAS（DROP_COACH_LOG v9）
+  // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
+  GAS_URL: "https://script.google.com/macros/s/AKfycbzdkIa8xnE0useu-5tuXMfLTBXCU80_9yhhpN0C6pcxnkePNdfR2jtVZ51PqyAb3XRe/exec",   // 仕上げ用 GAS（DROP_COACH_GPT v10）
+  LOG_URL: "https://script.google.com/macros/s/AKfycbzInJasVfcMk61ud2I7Qi8viHEj-lnZ10p7kgKpi_VMzlH7qW8OI3h-MOvmYE9-epd_vw/exec",   // 記録用 GAS（DROP_COACH_LOG v9）
   VOICE: "kansai",            // キャラクター「ぽとり」の話し方：kansai（関西弁）／standard（標準語）
   DATA_SOURCES: ["json/sample_drop.json"],
   EVENT: "culture-snack-2026",
