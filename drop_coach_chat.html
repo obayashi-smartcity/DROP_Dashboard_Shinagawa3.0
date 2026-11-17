@@ -196,13 +196,36 @@
   .bars s{display:block;height:8px;background:var(--bg-2);border-radius:4px;overflow:hidden;text-decoration:none}
   .bars s u{display:block;height:100%;background:var(--brown)}
   .card.staff pre{max-height:240px;overflow:auto;background:var(--bg);padding:8px;font-size:11px;border-radius:8px;white-space:pre-wrap;word-break:break-all}
-  /* 本日の DROP（コピーした本数） */
+  /* 本日の DROP：ステンドグラス（バラ窓。通算の本数で育つ） */
   .card.stamp .stamp-n{margin-left:auto;font-weight:900;color:var(--ink-2);font-size:13.5px}
-  .stamps{display:flex;gap:8px;margin:4px 0 10px}
-  .stamps i{width:44px;height:52px;display:flex;align-items:center;justify-content:center;font-style:normal;border-radius:12px;border:1.5px dashed var(--line);background:var(--paper)}
-  .stamps i svg{width:34px;height:42px}
-  .stamps i.on{border:none;background:none}
-  .stamps i.on:last-of-type svg{animation:rise .9s cubic-bezier(.2,1.4,.4,1)}
+  .glass{width:100%;max-width:320px;aspect-ratio:1/1;margin:2px auto 10px;border-radius:16px;overflow:hidden;transition:background .8s}
+  .glass.day{background:radial-gradient(circle at 50% 46%,#FFFDF8 0%,#F1E8D8 78%)}
+  .glass.night{background:radial-gradient(circle at 50% 46%,#26346A 0%,#0B1130 78%)}
+  .glass svg{width:100%;height:100%;display:block}
+  .glass-sub{margin:2px 0 0;font-size:14px;color:var(--ink-2);line-height:1.7}
+  .glass-night{margin:6px 0 0;font-size:12.5px;color:var(--dim)}
+  .sg-pop{transform-box:fill-box;transform-origin:center;animation:sgPop .75s cubic-bezier(.2,1.5,.4,1) both}
+  @keyframes sgPop{0%{transform:scale(.15);opacity:0}55%{opacity:1}100%{transform:scale(1);opacity:1}}
+  .sg-fade{animation:sgFade 1s ease-out both}
+  @keyframes sgFade{from{opacity:0}to{opacity:1}}
+  .sg-glint{animation:sgGlint 1s ease-out both;pointer-events:none}
+  @keyframes sgGlint{0%{opacity:0}35%{opacity:.85}100%{opacity:0}}
+  .sg-spark{transform-box:fill-box;transform-origin:center;animation:sgSpark 1.3s ease-out both}
+  @keyframes sgSpark{0%{transform:scale(0) rotate(0);opacity:0}40%{transform:scale(1.3) rotate(45deg);opacity:1}100%{transform:scale(0) rotate(90deg);opacity:0}}
+  .sg-hint{animation:sgHint 1.8s ease-in-out infinite}
+  @keyframes sgHint{0%,100%{opacity:.25}50%{opacity:.8}}
+  .sg-tw{animation:sgTw 2.6s ease-in-out infinite}
+  @keyframes sgTw{0%,100%{opacity:.15}50%{opacity:.95}}
+  .sg-rays{animation:sgSpin 60s linear infinite}
+  @keyframes sgSpin{to{transform:rotate(360deg)}}
+  /* あいさつの注記・行ってみるリストのボタン・写真のえらびなおし */
+  .sysnote{margin:-4px 0 10px 46px;font-size:12px;color:var(--dim);line-height:1.6}
+  .want-btn{display:inline-flex;align-items:center;gap:4px;margin-top:8px;min-height:40px;padding:6px 14px;border-radius:999px;border:1.5px solid var(--brown);background:#fff;color:var(--brown);font-size:14px;font-weight:900;cursor:pointer}
+  .pick-col{display:flex;flex-direction:column;align-items:flex-end;gap:2px;max-width:64%}
+  .pick-col .bubble.photo{max-width:100%}
+  .repick{min-height:32px;padding:2px 4px;font-size:12.5px}
+  .post-photo-wrap{position:relative}
+  .photo-chg{position:absolute;right:8px;top:8px;min-height:32px;padding:4px 12px;border-radius:999px;border:none;background:rgba(43,33,29,.72);color:#fff;font-size:12.5px;font-weight:700;cursor:pointer}
   .stamp-msg{margin:0;font-size:15.5px;line-height:1.7;font-weight:700}
   .stamp-ai{margin:8px 0 0;font-size:14px;color:var(--ink-2);line-height:1.6;display:flex;gap:8px;align-items:flex-start}
   .stamp-ai .avatar{width:28px;height:28px;box-shadow:none;background:var(--paper)}
@@ -444,6 +467,16 @@
 /* =====================================================================
    DROP. Coach — 投稿づくりチャット v5（drop_coach_chat.html）  2026/11/16
    ---------------------------------------------------------------------
+   v5.5（2026/11/17）
+   - 本日の DROP をステンドグラス（バラ窓）に：この端末でコピーした通算の本数で育つ（日をまたいでもリセットしない）
+     1〜5 本目でバラ窓がそろい、そのあとも外側に輪が広がる（11・16 本目は窓がひとまわり大きくなる）。5 本ごとに節目の飾り
+     （背景の色が中心から広がる→金の粒）。21 本目からは窓のまわりに光のしずくが増える。上限はない
+     夜（CONFIG.NIGHT_FROM、日本時間 18:30）からは夜空になり窓に灯りがともる。表示は「夜になると、窓に灯りがともります」
+     本数のお知らせは「通算○本目（本日○本目）です。」の順に
+   - 写真のえらびなおし：送った写真の下の「写真をえらびなおす」（写真なしで進んだときは「やっぱり写真をえらぶ」）、
+     投稿文カードの写真の「写真を変える」で、コピーするまで何度でも変えられる。投稿文はそのまま（「AI でもう一案」で新しい写真から作れる）。記録に photo_redo（回数）
+   - 2 本目以降のあいさつ：吹き出しを 2 つに（あいさつ／行ってみるリスト）。行ってみるリストはボタンで開ける（右上のメニュー（…）からも、と注記）
+     「○本目は、この端末でコピーした数」の注記はぽとりのセリフにせず、吹き出しの外に小さく。その日の 2 本目のときだけ出す
    v5.4（2026/11/17）
    - 複数えらべる問い：選ぶ欄の頭に「最大○つ」と、いま選んだ数（●○）・あと何個を出す。上限に達したら、ほかの候補をうすく
    - 入力欄：スクロールバーを出さず、2 行以上（例文が 2 行のときも）は自動で広がる
@@ -485,7 +518,7 @@
    - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v9）の /exec URL（★ 同上）。記録と「チャットの設定」の配布
    - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
 ===================================================================== */
-const APP_VERSION = "chat-v5.4 (2026-11-17)";
+const APP_VERSION = "chat-v5.5 (2026-11-17)";
 const CONFIG = {
   // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
   GAS_URL: "https://script.google.com/macros/s/AKfycbzdkIa8xnE0useu-5tuXMfLTBXCU80_9yhhpN0C6pcxnkePNdfR2jtVZ51PqyAb3XRe/exec",   // 仕上げ用 GAS（DROP_COACH_GPT v10）
@@ -497,6 +530,7 @@ const CONFIG = {
   LOGIN_AT_START: true,       // GAS 設定済み・未ログインなら最初に 1 回だけ名前とパスワードを聞く
   ALLOW_NO_LOGIN: false,      // true にすると「ログインせずに使う（AI・記録なし）」を出す（全員分を記録する方針のため false）
   AUTO_AI: true,              // 投稿文の段階に入ったら自動で AI が投稿文を作る（失敗したら自分の言葉の文を使う）
+  NIGHT_FROM: "18:30",        // 本日の DROP（ステンドグラス）に灯りがともる時刻（日本時間。閉場時刻が決まったら見直す）
   AI_MAX: 4,                  // 1 本の投稿で AI の案を作る上限（最初の 1 案＋「AI でもう一案」3 回）。案は残して、自分の言葉の文と見比べて選べる
   HINT_ON: true,              // ひとことの直後に裏で AI のヒントを 1 回呼ぶ（話題・各問いの候補）
   REFLECT_ON: true,           // 「どこが」のあとに裏で「そうそう！」の候補を 1 回作る
@@ -716,8 +750,8 @@ const TXT = {
   hello1: ["まいど！ 案内役の「ぽとり」やで。写真1枚から、DROP の投稿文を一緒につくろ", "こんにちは！ 案内役の「ぽとり」です。写真1枚から、DROP の投稿文を一緒につくりましょう", "やあ！ 案内役の「ぽとり」だよ。写真1枚から、DROP の投稿文を一緒につくろう"],
   hello1sub: ["5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成や。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光るで✦", "5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成です。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光ります✦", "5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成だよ。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光るよ✦"],
   hello2: ["おかえり！ {n}本目の冒険、いってみよか", "おかえりなさい！ {n}本目の冒険、いってみましょう", "おかえり！ 今日の{n}本目、いってみよう！"],
-  hello2sub: ["写真えらんで、ひとこと書いたら、また5つのかけらを集めにいこ", "写真をえらんで、ひとことを書いたら、また5つのかけらを集めにいきましょう", "写真をえらんで、ひとことを書いたら、また5つのかけらを集めにいこう"],
-  hello_want: ["☆行ってみるリストに{n}か所あるで。行った先の写真でもつくれるで（右上のメニューから見られる）", "☆行ってみるリストに{n}か所あります。行った先の写真でもつくれます（右上のメニューから見られます）", "☆行ってみるリストに{n}か所あるよ。行った先の写真でもつくれるよ（右上のメニューから見られるよ）"],
+  hello2sub: ["写真とひとことから、また5つのかけらを集めよか", "写真とひとことから、また5つのかけらを集めましょう。", "写真とひとことから、また5つのかけらを集めよう。"],
+  hello_want: ["ネタに迷ったら、行ってみるリストの{n}か所はどう？ 行った先の写真でもつくれるで", "ネタに迷ったら、行ってみるリストの{n}か所はいかがですか？ 行った先の写真でもつくれます", "ネタに迷ったら、行ってみるリストの{n}か所はどう？ 行った先の写真でもつくれるよ"],
   login_q: ["はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてな。この端末では1回だけやで", "はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてください。この端末では1回だけです", "はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてね。この端末では1回だけだよ"],
   login_sub: ["本名ではなく、ニックネーム（ひらがな）を入れてください。答えは、イベントの効果を確かめる分析にだけ使います", "本名ではなく、ニックネーム（ひらがな）を入れてください。答えは、イベントの効果を確かめる分析にだけ使います", "本名ではなく、ニックネーム（ひらがな）を入れてください。答えは、イベントの効果を確かめる分析にだけ使います"],
   photo_q: ["まずは、投稿する写真を1枚えらんでな（写真なしでもOKやで）", "まずは、投稿する写真を1枚えらんでください（写真なしでも大丈夫です）", "まずは、投稿する写真を1枚えらんでね（写真なしでもOKだよ）"],
@@ -786,10 +820,6 @@ const TXT = {
   compose_noai: ["投稿文できたで！ そのまま使っても、自由に直してもOKや", "投稿文ができました。そのまま使っても、自由に直してもOKです", "投稿文ができたよ！ そのまま使っても、自由に直してもOKだよ"],
   login_compose: ["投稿文をつくるのに、ニックネームとパスワードを入れてな（この端末では1回だけ）", "投稿文をつくるために、ニックネームとパスワードを入れてください（この端末では1回だけ）", "投稿文をつくるのに、ニックネームとパスワードを入れてね（この端末では1回だけ）"],
   copied: ["コピーしたで！ DROP に貼りつけて、写真と一緒に投稿してな", "コピーしました！ DROP に貼りつけて、写真と一緒に投稿してください", "コピーしたよ！ DROP に貼りつけて、写真と一緒に投稿してね"],
-  stamp1: ["1本目、完成や！ ほかのブースや気づいたことでも、もう1本どう？", "1本目、完成です！ ほかのブースや気づいたことでも、もう1本どうですか？", "1本目、完成！ ほかのブースや気づいたことでも、もう1本どう？"],
-  stamp3: ["3本目！ もう DROP 名人やな。ほかに気になったとこある？", "3本目！ もう DROP 名人です。ほかに気になったところはありますか？", "3本目！ もう DROP 名人だね。ほかに気になったところはある？"],
-  stamp5: ["スタンプそろったで！ たくさんの声、おおきに", "スタンプがそろいました！ たくさんの声をありがとうございます", "スタンプがそろったよ！ たくさんの声をありがとう"],
-  stampN: ["完成や！ 気づいたことがあったら、もう1本どう？", "完成です！ 気づいたことがあれば、もう1本どうですか？", "完成！ 気づいたことがあったら、もう1本どう？"],
   // 運営からの質問（KPI ③など）は、話し方の設定にかかわらず同じ文（答えを比べられるように）
   pulse_q: ["今日のことで、会社や職場の見え方は変わりましたか？", "今日のことで、会社や職場の見え方は変わりましたか？", "今日のことで、会社や職場の見え方は変わりましたか？"],
   pulse_thanks: ["ありがとうございました。参考にします", "ありがとうございました。参考にします", "ありがとうございました。参考にします"],
@@ -1018,12 +1048,15 @@ function msgHtml(m, isNew) {
   if (m.notice) return `<div class="notice" role="note">${LOCK_SVG}<span><b>おねがい：</b>${esc(PII_NOTICE)}</span></div>`;
   if (m.who === "sys") return sysHtml(m, isNew);
   if (m.who === "me") {
-    if (m.photo) return `<div class="${cls}"><div class="bubble photo">${PHOTO.img ? `<img src="${esc(PHOTO.img)}" alt="えらんだ写真">` : '<span class="nophoto">写真（この画面では表示できません）</span>'}</div></div>`;
+    const rp = isPickMsg(m) && !S.copied ? `<button type="button" class="lnk repick" data-repick="1">${m.photo ? "写真をえらびなおす" : "やっぱり写真をえらぶ"}</button>` : "";
+    if (m.photo) return `<div class="${cls}"><div class="pick-col"><div class="bubble photo">${PHOTO.img ? `<img src="${esc(PHOTO.img)}" alt="えらんだ写真">` : '<span class="nophoto">写真（この画面では表示できません）</span>'}</div>${rp}</div></div>`;
+    if (rp) return `<div class="${cls}"><div class="pick-col"><div class="bubble muted">${esc(m.text)}</div>${rp}</div></div>`;
     return `<div class="${cls}"><div class="bubble${m.muted ? " muted" : ""}">${esc(m.text)}</div></div>`;
   }
   const av = `<div class="avatar">${charSvg()}</div>`;
   if (m.card === "compose") return `<div class="${cls} wide">${composeCardHtml()}</div>`;
-  if (m.card === "stamp") return `<div class="${cls} wide">${stampCardHtml()}</div>`;
+  if (m.card === "stamp") return `<div class="${cls} wide">${stampCardHtml(isNew)}</div>`;
+  if (m.want) return `<div class="${cls}">${av}<div class="bubble">${esc(m.text)}<br><button type="button" class="want-btn" data-openwant="1">☆ 行ってみるリストを見る</button><span class="sub">右上のメニュー（…）からも、いつでも見られます</span></div></div>`;
   if (m.card === "treasure") return `<div class="${cls} wide">${treasureCardHtml()}</div>`;
   if (m.card === "survey") return `<div class="${cls} wide">${surveyCardHtml()}</div>`;
   return `<div class="${cls}">${av}<div class="bubble">${esc(m.text)}${m.sub ? `<span class="sub">${esc(m.sub)}</span>` : ""}</div></div>`;
@@ -1031,6 +1064,7 @@ function msgHtml(m, isNew) {
 /** 運営からのお知らせ・部屋に入る・かけらゲット・原石の完成（キャラにしゃべらせない表示） */
 function sysHtml(m, isNew) {
   if (m.ann) return `<div class="notice ann" role="note"><b>${esc(m.ann)}</b>${m.sub ? `<small>${esc(m.sub)}</small>` : ""}</div>`;
+  if (m.note) return `<p class="sysnote">${esc(m.note)}</p>`;
   if (m.room) {
     const r = ROOM[m.room]; if (!r) return "";
     const icon = r.i != null ? gemSvg(r.i, "now") : r.rare ? gemSvg(0, "rare") : ICON.spark;
@@ -1420,11 +1454,11 @@ function bindDock(st) {
   }
   if (st.kind === "photo") {
     const tileEl = $("dPhoto");
-    on("dPhoto", () => $("file").click());
+    on("dPhoto", () => { RT.repick = false; $("file").click(); });
     ["dragenter", "dragover"].forEach(t => tileEl.addEventListener(t, e => { e.preventDefault(); tileEl.classList.add("over"); }));
     ["dragleave", "drop"].forEach(t => tileEl.addEventListener(t, e => { e.preventDefault(); tileEl.classList.remove("over"); }));
     tileEl.addEventListener("drop", e => { const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) handlePhotoFile(f); });
-    on("dNoPhoto", async () => { if (RT.busy) return; S.skipped.push("photo"); markDone(st); me("写真なしで進む", { muted: true }); lockDock(); await advance(st.id); });
+    on("dNoPhoto", async () => { if (RT.busy) return; S.skipped.push("photo"); markDone(st); me("写真なしで進む", { muted: true, pick: true }); lockDock(); await advance(st.id); });
   }
   if (st.kind === "text") {
     const ta = $("dIn"), send = $("dSend");
@@ -1590,27 +1624,64 @@ async function decodeFile(file) {
     return { el: img, w: img.naturalWidth, h: img.naturalHeight, close: () => URL.revokeObjectURL(url) };
   } catch (e) { URL.revokeObjectURL(url); throw e; }
 }
-$("file").addEventListener("change", () => { const file = $("file").files && $("file").files[0]; $("file").value = ""; if (file) handlePhotoFile(file); });
+$("file").addEventListener("change", () => { const file = $("file").files && $("file").files[0]; $("file").value = ""; if (!file) return; if (RT.repick) handleRepick(file); else handlePhotoFile(file); });
 // PC：写真の問いのあいだは、画面のどこにドラッグしても読み込む（ブラウザが画像を開いてしまわないように）
 document.addEventListener("dragover", e => { if (S && S.phase === "ask" && S.cur === "photo") e.preventDefault(); });
 document.addEventListener("drop", e => { if (!(S && S.phase === "ask" && S.cur === "photo")) return; e.preventDefault(); const f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) handlePhotoFile(f); });
+const PHOTO_BAD = "この写真を読み込めませんでした。JPEG / PNG の写真を選んでください（iPhone の写真を PC に移した HEIC は読めないことがあります）";
+/** 写真ファイルのチェック（だめならメッセージ） */
+function photoFileErr(file) {
+  if (file.type && !/^image\//.test(file.type)) return "画像ファイルを選んでください";
+  if (file.size > CONFIG.MAX_MB * 1024 * 1024) return `画像が大きすぎます（${CONFIG.MAX_MB}MB まで）`;
+  return "";
+}
+/** 写真ファイル → 表示用・AI 用の JPEG（読めなければ例外） */
+async function makePhoto(file) {
+  const src = await decodeFile(file);
+  try {
+    if (!src.w || !src.h) throw new Error("empty image");
+    return { sid: S.sid, img: drawToDataUrl(src.el, src.w, src.h, CONFIG.PREVIEW_EDGE, 0.85), imgAi: drawToDataUrl(src.el, src.w, src.h, CONFIG.IMG_MAX_EDGE, CONFIG.IMG_QUALITY), w: src.w, h: src.h };
+  } finally { src.close(); }
+}
 async function handlePhotoFile(file) {
   if (!file || !S || S.cur !== "photo" || RT.busy) return;
   const err = m => { const el = $("dErr"); if (el) el.textContent = m; };
-  if (file.type && !/^image\//.test(file.type)) { err("画像ファイルを選んでください"); return; }
-  if (file.size > CONFIG.MAX_MB * 1024 * 1024) { err(`画像が大きすぎます（${CONFIG.MAX_MB}MB まで）`); return; }
+  const bad = photoFileErr(file); if (bad) { err(bad); return; }
   lockDock();
-  try {
-    const src = await decodeFile(file);
-    try {
-      if (!src.w || !src.h) throw new Error("empty image");
-      PHOTO = { sid: S.sid, img: drawToDataUrl(src.el, src.w, src.h, CONFIG.PREVIEW_EDGE, 0.85), imgAi: drawToDataUrl(src.el, src.w, src.h, CONFIG.IMG_MAX_EDGE, CONFIG.IMG_QUALITY), w: src.w, h: src.h };
-    } finally { src.close(); }
-  } catch (e) { console.warn(e); RT.busy = false; renderDock(); err("この写真を読み込めませんでした。JPEG / PNG の写真を選んでください（iPhone の写真を PC に移した HEIC は読めないことがあります）"); return; }
+  try { PHOTO = await makePhoto(file); }
+  catch (e) { console.warn(e); RT.busy = false; renderDock(); err(PHOTO_BAD); return; }
   if (!SS.set(CONFIG.KEYS.PHOTO, PHOTO)) console.warn("写真を一時保存できませんでした（容量超過）");
   markDone(stepOf("photo")); S.skipped = S.skipped.filter(x => x !== "photo");
-  me("", { photo: true });
+  me("", { photo: true, pick: true });
   await advance("photo", RT.gen);
+}
+/* ---------- 写真のえらびなおし（コピーするまで。送った写真の下・投稿文カードの写真から） ---------- */
+const isPickMsg = m => m.who === "me" && (m.pick || m.photo || m.text === "写真なしで進む");
+const canRepick = () => !!S && !S.copied && S.msgs.some(isPickMsg);
+function repickPhoto() {
+  if (!canRepick()) return;
+  if (RT.aiWait) { toast("AI が投稿文を整えているあいだは、写真を変えられません"); return; }
+  RT.repick = true; $("file").click();
+}
+async function handleRepick(file) {
+  RT.repick = false;
+  if (!canRepick()) return;
+  if (RT.aiWait) { toast("AI が投稿文を整えているあいだは、写真を変えられません"); return; }
+  const bad = photoFileErr(file); if (bad) { toast(bad); return; }
+  let p;
+  try { p = await makePhoto(file); } catch (e) { console.warn(e); toast(PHOTO_BAD); return; }
+  if (!canRepick()) return;
+  const had = hasPhoto();
+  PHOTO = p;
+  if (!SS.set(CONFIG.KEYS.PHOTO, PHOTO)) console.warn("写真を一時保存できませんでした（容量超過）");
+  if (!S.done.includes("photo")) S.done.push("photo");
+  S.skipped = S.skipped.filter(x => x !== "photo");
+  const m = S.msgs.find(isPickMsg); if (m) { m.photo = true; m.pick = true; m.text = ""; delete m.muted; }
+  S.photoRedo = (S.photoRedo || 0) + 1;
+  save();
+  RT.noScroll = true; renderMsgs(); RT.noScroll = false;
+  if (S.phase === "compose") renderComposeDock();
+  toast((S.drafts || []).length ? "写真を変えました。投稿文はそのままです（「AI でもう一案」で新しい写真から作れます）" : had ? "写真を変えました" : "写真を入れました");
 }
 
 /* =====================================================================
@@ -1764,7 +1835,7 @@ function composeCardHtml() {
     <div class="card-hd"><span class="post-label">あなたの投稿</span><span class="cnt" style="margin-left:auto;font-size:12.5px;color:var(--dim)">このままコピーして DROP へ</span></div>
     ${tabs}
     ${ds.length || canMoreAI() ? `<div class="ai-more">${ds.length ? `<button type="button" class="lnk" id="cCompare">${RT.compare ? "1つずつ見る" : `ならべて見る（${keys.length}つ）`}</button>` : ""}${canMoreAI() ? `<button type="button" class="btn ghost sm" id="cMore" style="margin-left:auto">${ICON.spark}AI でもう一案（あと${CONFIG.AI_MAX - ds.length}回）</button>` : ""}</div>` : ""}
-    ${RT.compare ? compare : `${PHOTO.img ? `<img class="post-photo" src="${esc(PHOTO.img)}" alt="えらんだ写真">` : ""}
+    ${RT.compare ? compare : `${PHOTO.img ? `<div class="post-photo-wrap"><img class="post-photo" src="${esc(PHOTO.img)}" alt="えらんだ写真">${!S.copied ? `<button type="button" class="photo-chg" data-repick="1">写真を変える</button>` : ""}</div>` : ""}
     ${lineMode ? lines : `<textarea id="cText" rows="5" maxlength="${CONFIG.MAX_FINAL}" aria-label="投稿文（タップして直せます）">${esc(bodyOf(S.chosen))}</textarea>`}
     <div class="card-foot"><span class="cnt" id="cCnt">${len} 字${lineMode ? "・行を押すと言いかえ" : "・文をタップして直せます"}</span>${lineMode ? `<button type="button" class="lnk" id="cEdit" style="padding:4px 2px">文を直接直す</button>` : d && isEdited() ? `<button type="button" class="lnk" id="cUndo" style="padding:4px 2px">直す前にもどす</button>` : ""}<label class="switch"><input type="checkbox" id="cTagsOn" ${S.tagsOn ? "checked" : ""}>ハッシュタグ</label></div>
     ${S.tagsOn && tags.length ? `<div class="tags">${tags.map(t => `<button type="button" class="tag${S.tagOff.includes(t) ? " off" : ""}" data-tag="${esc(t)}">${esc(t)}</button>`).join("")}</div><div class="hint">タグを押すと外せます</div>` : ""}
@@ -1773,6 +1844,8 @@ function composeCardHtml() {
 }
 function bindCards() {
   bindRate(); bindTreasure();
+  document.querySelectorAll("[data-repick]").forEach(b => b.addEventListener("click", repickPhoto));
+  document.querySelectorAll("[data-openwant]").forEach(b => b.addEventListener("click", openWant));
   const ta = $("cText");
   if (ta) {
     const grow = () => { ta.style.height = "auto"; ta.style.height = Math.max(140, ta.scrollHeight) + "px"; };
@@ -1871,16 +1944,185 @@ async function resume() {
   if (n) await ask(n); else await toCompose(false);
 }
 /* ---------- もう 1 本つくりたくなる仕掛け：投稿スタンプ（この端末でコピーした本数。今日・通算。日本時間の 0 時で日付が変わる） ---------- */
-const STAMP_SLOTS = 5;
 function postStats() { const p = LS.get(CONFIG.KEYS.POSTS, null), d = jstDate(); return p && p.date === d ? { ...p, total: p.total || p.n || 0 } : { date: d, n: 0, total: (p && p.total) || 0 }; }
 function countPost() { const p = postStats(); p.n++; p.total = (p.total || 0) + 1; LS.set(CONFIG.KEYS.POSTS, p); return p; }
-function stampCardHtml() {
-  const ps = postStats(), n = S.postNo || ps.n, tot = S.postTotal || ps.total, k = ((Math.max(n, 1) - 1) % STAMP_SLOTS) + 1, round = Math.ceil(Math.max(n, 1) / STAMP_SLOTS);
-  const enc = n === 1 ? T("stamp1") : k === STAMP_SLOTS ? T("stamp5") : n === 3 ? T("stamp3") : T("stampN");
-  const d = chosenDraft(), head = d && d.result && d.result.headline ? d.result.headline : "";
-  return `<div class="card stamp"><div class="card-hd"><b>本日の DROP${round > 1 ? `（${round}列目）` : ""}</b><span class="stamp-n">本日${n}本・通算${tot}本</span></div>
-    <div class="stamps" role="img" aria-label="本日${n}本">${Array.from({ length: STAMP_SLOTS }, (_, i) => `<i class="${i < k ? "on" : ""}">${i < k ? dropSvg(null, false) : ""}</i>`).join("")}</div>
-    <p class="stamp-msg">${esc(enc)}</p>${head ? `<div class="stamp-ai"><span class="avatar">${charSvg()}</span><span>${esc(head)}</span></div>` : ""}</div>`;
+/* ---------- 本日の DROP：ステンドグラス（バラ窓）。この端末でコピーした「通算」の本数で育つ（日をまたいでもリセットしない） ----------
+   1 本目：中心のしずく → 2〜4 本目：花びら → 5 本目：バラ窓がそろう（コバルトの背景が中心から広がる・金の粒）
+   6〜9 本目：外側の輪 → 10 本目：金のふちどり／11〜14：しずく入りのアーチ（窓がひとまわり大きくなる）→ 15：金のレース
+   16〜19：小さなバラ窓（さらに大きく）→ 20：光の冠／21 本目から：窓のまわりに光のしずくが増える（上限なし）
+   5 本ごとが節目。次にはまる場所は点線で明滅。夜（CONFIG.NIGHT_FROM 以降・日本時間）は夜空になり窓に灯りがともる
+   文言は運営のお知らせ（キャラにしゃべらせない。話し方の設定で変えない） */
+const SG = (() => {
+  const LEAD = "#2B2118";
+  const COL = {
+    ruby: ["#FFA3AE", "#B3173A"], gold: ["#FFF3B8", "#DE9C0B"], emer: ["#AEEFC6", "#13804E"],
+    sky: ["#C9EBFF", "#2378C8"], rose: ["#FFC9DD", "#CC3672"], cobalt: ["#5A80DA", "#142668"],
+    garnet: ["#D9546F", "#560B22"], teal: ["#5CC7A8", "#0B4A3C"],
+    frostD: ["#FFFFFF", "#E6DDCD"], frostN: ["#3B4468", "#1A203E"]
+  };
+  const DROP = "M0 -13 C4 -7 8 -3 8 3 A8 8 0 0 1 -8 3 C-8 -3 -4 -7 0 -13Z";
+  const PET_O = "M0 -20 C19 -29 19 -49 0 -58 C-19 -49 -19 -29 0 -20Z", PET_I = "M0 -28 C9 -33 9 -44 0 -50 C-9 -44 -9 -33 0 -28Z";
+  const LANCET = "M-9 -68 L-9 -82 A9 9 0 0 1 9 -82 L9 -68 Z";
+  const OGIVE = "M-13 -110 L-13 -122 C-13 -131 -7 -137 0 -142 C7 -137 13 -131 13 -122 L13 -110 Z";
+  const DIAM = "M0 -117 L5 -126 L0 -135 L-5 -126 Z";
+  const STAR = "M0 -7 L1.6 -1.6 L7 0 L1.6 1.6 L0 7 L-1.6 1.6 L-7 0 L-1.6 -1.6Z";
+  const RING_START = [1, 6, 11, 16];
+  const DISCS = [
+    { r: 184, start: 16, bg: 20, col: "teal", from: 146 }, { r: 146, start: 11, bg: 15, col: "garnet", from: 104 },
+    { r: 96, start: 6, bg: 10, col: "cobalt", from: 64 }, { r: 64, start: 1, bg: 5, col: "cobalt", from: 18 }
+  ];
+  const view = n => n <= 10 ? 112 : n <= 15 ? 162 : 202;
+  const P = [], add = o => P.push(o), Q4 = [[0, 4, 8, 12], [2, 6, 10, 14], [1, 5, 9, 13], [3, 7, 11, 15]];
+  add({ t: 1, ring: 0, k: "gold", c: [0, 0, 18], R: 18 });
+  add({ t: 1, ring: 0, k: "sky", d: DROP, w: 1.6, noSpark: true, R: 18 });
+  [[0, 4], [2, 6], [1, 5], [3, 7]].forEach((pair, p) => pair.forEach(i => {
+    const a = i * 45, x = i % 2 === 0;
+    add({ t: 2 + p, ring: 0, k: x ? "ruby" : "emer", d: PET_O, rot: a, sr: 39, R: 58 });
+    add({ t: 2 + p, ring: 0, k: x ? "gold" : "sky", d: PET_I, rot: a, w: 1.4, noSpark: true, R: 50 });
+  }));
+  for (let j = 0; j < 8; j++) add({ t: 5, ring: 0, k: "gold", c: [0, -52, 5], rot: 22.5 + 45 * j, w: 1.6, noSpark: true, late: true, R: 57 });
+  Q4.forEach((set, p) => set.forEach(i => {
+    const a = i * 22.5;
+    add({ t: 6 + p, ring: 1, k: i % 2 === 0 ? "rose" : "sky", d: LANCET, rot: a, sr: 79, R: 91 });
+    add({ t: 6 + p, ring: 1, k: "gold", c: [0, -81, 3.6], rot: a, w: 1.3, noSpark: true, R: 85 });
+  }));
+  for (let i = 0; i < 32; i++) add({ t: 10, ring: 1, k: "gold", c: [0, -100.5, 3.4], rot: i * 360 / 32, w: 1.1, noSpark: true, late: true, noFrost: true, noHint: true, R: 104 });
+  Q4.forEach((set, p) => set.forEach(i => {
+    const a = i * 22.5, ev = i % 2 === 0;
+    add({ t: 11 + p, ring: 2, k: ev ? "emer" : "gold", d: OGIVE, rot: a, sr: 126, R: 142 });
+    add({ t: 11 + p, ring: 2, k: ev ? "gold" : "ruby", d: DROP, tf: "translate(0 -124) scale(.62)", rot: a, w: 2.4, noSpark: true, R: 131 });
+  }));
+  for (let i = 0; i < 16; i++) add({ t: 15, ring: 2, k: "sky", d: DIAM, rot: 11.25 + 22.5 * i, w: 1.4, noSpark: true, late: true, R: 135 });
+  [[0, 4, 8, 12, 16, 20], [2, 6, 10, 14, 18, 22], [1, 5, 9, 13, 17, 21], [3, 7, 11, 15, 19, 23]].forEach((set, p) => set.forEach(i => {
+    const a = i * 15;
+    add({ t: 16 + p, ring: 3, k: i % 2 === 0 ? "rose" : "sky", c: [0, -166, 11], rot: a, sr: 166, R: 177 });
+    add({ t: 16 + p, ring: 3, k: "gold", c: [0, -166, 4.5], rot: a, w: 1.3, noSpark: true, R: 171 });
+  }));
+  for (let i = 0; i < 48; i++) add({ t: 20, ring: 3, k: "gold", c: [0, -190, 3.6], rot: i * 7.5, w: 1.1, noSpark: true, late: true, noFrost: true, noHint: true, R: 194 });
+  const EXTRA = [[-172, -172], [172, 172], [172, -172], [-172, 172], [-188, -118], [188, 118], [118, -188], [-118, 188], [188, -118], [-188, 118], [-118, -188], [118, 188]];
+  const EXTRA_COL = ["ruby", "emer", "sky", "gold", "rose"];
+  const STARS = [[-96, -92], [-78, -104], [-104, -60], [92, -98], [104, -72], [80, -106], [-100, 96], [-84, 104], [98, 92], [106, 64], [-106, 30], [106, -20], [70, 104], [-60, -108], [60, -104]];
+  const TEXT = [
+    ["しずくのガラスが、はまりました", "DROPするたびに、窓に色ガラスがはまっていきます"],
+    ["赤い花びらが、2まいひらきました", "バラ窓のかたちまで、あと3本"],
+    ["花びらが、十字にそろいました", "バラ窓のかたちまで、あと2本"],
+    ["みどりの花びらが、加わりました", "次の1本で、バラ窓のかたちがそろいます"],
+    ["バラ窓が、できあがりました！", "ここからのDROPで、窓のまわりに新しい輪が広がっていきます"],
+    ["新しい輪が、広がりはじめました", "DROPするたびに、窓が華やかになります"],
+    ["ばら色のガラスが、そろいました", "あと3本で、記念の飾りがつきます"],
+    ["空色のガラスが、加わりました", "あと2本で、記念の飾りがつきます"],
+    ["外側の輪が、ひとまわりしました", "次の1本で、記念の飾りがつきます"],
+    ["金のふちどりが、つきました！", "10本目の記念です。次の1本で、窓がひとまわり大きくなります"],
+    ["窓が、ひとまわり大きくなりました", "外側に、しずく入りのアーチが並びはじめます"],
+    ["アーチが、8つになりました", "あと3本で、15本目の記念の飾りがつきます"],
+    ["金のアーチが、加わりました", "あと2本で、記念の飾りがつきます"],
+    ["アーチが、ひとまわりしました", "次の1本で、記念の飾りがつきます"],
+    ["金のレースが、窓をふちどりました！", "15本目の記念です。次の1本で、窓がまた大きくなります"],
+    ["窓が、さらに大きくなりました", "いちばん外側に、小さなバラ窓が咲きはじめます"],
+    ["小さなバラ窓が、12こになりました", "あと3本で、20本目の記念の飾りがつきます"],
+    ["空色の小さなバラ窓が、咲きました", "あと2本で、記念の飾りがつきます"],
+    ["小さなバラ窓が、ひとまわりしました", "次の1本で、記念の飾りがつきます"],
+    ["光の冠が、つきました！", "20本目の記念です。ここからは、窓のまわりに光のしずくが増えていきます"]
+  ];
+  const text = n => n <= 20 ? TEXT[Math.max(1, n) - 1] : ["光のしずくが、1つ増えました", `窓のまわりの光のしずく：${n - 20}こ`];
+  function defs(id, V) {
+    let s = "<defs>";
+    for (const k in COL) s += `<radialGradient id="${id}g-${k}" cx="40%" cy="34%" r="80%"><stop offset="0" stop-color="${COL[k][0]}"/><stop offset="1" stop-color="${COL[k][1]}"/></radialGradient>`;
+    s += `<radialGradient id="${id}ray" cx="0" cy="0" r="${1.55 * V}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#FFF6D6" stop-opacity=".9"/><stop offset="1" stop-color="#FFF6D6" stop-opacity="0"/></radialGradient>`;
+    s += `<filter id="${id}halo" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="${5 * V / 112}"/></filter>`;
+    s += `<filter id="${id}shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="${2.5 * V / 112}" stdDeviation="${2.5 * V / 112}" flood-color="#5A3E2B" flood-opacity=".22"/></filter>`;
+    return s + "</defs>";
+  }
+  const shape = (p, fill, stroke, w, extra) => `${p.c ? `<circle cx="${p.c[0]}" cy="${p.c[1]}" r="${p.c[2]}"` : `<path d="${p.d}"`} fill="${fill}" stroke="${stroke}" stroke-width="${w}" ${extra || ""}/>`;
+  const place = (p, inner) => { if (p.tf) inner = `<g transform="${p.tf}">${inner}</g>`; return p.rot ? `<g transform="rotate(${p.rot})">${inner}</g>` : inner; };
+  function scallops(R, N) {
+    let s = ""; const r = (R * Math.sin(Math.PI / N)).toFixed(2);
+    for (let i = 0; i <= N; i++) { const a = i * 2 * Math.PI / N - Math.PI / 2, x = (R * Math.cos(a)).toFixed(2), y = (R * Math.sin(a)).toFixed(2); s += i === 0 ? `M${x} ${y}` : ` A${r} ${r} 0 0 1 ${x} ${y}`; }
+    return s + "Z";
+  }
+  /** n：通算の本数、night：夜、anim：はまる演出（新しく出たときだけ）、id：SVG の中の id の頭 */
+  function svg(n, night, anim, id) {
+    n = Math.max(1, n);
+    const V = view(n), pv = view(Math.max(1, n - 1)), zoom = anim && pv !== V, base = zoom ? 1.0 : 0, k = V / 112;
+    const G = c => `url(#${id}g-${c})`, frost = G(night ? "frostN" : "frostD"), vb = v => `${-v} ${-v} ${2 * v} ${2 * v}`;
+    let s = `<svg viewBox="${vb(V)}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ステンドグラスの窓（通算${n}本）">`;
+    if (zoom) s += `<animate attributeName="viewBox" from="${vb(pv)}" to="${vb(V)}" dur="1s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".45 0 .2 1"/>`;
+    s += defs(id, V);
+    if (night) STARS.forEach((q, i) => { s += `<circle class="${anim ? "sg-tw" : ""}" style="animation-delay:${(i % 5) * .5}s" cx="${q[0] * k}" cy="${q[1] * k}" r="${(i % 3 ? 0.9 : 1.4) * k}" fill="#FFF6D6"/>`; });
+    if (night || n >= 10) {
+      let r = ""; for (let i = 0; i < 12; i++) r += `<path transform="rotate(${i * 30})" d="M0 0 L${-9 * k} ${-1.55 * V} L${9 * k} ${-1.55 * V}Z" fill="url(#${id}ray)"/>`;
+      s += `<g opacity="${night ? (n >= 10 ? .32 : .16) : .22}"><g class="${anim ? "sg-rays" : ""}">${r}</g></g>`;
+    }
+    const lit = P.filter(p => p.t <= n), extra = Math.max(0, n - 20);
+    if (night) {
+      s += `<g filter="url(#${id}halo)" opacity=".85">`;
+      DISCS.forEach(d => { if (n >= d.bg) s += `<circle r="${d.r}" fill="${G(d.col)}"/>`; });
+      if (n >= 15) s += `<path d="${scallops(146, 48)}" fill="${G("gold")}"/>`;
+      lit.forEach(p => { s += place(p, shape(p, G(p.k), "none", 0)); });
+      for (let j = 0; j < Math.min(extra, EXTRA.length); j++) { const q = EXTRA[j]; s += `<g transform="translate(${q[0]} ${q[1]}) scale(1.4)"><path d="${DROP}" fill="${G(EXTRA_COL[j % 5])}"/></g>`; }
+      s += "</g>";
+    }
+    s += `<g ${night ? 'style="filter:saturate(1.25) brightness(1.12)"' : `filter="url(#${id}shadow)"`}>`;
+    DISCS.forEach(d => {
+      if (d.r === 146 && n >= 15) s += `<path class="${anim && n === 15 ? "sg-fade" : ""}" style="animation-delay:${(base + 1.3).toFixed(2)}s" d="${scallops(146, 48)}" fill="${G("gold")}" stroke="${LEAD}" stroke-width="1.4"/>`;
+      if (n < d.start) return;
+      if (n >= d.bg) {
+        if (anim && n === d.bg) {   // 節目：背景の色が中心から外へ広がる
+          const cid = `${id}c${d.r}`;
+          s += `<clipPath id="${cid}"><circle r="${d.from}"><animate attributeName="r" from="${d.from}" to="${d.r + 3}" begin="${(base + 0.45).toFixed(2)}s" dur="0.9s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".3 0 .2 1"/></circle></clipPath>`;
+          s += `<circle r="${d.r}" fill="${frost}" stroke="${LEAD}" stroke-width="2.6"/><circle r="${d.r}" fill="${G(d.col)}" stroke="${LEAD}" stroke-width="2.6" clip-path="url(#${cid})"/>`;
+        } else s += `<circle r="${d.r}" fill="${G(d.col)}" stroke="${LEAD}" stroke-width="2.6"/>`;
+      } else s += `<circle r="${d.r}" fill="${frost}" stroke="${LEAD}" stroke-width="2.6"/>`;
+    });
+    const hc = night ? "#E6DDCD" : "#7A6A5C", gc = night ? "#FFE9A0" : "#B48A2A";
+    if (n === 5) s += `<circle r="96" fill="none" stroke="${hc}" stroke-width="1.2" stroke-dasharray="3 3" class="sg-hint"/>`;
+    if (n === 9) s += `<circle r="100.5" fill="none" stroke="${gc}" stroke-width="1.4" stroke-dasharray="2 4" class="sg-hint"/>`;
+    if (n === 14) s += `<circle r="150" fill="none" stroke="${gc}" stroke-width="1.6" stroke-dasharray="3 4" class="sg-hint"/>`;
+    if (n === 19) s += `<circle r="190" fill="none" stroke="${gc}" stroke-width="1.6" stroke-dasharray="2 5" class="sg-hint"/>`;
+    let top = "", fx = "", lateI = 0;
+    P.forEach((p, idx) => {
+      if (p.t <= n) {
+        const isNew = anim && p.t === n;
+        const d = isNew ? base + (p.late ? 1.25 + (lateI++) * 0.022 : (idx % 8) * 0.06) : 0;
+        let inner = `<g class="${isNew ? "sg-pop" : ""}" style="animation-delay:${d.toFixed(2)}s">` + shape(p, G(p.k), LEAD, p.w || 2.2);
+        if (isNew) inner += shape(p, "#FFFFFF", "none", 0, `class="sg-glint" style="animation-delay:${(d + .45).toFixed(2)}s"`);
+        top += place(p, inner + "</g>");
+        if (isNew && !p.noSpark) {
+          const sr = p.sr || 0;
+          fx += `<g transform="rotate(${p.rot || 0}) translate(${sr ? 8 + sr * .05 : 10} ${sr ? -sr - 6 : -14}) scale(${Math.max(1, k * .8)})"><path class="sg-spark" style="animation-delay:${(d + .35).toFixed(2)}s" d="${STAR}" fill="#FFFFFF"/></g>`;
+        }
+      } else if (p.t === n + 1 && !p.noHint && p.R <= V) {
+        top += place(p, shape(p, "none", hc, 1.3, 'stroke-dasharray="3 2.5" class="sg-hint"'));
+      } else if (!p.noFrost && n >= RING_START[p.ring]) {
+        top += place(p, shape(p, frost, LEAD, (p.w || 2.2) * .8));
+      }
+    });
+    for (let j = 0; j < Math.min(extra, EXTRA.length); j++) {
+      const q = EXTRA[j], isNew = anim && j === extra - 1;
+      top += `<g transform="translate(${q[0]} ${q[1]}) scale(1.4)"><g class="${isNew ? "sg-pop" : ""}"><path d="${DROP}" fill="${G(EXTRA_COL[j % 5])}" stroke="${LEAD}" stroke-width="1.4"/>${isNew ? `<path class="sg-glint" style="animation-delay:.45s" d="${DROP}" fill="#fff"/>` : ""}</g></g>`;
+      if (isNew) fx += `<g transform="translate(${q[0] + 12} ${q[1] - 16}) scale(1.6)"><path class="sg-spark" style="animation-delay:.35s" d="${STAR}" fill="#FFFFFF"/></g>`;
+    }
+    s += top + "</g>";
+    if (anim && n % 5 === 0) [[-.62, -.62], [.66, -.54], [-.56, .68], [.62, .64]].forEach((q, i) => { s += `<g transform="translate(${q[0] * V} ${q[1] * V}) scale(${k})"><path class="sg-spark" style="animation-delay:${(base + 1.9 + i * .22).toFixed(2)}s" d="${STAR}" fill="#FFF3B8"/></g>`; });
+    return s + fx + "</svg>";
+  }
+  return { svg, text };
+})();
+/** 夜か（日本時間 CONFIG.NIGHT_FROM〜翌 4 時） */
+function isNight() {
+  const d = new Date(Date.now() + 9 * 3600e3), m = d.getUTCHours() * 60 + d.getUTCMinutes();
+  const [h, mm] = String(CONFIG.NIGHT_FROM || "18:30").split(":").map(Number);
+  return m >= h * 60 + (mm || 0) || m < 4 * 60;
+}
+function stampCardHtml(isNew) {
+  const ps = postStats(), tot = Math.max(1, S.postTotal || ps.total), night = isNight();
+  const anim = !!isNew && !matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const t = SG.text(tot), d = chosenDraft(), head = d && d.result && d.result.headline ? d.result.headline : "";
+  return `<div class="card stamp"><div class="card-hd"><b>本日の DROP</b><span class="stamp-n">通算${tot}本目</span></div>
+    <div class="glass ${night ? "night" : "day"}">${SG.svg(tot, night, anim, "sg")}</div>
+    <p class="stamp-msg">${esc(t[0])}</p><p class="glass-sub">${esc(t[1])}</p>
+    <p class="glass-night">${night ? "夜になって、窓に灯りがともりました" : "夜になると、窓に灯りがともります"}</p>
+    ${head ? `<div class="stamp-ai"><span class="avatar">${charSvg()}</span><span>${esc(head)}</span></div>` : ""}</div>`;
 }
 /** 運営からの質問（任意）：会社や職場の見え方（KPI ③。1 日 1 回）・使いごこち。宝箱を開けた（またはとばした）あとに出す */
 function surveyCardHtml() {
@@ -1958,7 +2200,7 @@ async function copyFinal() {
   if (first) {
     await bot(T("copied"));
     // 本数は運営からのお知らせ（キャラにしゃべらせない）。そのあと「本日の DROP」→ おまけの宝箱 →（開けたら）運営からの質問
-    S.msgs.push({ who: "sys", ann: `本日${S.postNo}本目（通算${S.postTotal}本目）です。`, sub: "※この端末でコピーした投稿の数" });
+    S.msgs.push({ who: "sys", ann: `通算${S.postTotal}本目（本日${S.postNo}本目）です。`, sub: "※この端末でコピーした投稿の数" });
     S.msgs.push({ who: "bot", card: "stamp" });
     if (S.msgs.some(m => m.card === "treasure" || m.card === "survey")) { /* コピーしないで次へ のあとにコピーした：宝箱・質問はもう出ている */ }
     else if (CONFIG.RECOMMEND_ON && CS.items.length) { S.rec = S.rec || newRec(); S.msgs.push({ who: "bot", card: "treasure" }); }
@@ -2301,7 +2543,7 @@ function buildRecord(end) {
     started_at: S.started, ended_at: new Date().toISOString(), duration_sec: r2((now() - S.t0) / 1000),
     answered: answeredCount(),
     last_step: S.phase === "compose" ? (S.early ? "途中で投稿文へ（" + stepName(lastAsked) + "）" : "最後まで") : stepName(lastAsked),
-    early: S.early, has_photo: hasPhoto(),
+    early: S.early, has_photo: hasPhoto(), photo_redo: S.photoRedo || 0,
     text1: A.text1,
     detected: { ...S.det, feel_labels: S.det.feels.map(id => (item("feel", id) || {}).label || id), who_label: S.det.who ? item("who", S.det.who).label : "" },
     subject: subjectOf(),
@@ -2484,14 +2726,15 @@ async function start() {
   const ps = postStats();
   const h = { n: ps.n > 0 ? ps.n + 1 : 0, wl: wantList().length }, hp = helloParts(h);
   if (!await bot(hp[0], { sub: hp[1], hello: h })) return;
+  if (h.n === 2) { S.msgs.push({ who: "sys", note: `※「${h.n}本目」は、この端末でコピーした投稿の数です（コピーしなかった投稿は数えません）` }); renderMsgs(); save(); }   // 本数の数え方：その日はじめて本数が出るときだけ。ぽとりのセリフにしない
+  if (h.n && h.wl && !await bot(T("hello_want", { n: h.wl }), { want: true })) return;   // 行ってみるリストは吹き出しを分けて、ボタンで開ける
   S.msgs.push({ who: "bot", notice: true }); renderMsgs(); save();   // 個人情報のおねがい（毎回はじめに）
   await advance(null, g);
 }
-/** あいさつの文（2 本目以降は、本数の数え方も書く） */
+/** あいさつの文（2 本目以降。行ってみるリストは別の吹き出し、本数の数え方は吹き出しの外の注記） */
 function helloParts(h) {
   if (!h || !h.n) return [String(T("hello1")), String(T("hello1sub"))];
-  const note = `※「${h.n}本目」は、この端末で投稿文をコピーした数から数えています（コピーしなかった投稿は数えません）`;
-  return [String(T("hello2", { n: h.n })), String(T("hello2sub")) + (h.wl ? "\n" + T("hello_want", { n: h.wl }) : "") + "\n" + note];
+  return [String(T("hello2", { n: h.n })), String(T("hello2sub"))];
 }
 /** それまでの会話を、いまの話し方で言いなおす（ぽとりのセリフ・あいさつ・問い。運営からのお知らせと、あなたの答えはそのまま） */
 function relocalize() {
