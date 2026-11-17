@@ -302,6 +302,16 @@
   .hint-btn.open{background:var(--paper)}
   .hint-box{margin-top:10px}
   .hint-box .lab{margin-top:0}
+  /* 選ぶ欄の頭：最大○つ・いまの数 */
+  .pickhd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:12px 2px 8px}
+  .hint-box .pickhd{margin-top:2px}
+  .pickhd b{font-size:14px;font-weight:900;color:var(--ink)}
+  .maxpill{font-size:12.5px;font-weight:900;color:#fff;background:var(--brown);border-radius:999px;padding:3px 10px;white-space:nowrap}
+  .dots{display:inline-flex;gap:4px;align-items:center}
+  .dots i{width:11px;height:11px;border-radius:50%;border:1.5px solid var(--brown);background:#fff}
+  .dots i.on{background:var(--brown)}
+  .pickhd .left{font-size:12.5px;font-weight:800;color:var(--ink-2)}
+  .chips.full .chip:not(.on){opacity:.42}
   /* ぽとりの確かめ（だれと・しめ）：白い吹き出し */
   .say{display:flex;gap:8px;align-items:flex-start}
   .say .avatar{width:30px;height:30px;box-shadow:none}
@@ -326,7 +336,7 @@
   .btn.text{background:none;color:var(--ink-2);padding:0 12px;min-width:84px;font-size:15px}
   .lnk{background:none;border:none;color:var(--ink-2);font-size:14px;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:10px 6px;min-height:44px}
   .inrow{position:relative}
-  .input{display:block;width:100%;min-height:52px;max-height:160px;border:1.5px solid var(--line);border-radius:22px;padding:13px 60px 13px 16px;font-size:17px;line-height:1.5;outline:none;resize:none;background:#fff;color:var(--ink)}
+  .input{display:block;width:100%;min-height:52px;max-height:150px;overflow-y:hidden;border:1.5px solid var(--line);border-radius:22px;padding:13px 60px 13px 16px;font-size:17px;line-height:1.5;outline:none;resize:none;background:#fff;color:var(--ink)}
   .input:focus{border-color:var(--brown);box-shadow:0 0 0 4px rgba(78,59,56,.1)}
   .input::placeholder{color:#8f8177;font-weight:500}
   .send{position:absolute;right:6px;bottom:6px;width:42px;height:42px;border-radius:50%;border:none;background:var(--brown);color:#fff;display:flex;align-items:center;justify-content:center}
@@ -434,6 +444,9 @@
 /* =====================================================================
    DROP. Coach — 投稿づくりチャット v5（drop_coach_chat.html）  2026/11/16
    ---------------------------------------------------------------------
+   v5.4（2026/11/17）
+   - 複数えらべる問い：選ぶ欄の頭に「最大○つ」と、いま選んだ数（●○）・あと何個を出す。上限に達したら、ほかの候補をうすく
+   - 入力欄：スクロールバーを出さず、2 行以上（例文が 2 行のときも）は自動で広がる
    v5.3（2026/11/17）
    - 話し方を切りかえると、それまでの会話（ぽとりのセリフ・あいさつ・問い・おすすめの理由）も新しい話し方で言いなおす
    - 前の版（関西弁が既定だったころ）のチャットは続きから開かず、新しく始める
@@ -472,7 +485,7 @@
    - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v9）の /exec URL（★ 同上）。記録と「チャットの設定」の配布
    - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
 ===================================================================== */
-const APP_VERSION = "chat-v5.3 (2026-11-17)";
+const APP_VERSION = "chat-v5.4 (2026-11-17)";
 const CONFIG = {
   // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
   GAS_URL: "https://script.google.com/macros/s/AKfycbzdkIa8xnE0useu-5tuXMfLTBXCU80_9yhhpN0C6pcxnkePNdfR2jtVZ51PqyAb3XRe/exec",   // 仕上げ用 GAS（DROP_COACH_GPT v10）
@@ -1112,6 +1125,7 @@ function bindGrab() {
 function lockDock() { RT.busy = true; dock(`<div class="wait"><span class="spin"></span></div>`); }
 function syncDockH() { document.documentElement.style.setProperty("--dockH", $("dock").offsetHeight + "px"); }
 if ("ResizeObserver" in window) new ResizeObserver(syncDockH).observe($("dock"));
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { const t = $("dIn"); if (t && t._grow) t._grow(); });
 /* スマホのキーボード：答える欄がキーボードの下に隠れないように持ち上げる（iPhone の Safari 向け） */
 if (window.visualViewport) {
   const vv = window.visualViewport;
@@ -1313,7 +1327,7 @@ function renderDock() {
       html = `<div class="say"><div class="avatar">${charSvg()}</div><p>${esc(T(st.id === "who" ? "who_confirm" : "next_confirm", { t: short, l: labs.join("」「") }))}</p></div>`;
       act = `<div class="row"><button type="button" class="btn ghost wide" id="dNo">ちがう</button><button type="button" class="btn wide" id="dYes">OK</button></div>`;
     } else {
-      html = `<div class="say"><div class="avatar">${charSvg()}</div><p>「${esc(short)}」──${esc(T("pick_q"))}</p></div><div class="chips" style="margin-top:10px">${V[st.opts].filter(x => !x.hidden).map(o => { const k = c.picks.indexOf(o.id); return tile(o, k >= 0, k >= 0 ? `<span class="ck">✓</span>` : ""); }).join("")}</div><div class="hint" id="dMax" hidden>${st.max > 1 ? `選べるのは${st.max}つまでです` : ""}</div>`;
+      html = `<div class="say"><div class="avatar">${charSvg()}</div><p>「${esc(short)}」──${esc(T("pick_q"))}</p></div>${pickHead(c.picks.length, st.max, "近いものをえらぶ")}<div class="chips${st.max > 1 && c.picks.length >= st.max ? " full" : ""}">${V[st.opts].filter(x => !x.hidden).map(o => { const k = c.picks.indexOf(o.id); return tile(o, k >= 0, k >= 0 ? `<span class="ck">✓</span>` : ""); }).join("")}</div><div class="hint" id="dMax" hidden>${st.max > 1 ? `選べるのは${st.max}つまでです` : ""}</div>`;
       act = `<div class="row"><button type="button" class="btn text" id="dBack">書きなおす</button><button type="button" class="btn wide" id="dYes" ${c.picks.length ? "" : "disabled"}>次へ</button></div>`;
     }
   } else if (st.kind === "free") {
@@ -1322,10 +1336,10 @@ function renderDock() {
     const cands = open ? optionsOf(st) : [];
     html = `<div class="inrow"><textarea class="input" id="dIn" rows="1" maxlength="${CONFIG.MAX_FREE}" placeholder="${esc(st.ph ? st.ph() : "")}" enterkeyhint="send" aria-label="自分のことばで答える">${esc(txt)}</textarea><button type="button" class="send" id="dSend" aria-label="送る" ${n ? "" : "disabled"}>${ICON.send}</button></div>
       <div class="pii">${esc(PII_SHORT)}</div><div class="err" id="dErr"></div>
-      ${sel.length && !open ? `<div class="lab">えらんだもの（押すと外せます）</div><div class="chips">${sel.map(x => `<button type="button" class="chip on" data-rm="${esc(x.id)}"><span>${esc(x.label)}</span><span class="ck">×</span></button>`).join("")}</div>` : ""}
+      ${sel.length && !open ? `${pickHead(sel.length, st.max, "えらんだもの（押すと外せます）")}<div class="chips">${sel.map(x => `<button type="button" class="chip on" data-rm="${esc(x.id)}"><span>${esc(x.label)}</span><span class="ck">×</span></button>`).join("")}</div>` : ""}
       <button type="button" class="hint-btn${open ? " open" : ""}" id="dHint" aria-expanded="${open}">${ICON.bulb}${open ? "ヒントをとじる" : "迷ったらヒント"}</button>
-      ${open ? `<div class="hint-box"><div class="lab">${st.max > 1 ? `近いものを${st.max}つまで（押した順）` : "近いものを1つ"}</div>
-        ${cands.length ? `<div class="chips">${cands.map(o => { const k = sel.findIndex(x => x.id === o.id); return tile(o, k >= 0, k >= 0 ? `<span class="ord">${st.max === 1 ? "✓" : k + 1}</span>` : ""); }).join("")}</div>` : `<p class="hint">${esc(T("hint_none"))}</p>`}
+      ${open ? `<div class="hint-box">${pickHead(sel.length, st.max, st.max > 1 ? "近いものをえらぶ（押した順）" : "近いものをえらぶ")}
+        ${cands.length ? `<div class="chips${st.max > 1 && sel.length >= st.max ? " full" : ""}">${cands.map(o => { const k = sel.findIndex(x => x.id === o.id); return tile(o, k >= 0, k >= 0 ? `<span class="ord">${st.max === 1 ? "✓" : k + 1}</span>` : ""); }).join("")}</div>` : `<p class="hint">${esc(T("hint_none"))}</p>`}
         <div class="hint" id="dMax" hidden>${st.max ? `選べるのは${st.max}つまでです` : ""}</div></div>` : ""}`;
     act = st.optional
       ? `<div class="row"><button type="button" class="btn ghost wide" id="dOptDone">投稿文をつくる</button><button type="button" class="btn wide${n ? "" : " ghost"}" id="dOk">${n ? "次へ" : "とばす"}</button></div><div class="hint" style="text-align:center">任意の問い：あと${optRemaining()}つ</div>`
@@ -1349,6 +1363,11 @@ function renderDock() {
   }
   dock(html, act, head, mini);
   bindDock(st);
+}
+/** 選ぶ欄の頭：「最大○つ」と、いま選んだ数（●○）・あと何個えらべるか */
+function pickHead(n, max, title) {
+  if (max <= 1) return `<div class="pickhd"><b>${esc(title)}</b><span class="maxpill">1つだけ</span></div>`;
+  return `<div class="pickhd"><b>${esc(title)}</b><span class="maxpill">最大${max}つ</span><span class="dots" role="img" aria-label="${max}つのうち${n}つえらんでいます">${Array.from({ length: max }, (_, i) => `<i class="${i < n ? "on" : ""}"></i>`).join("")}</span><span class="left">${n >= max ? "いっぱい（外すと選びなおせます）" : `あと${max - n}つ`}</span></div>`;
 }
 function loginHtml(label) {
   return `<form class="login" id="dLogin" autocomplete="on">
@@ -1375,7 +1394,18 @@ function piiGate(text) {
 const coarse = () => matchMedia("(pointer:coarse)").matches;
 /** テキスト欄：高さを中身に合わせる・PC は Enter で送る（Shift+Enter で改行） */
 function bindTextarea(ta, onSend, onInput) {
-  const grow = () => { ta.style.height = "auto"; ta.style.height = Math.min(150, ta.scrollHeight) + "px"; syncDockH(); };
+  const MAXH = 150;
+  const grow = () => {
+    const cs = getComputedStyle(ta), bw = (parseFloat(cs.borderTopWidth) || 0) + (parseFloat(cs.borderBottomWidth) || 0);
+    ta.style.height = "auto";
+    let h = ta.scrollHeight;
+    if (!ta.value && ta.placeholder) { ta.value = ta.placeholder; h = ta.scrollHeight; ta.value = ""; }   // 例文が 2 行になるときも、はみださない高さに
+    h += bw;
+    ta.style.height = Math.min(MAXH, h) + "px";
+    ta.style.overflowY = h > MAXH ? "auto" : "hidden";
+    syncDockH();
+  };
+  ta._grow = grow;
   ta.addEventListener("input", () => { grow(); if (onInput) onInput(); });
   ta.addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey && !e.isComposing && !coarse()) { e.preventDefault(); onSend(); } });
   grow();
