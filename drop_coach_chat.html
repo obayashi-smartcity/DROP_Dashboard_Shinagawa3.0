@@ -2128,7 +2128,7 @@ function bindLogin(onOk) {
     const name = normNick($("lName").value), pw = $("lPw").value;
     $("lName").value = name;
     if (!name) { $("lErr").textContent = "ニックネーム（ひらがな）を入れてください"; $("lName").focus(); return; }
-    if (!NICK_OK(name)) { $("lErr").textContent = "ニックネームは、ひらがなで入れてください（例：やまもと、たろう）。漢字・英字は使えません"; $("lName").focus(); return; }
+    if (!NICK_OK(name)) { $("lErr").textContent = "ニックネームは、ひらがなで入れてください（例：しながわたろう）。漢字・英字は使えません"; $("lName").focus(); return; }
     if (!pw) { $("lErr").textContent = "パスワードを入れてください"; $("lPw").focus(); return; }
     RT.loginBusy = true; $("lGo").disabled = true; $("lErr").textContent = "確認しています…";
     const r = await doLogin(name, pw);
