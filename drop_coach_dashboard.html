@@ -26,7 +26,7 @@
 [hidden]{display:none!important}
 html,body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:14px;line-height:1.65;-webkit-font-smoothing:antialiased}
 button,input,select{font-family:var(--font);font-size:13.5px;color:var(--ink)}
-h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.35}
+h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.45}
 :focus-visible{outline:3px solid var(--good);outline-offset:2px;border-radius:6px}
 .num,td.n,.tile .v{font-variant-numeric:tabular-nums}
 .vh{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -37,7 +37,7 @@ h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.35}
 .top-in{max-width:1400px;margin:0 auto;padding:10px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;margin-right:6px}
 .brand .mk{width:30px;height:30px;border-radius:9px;background:#fff;color:var(--struct);display:grid;place-items:center;font-weight:700;font-size:15px}
-.brand b{font-size:15px;letter-spacing:.2px;display:block;line-height:1.2}
+.brand b{font-size:15px;letter-spacing:.2px;display:block;line-height:1.35}
 .brand small{font-size:12px;opacity:.82;display:block;margin-top:3px;line-height:1.3}
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-size:12px;background:rgba(255,255,255,.12);white-space:nowrap}
 .pill.demo{background:var(--mid);color:#3b2a00;font-weight:700}
@@ -56,8 +56,8 @@ h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.35}
 .tabs{position:sticky;top:50px;z-index:19;background:#fff;border-bottom:1px solid var(--line)}
 .tabs-in{max-width:1400px;margin:0 auto;padding:0 16px;display:flex;gap:2px;overflow-x:auto}
 .tab{appearance:none;border:0;background:none;padding:10px 14px 9px;border-bottom:3px solid transparent;cursor:pointer;text-align:left;white-space:nowrap;color:var(--ink2)}
-.tab b{display:block;font-size:14px;color:var(--ink)}
-.tab span{display:block;font-size:12px;color:var(--gray-ink)}
+.tab b{display:block;font-size:14px;color:var(--ink);line-height:1.45}
+.tab span{display:block;font-size:12px;color:var(--gray-ink);line-height:1.45;margin-top:3px}
 .tab:hover{background:var(--struct-faint)}
 .tab[aria-selected="true"]{border-bottom-color:var(--struct)}
 .tab[aria-selected="true"] b{color:var(--struct)}
@@ -93,10 +93,10 @@ h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.35}
 .c12{grid-column:span 12}.c8{grid-column:span 8}.c7{grid-column:span 7}.c6{grid-column:span 6}.c5{grid-column:span 5}.c4{grid-column:span 4}.c3{grid-column:span 3}
 @media (max-width:1100px){.c8,.c7,.c6,.c5,.c4{grid-column:span 12}.c3{grid-column:span 6}}
 .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px 14px;min-width:0}
-.card-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;margin-bottom:6px}
 .card-h h3{font-size:15px;color:var(--ink)}
 .card-h .roles{margin-left:auto;display:flex;gap:4px}
-.ans{margin:6px 0 10px;font-size:13.5px;color:var(--ink);display:flex;gap:8px;align-items:flex-start}
+.ans{margin:2px 0 10px;line-height:1.7;font-size:13.5px;color:var(--ink);display:flex;gap:8px;align-items:flex-start}
 .ans b{color:var(--ink)}
 .why{margin:2px 0 10px;font-size:13px;color:var(--gray-ink)}
 .note{font-size:12.5px;color:var(--gray-ink);margin:8px 0 0}
@@ -221,6 +221,9 @@ table.t td.thin{color:var(--gray-ink2)}
 .three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:start}
 .three h4,.two h4{font-size:13px;color:var(--struct2);margin:0 0 8px}
 @media (max-width:1100px){.two,.three{grid-template-columns:1fr}}
+.tgrid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr) minmax(0,1fr);gap:16px 28px;align-items:start}
+.agrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px 28px;align-items:center}
+@media (max-width:1100px){.tgrid,.agrid{grid-template-columns:1fr}}
 .mgroups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:1100px){.mgroups{grid-template-columns:1fr}}
 .mg{border:1px solid var(--line);border-radius:10px;padding:8px 12px 4px;background:var(--soft)}
@@ -250,7 +253,7 @@ table.rec .bc b{font-variant-numeric:tabular-nums}
 .kc .mt s{position:absolute;top:0;bottom:0;background:rgba(255,255,255,.45);border-left:1px solid #fff;border-right:1px solid #fff}
 .kc .kn{font-size:12px;color:var(--gray-ink);margin-top:4px}
 .srcs{display:flex;flex-direction:column;gap:7px}
-.sr .st{font-size:12.5px;color:var(--ink);line-height:1.35}
+.sr .st{font-size:12.5px;color:var(--ink);line-height:1.55}
 .sr .st span{display:inline-block;font-size:11px;font-weight:700;color:var(--gray-ink);background:var(--none);border-radius:4px;padding:0 5px;margin-right:5px}
 .sr .sb{display:flex;align-items:center;gap:6px;margin-top:2px}
 .sr .sb i{flex:none;height:9px;border-radius:0 3px 3px 0;background:var(--gray);min-width:2px}
@@ -274,7 +277,7 @@ table.rec .bc b{font-variant-numeric:tabular-nums}
 @media (min-width:1100px){.pairs{gap:4px}.pr{display:grid;grid-template-columns:minmax(0,52%) minmax(0,1fr);align-items:center;column-gap:12px;padding:4px}.pr .pb{margin-top:0}}
 .pr{border-radius:6px;padding:2px 4px}
 .pr[data-drill]:hover{background:var(--struct-faint)}
-.pr .pt{font-size:13px;color:var(--ink);line-height:1.4}
+.pr .pt{font-size:13px;color:var(--ink);line-height:1.55}
 .pr .pt span{display:inline-block;font-size:11px;font-weight:700;color:var(--gray-ink);background:var(--none);border-radius:4px;padding:0 5px;margin-right:4px}
 .pr .pt em{font-style:normal;color:var(--gray-ink);margin:0 7px}
 .pr .pb{display:flex;align-items:center;gap:6px;margin-top:3px;font-size:12.5px;color:var(--ink2)}
@@ -341,10 +344,13 @@ table.rec .bc b{font-variant-numeric:tabular-nums}
 .al .do{grid-column:2;font-size:12.5px;color:var(--ink2)}
 .al .do b{color:var(--struct2)}
 
-/* 投稿の一覧 */
+/* やりとり一覧 */
 .drillbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px;padding:10px 14px;margin:0 0 12px;border-radius:10px;background:var(--struct-faint);border:1px solid var(--line2)}
 .drillbar .dl{font-size:12px;font-weight:700;color:#fff;background:var(--struct);border-radius:999px;padding:2px 10px}
 .drillbar b{font-size:15px;color:var(--ink)}
+.t tr.pgrp td{background:var(--soft);border-top:2px solid var(--line2);padding:10px 12px 8px;line-height:1.5}
+.t tr.pgrp b{font-size:14.5px;margin-right:10px}
+.t tr.pgrp span{font-size:13px;color:var(--ink2)}
 .drillbar .dn{font-size:13px;color:var(--ink2)}
 .drillbar .sp{flex:1}
 [data-drill]{cursor:pointer}
@@ -366,8 +372,8 @@ tr.prow{cursor:pointer}
 tr.prow:hover td{background:var(--struct-faint)}
 tr.pdet td{background:var(--soft);font-size:12px}
 .pdet-g{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px 18px}
-.pdet-g dt{color:var(--gray-ink);font-size:12px}
-.pdet-g dd{margin:0 0 4px}
+.pdet-g dt{color:var(--gray-ink);font-size:12px;margin-bottom:2px}
+.pdet-g dd{margin:0 0 8px;line-height:1.65}
 .txt{white-space:pre-line}
 table.t .w-time{width:110px;white-space:nowrap}
 table.t .w-name{width:150px}
@@ -453,7 +459,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 24px 30px;font-size:12px;color:v
   </div>
 </header>
 <section class="loader wrap" id="loader">
-  <div class="intro"><h1>どのデータを見ますか？</h1><p>投稿づくりチャット（DROP. Coach）の記録を読み込んで、投稿の量（使われ方）と投稿の質（中身・KPI）を見ます。いつもは「記録用 GAS から読み込む」を使います。</p></div>
+  <div class="intro"><h1>どのデータを見ますか？</h1><p>投稿づくりチャット（DROP. Coach）の記録を読み込んで、Coach の使われ方（投稿文のコピーまで）と、みがきの質（Coach でみがいた投稿文の中身・KPI）を見ます。いつもは「記録用 GAS から読み込む」を使います。</p></div>
   <div class="resume" id="loaderBack" hidden><span>いま読み込んでいるデータ：<b id="loaderCur"></b></span><button class="btn pri" id="loaderBackBtn" type="button">このデータの分析にもどる →</button></div>
   <div class="choices">
     <article class="choice rec">
@@ -487,9 +493,9 @@ footer{max-width:1400px;margin:0 auto;padding:0 24px 30px;font-size:12px;color:v
 <nav class="tabs" aria-label="タブ">
   <div class="tabs-in" role="tablist" id="tablist">
     <button class="tab" role="tab" data-tab="about" id="t-about" aria-controls="p-about"><b>使い方</b><span>見方・数え方・探し方</span></button>
-    <button class="tab" role="tab" data-tab="flow" id="t-flow" aria-controls="p-flow"><b>投稿の量</b><span>使われた数・どこで止まる・何本続く・利用時間</span></button>
-    <button class="tab" role="tab" data-tab="quality" id="t-quality" aria-controls="p-quality"><b>投稿の質</b><span>投稿の内容・KPIの手がかり</span></button>
-    <button class="tab" role="tab" data-tab="posts" id="t-posts" aria-controls="p-posts"><b>投稿の一覧</b><span>検索・1件ずつの中身</span></button>
+    <button class="tab" role="tab" data-tab="flow" id="t-flow" aria-controls="p-flow"><b>使われ方</b><span>使われた数・どこで止まる・何本続く・利用時間</span></button>
+    <button class="tab" role="tab" data-tab="quality" id="t-quality" aria-controls="p-quality"><b>みがきの質</b><span>投稿の内容・KPIの手がかり</span></button>
+    <button class="tab" role="tab" data-tab="posts" id="t-posts" aria-controls="p-posts"><b>やりとり一覧</b><span>検索・1 本ずつの答えと投稿文</span></button>
   </div>
 </nav>
 
@@ -508,7 +514,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 24px 30px;font-size:12px;color:v
       <span><i style="background:var(--many)"></i><i style="background:var(--few)"></i>全体より ↑多い ↓少ない（良し悪しではない差）</span>
       <span><i style="background:var(--o1)"></i><i style="background:var(--o2)"></i><i style="background:var(--o3)"></i><i style="background:var(--o4)"></i>段階・順序</span>
       <span>薄い灰色の数字＝10件未満の参考値</span>
-      <span><b style="color:var(--struct)">棒・マス・札・下線の数字を押すと</b>、当てはまるチャットだけを「投稿の一覧」に出します</span>
+      <span><b style="color:var(--struct)">棒・マス・札・下線の数字を押すと</b>、当てはまるチャットだけを「やりとり一覧」に出します</span>
       <button type="button" class="lnk" data-goto="about" data-card="c-colors">くわしくは「使い方」→</button>
     </div>
   </details>
@@ -728,7 +734,9 @@ function makeSession(P, t0, total) {
   s.caveat = s.reached && rnd() < .03 ? "人名らしい言葉を「同僚」に置きかえました" : "";
   // 所要時間
   const stepSum = Object.values(s.st).reduce((a, x) => a + x.sec, 0);
-  s.dur = between(6, 20) + stepSum + (s.reached ? (s.ai.sec || 0) * Math.max(1, s.ai.n) + between(5, 25) : 0) + s.photoRedo * 15;
+  // 実際の記録では中央値 15 分ほど（答えの合間に会場を回る・人と話す時間を含む）。やめた人は短め
+  const idle = 60 * (s.reached ? 5 + 22 * rnd() ** 1.4 + (rnd() < .1 ? 10 + 30 * rnd() : 0) : 1 + 8 * rnd() ** 1.6);
+  s.dur = between(6, 20) + stepSum + idle + (s.reached ? (s.ai.sec || 0) * Math.max(1, s.ai.n) + between(5, 25) : 0) + s.photoRedo * 15;
   s.end = addSec(t0, s.dur);
   // コピーのあと：会社の見え方（1 日 1 回）・使いごこち・宝箱
   s.cv = ""; s.rating = null; s.comment = ""; s.theme = ""; s.rec = null;
@@ -892,13 +900,13 @@ const nameOf = s => ($("maskTog").checked ? s.mask : s.nick);
 
 /* ---------- ツールチップ（data-tip の要素にマウスを乗せる） ---------- */
 const TIP = $("tip");
-document.addEventListener("mouseover", e => { const el = e.target.closest("[data-tip]"); if (!el) return; TIP.innerHTML = el.getAttribute("data-tip") + (e.target.closest("[data-drill]") ? '<div class="th">押すと、当てはまる投稿の一覧へ</div>' : ""); TIP.style.display = el.getAttribute("data-tip") ? "block" : "none"; });
+document.addEventListener("mouseover", e => { const el = e.target.closest("[data-tip]"); if (!el) return; TIP.innerHTML = el.getAttribute("data-tip") + (e.target.closest("[data-drill]") ? '<div class="th">押すと、当てはまるやりとり一覧へ</div>' : ""); TIP.style.display = el.getAttribute("data-tip") ? "block" : "none"; });
 document.addEventListener("mousemove", e => { if (TIP.style.display !== "block") return; const w = TIP.offsetWidth, h = TIP.offsetHeight; let x = e.clientX + 14, y = e.clientY + 14; if (x + w > innerWidth - 8) x = e.clientX - w - 14; if (y + h > innerHeight - 8) y = e.clientY - h - 14; TIP.style.left = x + "px"; TIP.style.top = y + "px"; });
 document.addEventListener("mouseout", e => { if (e.target.closest("[data-tip]") && !e.relatedTarget?.closest?.("[data-tip]")) TIP.style.display = "none"; });
 const tipAttr = html => `data-tip="${esc(html)}"`;
 
 /* ---------- 部品 ---------- */
-/* ---------- 押すと「投稿の一覧」へ：図のその部分に当てはまるチャットに絞る ---------- */
+/* ---------- 押すと「やりとり一覧」へ：図のその部分に当てはまるチャットに絞る ---------- */
 let DRL = [], DRILL = null;
 /** data-drill 属性を返す。label＝一覧の上に出す名前、pred＝当てはまるチャットか、o.open＝開く 1 件、o.all＝上の絞り込みを使わない */
 function drill(label, pred, o = {}) { DRL.push({ label, pred, ...o }); return ` data-drill="${DRL.length - 1}"`; }
@@ -911,6 +919,52 @@ function card(o) {
 }
 function table(cols, rows, o = {}) {
   return `<table class="t ${o.cls || ""}"><thead><tr>${cols.map(c => `<th class="${c[1] || ""}">${esc(c[0])}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr class="${r.cls || ""}"${r.drill || ""}>${r.cells.map((v, i) => `<td class="${(cols[i] && cols[i][1]) || ""} ${r.thin ? "thin" : ""}">${v}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
+}
+/** 時間の分布（縦棒）。区切りの幅は、遅いほうから 1 割の値までが 8 本以内に収まる 1・2・3・5・10・15・20・30 分から選ぶ（決め打ちしない）。
+ *  o: {secs, unit:"件", drill(label, lo, hi)} 。中央値の入る棒をマゼンタにし、上に「中央値」の印 */
+function durHist(o) {
+  const v = o.secs.filter(x => x != null && isFinite(x)); if (!v.length) return '<p class="note">まだデータがありません</p>';
+  const p90 = quant(v, .9) / 60, md = median(v) / 60;
+  const step = [1, 2, 3, 5, 10, 15, 20, 30].find(s => Math.ceil(p90 / s) <= 8) || 30, nb = Math.max(3, Math.ceil(p90 / step));
+  const bins = Array.from({ length: nb + 1 }, (_, i) => { const lo = i * step, hi = i < nb ? (i + 1) * step : Infinity; return { lo, hi, label: hi === Infinity ? `${lo}分〜` : `${lo}〜${hi}分`, n: v.filter(x => x / 60 >= lo && x / 60 < hi).length }; });
+  const W = 640, H = 250, L = 10, R = 10, T = 52, B = 30, bw = (W - L - R) / bins.length, max = Math.max(1, ...bins.map(b => b.n));
+  const mi = bins.findIndex(b => md >= b.lo && md < b.hi);
+  let g = `<line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" stroke="var(--line2)"/>`;
+  bins.forEach((b, i) => {
+    const h = (H - T - B) * b.n / max, x = L + i * bw + 6, w = bw - 12, e = i === mi;
+    const tip = `<b>${b.label}</b><br>${b.n} ${o.unit || "件"}（${fpk(b.n, v.length)}）`;
+    g += `<g${b.n && o.drill ? o.drill(b.label, b.lo, b.hi) : ""} data-tip="${esc(tip)}"><rect x="${L + i * bw}" y="${T}" width="${bw}" height="${H - T - B}" fill="transparent"/>`;
+    g += `<rect x="${x}" y="${H - B - h}" width="${w}" height="${Math.max(h, b.n ? 2 : 0)}" rx="3" fill="${e ? "var(--emph)" : "var(--gray)"}"/>`;
+    g += `<text x="${x + w / 2}" y="${H - B - h - 22}" text-anchor="middle" font-size="13.5" font-weight="700" fill="${e ? "var(--emph)" : "var(--ink)"}">${b.n}</text>`;
+    g += `<text x="${x + w / 2}" y="${H - B - h - 7}" text-anchor="middle" font-size="12" fill="${e ? "var(--emph)" : "var(--ink2)"}">（${fpk(b.n, v.length)}）</text></g>`;
+    g += `<text x="${x + w / 2}" y="${H - 10}" text-anchor="middle" font-size="12.5" fill="var(--ink2)">${esc(b.label)}</text>`;
+  });
+  if (mi >= 0) { const b = bins[mi], fx = b.hi === Infinity ? .5 : (md - b.lo) / (b.hi - b.lo), mx = L + mi * bw + 6 + (bw - 12) * fx; g += `<text x="${mx}" y="14" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--emph)">中央値 ${esc(fsec(md * 60))} ▼</text><line x1="${mx}" x2="${mx}" y1="19" y2="${H - B - (H - T - B) * b.n / max - 38}" stroke="var(--emph)" stroke-width="1.5" stroke-dasharray="3 3"/>`; }
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label || "時間の分布")}">${g}</svg>`;
+}
+/** 割合の縦棒（0〜100% の枠つき）を、まとまりごとに並べる。点線＝全体の値。
+ *  groups: [{title, items:[{label, p, n, e, tip}]}]、ref: {p, label} 。10 件未満は薄い棒＋「参考」 */
+function pctCols(groups, ref, o = {}) {
+  const W = o.w || 640, H = o.h || 270, L = 62, R = 8, T = 46, B = 46, GAP = 28, ph = H - T - B;
+  const nc = groups.reduce((a, g) => a + g.items.length, 0), cw = (W - L - R - GAP * (groups.length - 1)) / nc, bw = Math.min(44, cw * .58);
+  const y = p => T + ph * (1 - Math.max(0, Math.min(100, p || 0)) / 100);
+  let g = "", t = "", x0 = L;   // t＝割合の数字。点線より上に重ねる
+  groups.forEach(gr => {
+    const gw = cw * gr.items.length;
+    g += `<text x="${x0 + gw / 2}" y="15" text-anchor="middle" font-size="12.5" font-weight="700" fill="var(--ink2)">${esc(gr.title)}</text><line x1="${x0 + 6}" x2="${x0 + gw - 6}" y1="22" y2="22" stroke="var(--line2)"/>`;
+    gr.items.forEach((it, i) => {
+      const cx = x0 + cw * i + cw / 2, thin = it.n < SMALL, fill = it.e ? "var(--emph)" : "var(--gray)";
+      g += `<g ${it.tip ? tipAttr(it.tip) : ""}><rect x="${cx - cw / 2}" y="${T}" width="${cw}" height="${ph + B}" fill="transparent"/>`;
+      g += `<rect x="${cx - bw / 2}" y="${T}" width="${bw}" height="${ph}" rx="3" fill="var(--soft)" stroke="var(--line)"/>`;
+      if (it.n) g += `<rect x="${cx - bw / 2}" y="${y(it.p)}" width="${bw}" height="${T + ph - y(it.p)}" rx="3" fill="${fill}"${thin ? ' opacity=".4"' : ""}/>`;
+      t += `<text x="${cx}" y="${y(it.p) - 7}" text-anchor="middle" font-size="14" font-weight="700" pointer-events="none" paint-order="stroke" stroke="var(--card)" stroke-width="5" stroke-linejoin="round" fill="${thin ? "var(--ink2)" : it.e ? "var(--emph)" : "var(--ink)"}">${it.n ? fp(it.p) : "−"}</text>`;
+      g += `<text x="${cx}" y="${H - B + 18}" text-anchor="middle" font-size="13" fill="var(--ink)">${esc(it.label)}</text>`;
+      g += `<text x="${cx}" y="${H - B + 35}" text-anchor="middle" font-size="12" fill="var(--ink2)">${it.n} 本${thin ? "・参考" : ""}</text></g>`;
+    });
+    x0 += gw + GAP;
+  });
+  if (ref && ref.p != null) { const ry = y(ref.p); g += `<line x1="${L - 4}" x2="${W - R}" y1="${ry}" y2="${ry}" stroke="var(--ink)" stroke-width="1.3" stroke-dasharray="5 4" opacity=".7" pointer-events="none"/><text x="${L - 8}" y="${ry - 3}" text-anchor="end" font-size="12" fill="var(--ink2)">${esc(ref.label || "すべて")}</text><text x="${L - 8}" y="${ry + 13}" text-anchor="end" font-size="13.5" font-weight="700" fill="var(--ink)">${fp(ref.p)}</text>`; }
+  return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label || "割合")}">${g}${t}</svg>`;
 }
 /** 横棒（items: {label, v, n?, txt?, e?, tip?}） */
 function hbars(items, o = {}) {
@@ -966,7 +1020,8 @@ function lineChart(o) {
   let g = "";
   for (let v = 0; v <= top; v += o.step || 25) g += `<line class="gl" x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}"/><text class="ax" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}${o.unit || ""}</text>`;
   // 節目の線。右端に近い線は、文字を線の左に置いて切れないようにする
-  (o.vlines || []).forEach(m => { const vx = x(m.i) + (W - L - R) / n / 2, left = vx > W - R - 150; g += `<line x1="${vx}" x2="${vx}" y1="${T}" y2="${H - B}" stroke="var(--o1)" stroke-width="1.5"/><text x="${left ? vx - 3 : vx + 3}" y="${T + 10}" font-size="12" fill="var(--o3)" text-anchor="${left ? "end" : "start"}">${esc(m.label)}</text>`; });
+  (o.vlines || []).filter(m => m.i < (m.on ? n : n - 1)).forEach(m => {   // 点がその先にないときは、線を引かない
+    const vx = m.on ? x(m.i) : x(m.i) + (W - L - R) / n / 2, left = vx > W - R - 150; g += `<line x1="${vx}" x2="${vx}" y1="${T}" y2="${H - B}" stroke="var(--o1)" stroke-width="1.5"/><text x="${left ? vx - 3 : vx + 3}" y="${T + 10}" font-size="12" fill="var(--o3)" text-anchor="${left ? "end" : "start"}">${esc(m.label)}</text>`; });
   if (o.ref != null) g += `<line x1="${L}" x2="${W - R}" y1="${y(o.ref)}" y2="${y(o.ref)}" stroke="var(--ink)" stroke-width="1.2" stroke-dasharray="5 4"/><text x="${W - R}" y="${y(o.ref) - 4}" font-size="12" fill="var(--ink2)" text-anchor="end">${esc(o.refLabel || "")}</text>`;
   const ok = o.points.map((p, i) => (p.v == null ? null : [x(i), y(p.v)]));
   let d = ""; ok.forEach((p, i) => { if (!p) return; d += (d && ok[i - 1] ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1); });
@@ -975,7 +1030,7 @@ function lineChart(o) {
     if (p.v == null) { g += `<text class="ax" x="${x(i)}" y="${H - 14}" text-anchor="middle">${esc(p.x)}</text>`; return; }
     const thin = p.n != null && p.n < SMALL, r = p.e ? 6 : 4.5;
     g += `<circle cx="${x(i)}" cy="${y(p.v)}" r="${r}" fill="${p.e ? "var(--emph)" : thin ? "#fff" : "var(--struct2)"}" stroke="${p.e ? "#fff" : thin ? "var(--gray-ink2)" : "#fff"}" stroke-width="2"/>`;
-    if (p.lab) g += `<text x="${x(i)}" y="${y(p.v) - 10}" font-size="13" font-weight="700" text-anchor="middle" fill="${thin ? "var(--gray-ink2)" : "var(--ink)"}">${esc(p.lab)}</text>`;
+    if (p.lab) g += `<text x="${x(i)}" y="${y(p.v) - 10}" font-size="13" font-weight="700" text-anchor="middle" paint-order="stroke" stroke="var(--card)" stroke-width="5" stroke-linejoin="round" fill="${thin ? "var(--gray-ink2)" : "var(--ink)"}">${esc(p.lab)}</text>`;
     g += `<text class="ax" x="${x(i)}" y="${H - 14}" text-anchor="middle">${esc(p.x)}</text>`;
     g += `<rect x="${x(i) - (W - L - R) / n / 2}" y="${T}" width="${(W - L - R) / n}" height="${H - T - B}" fill="transparent" data-tip="${esc(p.tip || "")}"/>`;
   });
@@ -1040,13 +1095,13 @@ function dayHourBars(o) {
 /** ファネル（上から下へ細くなる帯）。rows: [label, count]、emph: いちばん減ったつなぎ目の番号。o.cols: 段の右に並べる列 [{head, vals: [{txt, tip}|null…], emph}] */
 function funnelSvg(rows, emph, o = {}) {
   const cols = o.cols || [], DW = cols.length ? 150 : 0, CW = 150, FW = o.fw || 760, L = 130, rh = 38, gap = 10;
-  const R = DW + cols.length * CW, W = L + FW + R + 6, T = cols.length ? 44 : 4, cx = L + FW / 2, maxW = FW;
+  const R = DW + cols.length * CW, W = L + FW + R + 6, T = cols.length ? 50 : 4, cx = L + FW / 2, maxW = FW;
   const start = rows[0][1] || 1, wOf = v => Math.max(40, maxW * v / start);
   const H = T + rows.length * rh + (rows.length - 1) * gap + 4, x0 = L + FW + 14;
   let g = "";
   if (cols.length) {   // 右の列は補足：数字だけ（いちばん多いところはマゼンタの字）
-    g += `<text x="${x0}" y="16" font-size="13.5" font-weight="700" fill="var(--ink2)">前の段から減った</text><text x="${x0}" y="33" font-size="11.5" fill="var(--gray-ink)">前の段のうちの%</text>`;
-    cols.forEach((c, j) => { const x = x0 + DW + j * CW; g += `<text x="${x}" y="16" font-size="13.5" font-weight="700" fill="var(--ink2)">${esc(c.head)}</text>${c.sub ? `<text x="${x}" y="33" font-size="11.5" fill="var(--gray-ink)">${esc(c.sub)}</text>` : ""}`; });
+    g += `<text x="${x0}" y="16" font-size="13.5" font-weight="700" fill="var(--ink2)">前の段から減った</text><text x="${x0}" y="37" font-size="11.5" fill="var(--gray-ink)">（ ）は前の段のうち</text>`;
+    cols.forEach((c, j) => { const x = x0 + DW + j * CW; g += `<text x="${x}" y="16" font-size="13.5" font-weight="700" fill="var(--ink2)">${esc(c.head)}</text>${c.sub ? `<text x="${x}" y="37" font-size="11.5" fill="var(--gray-ink)">${esc(c.sub)}</text>` : ""}`; });
   }
   rows.forEach((r, i) => {
     const y = T + i * (rh + gap), w = wOf(r[1]), ty = y + rh / 2 + 5;
@@ -1054,16 +1109,17 @@ function funnelSvg(rows, emph, o = {}) {
       const py = y - gap, pw = wOf(rows[i - 1][1]), loss = rows[i - 1][1] - r[1], e = i === emph;
       const P = o.preds, pa = P && P[i - 1], pb = P && P[i], lossDr = P && loss ? drill(`「${rows[i - 1][0]}」まで進んで、「${r[0]}」に進まなかったチャット`, s => pa(s) && !pb(s)) : "";
       g += `<polygon points="${cx - pw / 2},${py} ${cx + pw / 2},${py} ${cx + w / 2},${y} ${cx - w / 2},${y}" fill="${e ? "var(--emph)" : "var(--struct-soft)"}" data-tip="${esc(`<b>${rows[i - 1][0]} → ${r[0]}</b><br>${loss} 件へった（前の段の ${fpk(loss, rows[i - 1][1])}）`)}"${lossDr}/>`;
-      if (loss) g += `<text x="${x0}" y="${cols.length ? ty : py + gap / 2 + 4}" font-size="13.5" fill="${e ? "var(--emph)" : "var(--gray-ink)"}" font-weight="${e ? 700 : 400}"${lossDr}>−${loss}（−${fpk(loss, rows[i - 1][1], 1)}）</text>`;
+      // 減った数は「前の段」と「この段」の差なので、2 つの段のあいだ（つなぎ目）の高さに置く
+      if (loss) g += `<text x="${x0}" y="${y - gap / 2 + 5}" font-size="14" fill="${e ? "var(--emph)" : "var(--ink)"}"${lossDr}><tspan font-weight="700">－${loss}件</tspan><tspan font-size="13" font-weight="700" fill="${e ? "var(--emph)" : "var(--ink2)"}">（－${fpk(loss, rows[i - 1][1], 1)}）</tspan></text>`;
     }
     g += `<rect x="${cx - w / 2}" y="${y}" width="${w}" height="${rh}" rx="6" fill="var(--gray)" data-tip="${esc(`<b>${r[0]}</b><br>${r[1]} 件（始めたうちの ${fpk(r[1], start)}）`)}"${o.preds && r[1] ? drill(i ? `「${r[0]}」まで進んだチャット` : "始めたチャット（すべて）", o.preds[i]) : ""}/>`;
     g += `<text x="${L - 12}" y="${ty + 1}" text-anchor="end" font-size="16" fill="var(--ink)">${esc(r[0])}</text>`;
-    g += `<text x="${cx}" y="${ty + 1}" text-anchor="middle" font-size="16" fill="var(--ink)" pointer-events="none"><tspan font-weight="700">${r[1]}</tspan>　${fpk(r[1], start)}</text>`;
+    g += `<text x="${cx}" y="${ty + 1}" text-anchor="middle" font-size="16" fill="var(--ink)" pointer-events="none"><tspan font-weight="700">${r[1]}</tspan><tspan font-size="14">（${fpk(r[1], start)}）</tspan></text>`;
     cols.forEach((c, j) => {
       const v = c.vals[i]; if (!v) return;
       const x = x0 + DW + j * CW, e = c.emph === i;
       g += `<g${v.drill || ""} data-tip="${esc(v.tip || "")}"><rect x="${x - 4}" y="${y + 4}" width="${CW - 12}" height="${rh - 8}" rx="4" fill="transparent"/>`;
-      g += `<text x="${x}" y="${ty}" font-size="14" fill="${v.zero ? "var(--gray-ink2)" : e ? "var(--emph)" : "var(--ink)"}" pointer-events="none"><tspan font-weight="700">${esc(v.pt)}</tspan><tspan font-size="12" fill="${v.zero ? "var(--gray-ink2)" : e ? "var(--emph)" : "var(--gray-ink)"}">（${v.n}件）</tspan></text></g>`;
+      g += `<text x="${x}" y="${ty}" font-size="14" fill="${v.zero ? "var(--gray-ink2)" : e ? "var(--emph)" : "var(--ink)"}" pointer-events="none"><tspan font-weight="700">${v.n}件</tspan><tspan font-size="13" fill="${v.zero ? "var(--gray-ink2)" : e ? "var(--emph)" : "var(--ink2)"}">（${esc(v.pt)}）</tspan></text></g>`;
     });
   });
   return `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(o.label || "ファネル")}">${g}</svg>`;
@@ -1095,7 +1151,13 @@ function base(F) {
   return { F, T1, R, C, A, people, copiers, calls, fail, failP: pct(fail, calls.length), aiP50: median(aiW), aiP90: quant(aiW, .9), rated, rating: mean(rated.map(s => s.rating)),
     copyRate: pct(C.length, F.length), ana: A.filter(s => s.ana).length, anaP: pct(A.filter(s => s.ana).length, A.length), own, kpiAny, kpiP: pct(kpiAny, C.length) };
 }
-/** 人ごとの通算：n 本目をコピーした人のうち、n+1 本目もコピーした人（コピーした全員を数える） */
+/** n 本目のコピー率：n 本目のチャット（それまでにコピーした本数＋1 ＝ 記録の「通算何本目」）のうち、コピーまで行った割合 */
+function copyByNth(F, max = 12) {
+  const out = [];
+  for (let n = 1; n <= max; n++) { const at = F.filter(s => s.postTotal === n), go = at.filter(s => s.copied).length; out.push({ n, at: at.length, go, p: pct(go, at.length) }); }
+  return out;
+}
+/** （前の版）n 本目をコピーした人のうち、n+1 本目もコピーした人 */
 function retention(F, all) {
   const byP = new Map();
   all.filter(s => s.copied).forEach(s => { byP.set(s.pkey, Math.max(byP.get(s.pkey) || 0, s.postTotal)); });
@@ -1316,27 +1378,27 @@ function buildCtx(D) {
 }
 
 /* =====================================================================
-   タブ：投稿の量（使われ方）
+   タブ：使われ方
 ===================================================================== */
 const lead = (h, p) => `<div class="lead"><div><h2>${esc(h)}</h2>${p ? `<p>${p}</p>` : ""}</div></div>`;
 
-/* ---------- 投稿の量（使われ方） ---------- */
+/* ---------- 使われ方 ---------- */
 function renderFlow(F, ALL) {
   const fr = funnel(F), start = fr[0][1];
   const FP = fr.map(r => r[0] === "始めた" ? () => true : r[0] === "投稿文ができた" ? s => !!s.reached : r[2] === "copy" ? s => !!s.copied : r[2] === "rec" ? s => !!(s.rec && s.rec.opened) : (k => s => passedStep(s, k))(r[2]));
   let worst = -1, worstLoss = 0;
   fr.forEach((r, i) => { if (i === 0 || r[0] === "宝箱をあけた" || r[0] === "投稿文ができた") return; const loss = fr[i - 1][1] - r[1]; if (loss > worstLoss) { worstLoss = loss; worst = i; } });
   const qWorst = fr.slice(1, 7).map((r, i) => [r[0], fr[i][1] - r[1]]).sort((a, b) => b[1] - a[1])[0];
-  // n 本目 → n+1 本目
-  const ret = retention(F, ALL).slice(0, 12).filter((r, i) => i < 5 || r.at >= 3);
-  const r5 = ret[4], r4 = ret[3];
-  const pts = ret.map(r => ({ x: `${r.n}→${r.n + 1}`, v: r.p, n: r.at, e: r.n === 5, lab: r.at >= SMALL ? fp(r.p) : "", tip: `<b>${r.n} 本目 → ${r.n + 1} 本目</b><br>${r.n} 本目をコピーした ${r.at} 人のうち ${r.go} 人が続けた（${fp(r.p)}）${r.at < SMALL ? "<br>10 人未満の参考値" : `<br>${ciText(r.go, r.at)}`}` }));
-  const retChart = lineChart({ points: pts, w: 620, h: 250, max: 100, step: 25, unit: "%", vlines: [{ i: 3, label: "5本目でバラ窓がそろう" }, { i: 8, label: "10本目で金のふちどり" }], label: "n 本目をコピーした人のうち n+1 本目もコピーした割合" });
+  // n 本目のコピー率
+  const ret = copyByNth(F, 12).filter((r, i) => i < 5 || r.at >= 3);
+  const r1 = ret[0], r5 = ret[4], allCopy = pct(F.filter(s => s.copied).length, F.length);
+  const pts = ret.map(r => ({ x: `${r.n}本目`, v: r.at ? r.p : null, n: r.at, e: r.n === 5, lab: r.at >= SMALL ? fp(r.p) : "", tip: `<b>${r.n} 本目のチャット</b>${r.n === 5 ? "（バラ窓がそろう）" : r.n === 10 ? "（金のふちどり）" : ""}<br>始めた ${r.at} 件のうち ${r.go} 件をコピー（${fp(r.p)}）${r.at < SMALL ? "<br>10 件未満の参考値" : `<br>${ciText(r.go, r.at)}`}` }));
+  const retChart = lineChart({ points: pts, w: 620, h: 250, max: 100, step: 25, unit: "%", ref: allCopy, refLabel: `すべて ${fp(allCopy)}`, vlines: [{ i: 4, on: true, label: "バラ窓がそろう" }, { i: 9, on: true, label: "金のふちどり" }], label: "n 本目のチャットのコピー率" });
   // 通算本数の分布（人）
   const maxT = new Map(); F.filter(s => s.copied).forEach(s => maxT.set(s.pkey, Math.max(maxT.get(s.pkey) || 0, s.postTotal)));
   const DB = [["1本", v => v === 1], ["2本", v => v === 2], ["3本", v => v === 3], ["4本", v => v === 4], ["5本", v => v === 5], ["6〜9本", v => v >= 6 && v <= 9], ["10本以上", v => v >= 10]];
   const vals = [...maxT.values()], dist = DB.map(([l, f]) => [l, vals.filter(f).length]);
-  const distBars = hbars(dist.map(([l, v]) => ({ label: l, v, e: l === "5本", txt: `<b>${v}</b> 人　${fpk(v, vals.length)}` })));
+  const distBars = hbars(DB.map(([l, f], i) => { const v = dist[i][1]; return { label: l, v, e: l === "5本", txt: `<b>${v}</b> 人　${fpk(v, vals.length)}`, drill: v ? drill(`通算 ${l} コピーした人`, s => !!s.copied && f(maxT.get(s.pkey) || 0), { byPerson: true }) : "" }; }));
   // 次の 1 本
   const C = F.filter(s => s.copied), nxAll = nextAfter(C), nxDay = nextAfter(C.filter(s => !s.night)), nxNight = nextAfter(C.filter(s => s.night));
   const nxB = BUCKETS.map(([l, f]) => [l, nextAfter(C.filter(s => f(s.postTotal)))]);
@@ -1345,10 +1407,10 @@ function renderFlow(F, ALL) {
   const NXL = { "1本目": "1本目のあと", "2〜4本目": "2〜4本目のあと", "5本目": "5本目のあと（バラ窓がそろった）", "6〜9本目": "6〜9本目のあと", "10本目〜": "10本目〜のあと" };
   const nxTip = (l, x) => `<b>${l}</b><br>コピーした ${x.n} 本のうち ${x.k} 本で、次のチャットを始めた（${fp(x.p)}）${x.n >= SMALL ? "<br>" + ciText(x.k, x.n) : "<br>10 件未満の参考値"}`;
   const nxLow = nxB.filter(([, x]) => x.n >= SMALL).sort((a, b) => a[1].p - b[1].p)[0];
-  const nxTimeI = [[`昼（〜${NFT}）`, nxDay], [`夜（${NFT}〜）`, nxNight]].map(([l, x]) => ({ label: l, v: x.p || 0, n: x.n, txt: `<b>${fp(x.p)}</b>　${x.k}/${x.n} 本${x.n < SMALL ? "（参考）" : ""}`, tip: nxTip(l, x) }));
+  const nxTimeI = [["昼", `昼（〜${NFT}）`, nxDay], ["夜", `夜（${NFT}〜）`, nxNight]].map(([l, lt, x]) => ({ label: l, p: x.p, n: x.n, tip: nxTip(lt, x) }));
   const nxIsLow = (l, x) => nxLow && x.n >= SMALL && Math.round(x.p) === Math.round(nxLow[1].p), nxLows = nxB.filter(([l, x]) => nxIsLow(l, x));
-  const nxPostI = nxB.map(([l, x]) => ({ label: NXL[l] || l, v: x.p || 0, n: x.n, e: nxIsLow(l, x), txt: `<b>${fp(x.p)}</b>　${x.k}/${x.n} 本${x.n < SMALL ? "（参考）" : ""}`, tip: nxTip(NXL[l] || l, x) }));
-  const nxBars = hbars([{ label: "すべて", b: true, v: nxAll.p || 0, n: nxAll.n, txt: `<b>${fp(nxAll.p)}</b>　${nxAll.k}/${nxAll.n} 本`, tip: nxTip("すべて", nxAll) }, { head: "何本目のあとか" }, ...nxPostI, { head: "時間帯（夜は窓に灯りがともる）" }, ...nxTimeI], { max: 100, track: true, lw: 210, reserve: 130 });
+  const nxPostI = nxB.map(([l, x]) => ({ label: l, p: x.p, n: x.n, e: nxIsLow(l, x), tip: nxTip(NXL[l] || l, x) }));
+  const nxBars = pctCols([{ title: "何本目のあとか（5本目＝バラ窓がそろう）", items: nxPostI }, { title: "時間帯（夜＝窓に灯り）", items: nxTimeI }], { p: nxAll.p, label: "すべて" }, { label: "コピーのあと、次の 1 本を始めた割合" });
   // 日×時
   const HD = CTX.days.filter(d => F.some(s => s.day === d)).slice(-6);
   const hLo = Math.min(...HD.map(d => CTX.open[d].getHours())), hHi = Math.max(...HD.map(d => CTX.close[d].getHours() - (CTX.close[d].getMinutes() ? 0 : 1)));
@@ -1378,7 +1440,7 @@ function renderFlow(F, ALL) {
   // ファネルに出ていない数字：問いごとの「とばした」「ここで投稿文へ」
   const QK = fr.slice(2, 7).map((r, j) => { const k = SKEY[j + 2], sh = shownQ(k); return { k, l: r[0], sh, sk: F.filter(s => s.st[k] && s.st[k].src === "skip").length, ea: F.filter(s => s.early === k).length }; });
   const skMax = Math.max(...QK.map(q => pct(q.sk, q.sh) || 0)), eaMaxP = Math.max(...QK.map(q => pct(q.ea, q.sh) || 0));
-  const colSkip = { head: "とばした", sub: "その問いが出たうち", emph: -1, vals: fr.map(() => null) }, colEarly = { head: "ここで投稿文へ", sub: "その問いが出たうち", emph: -1, vals: fr.map(() => null) };
+  const colSkip = { head: "とばした", sub: "（ ）は問いが出たうち", emph: -1, vals: fr.map(() => null) }, colEarly = { head: "ここで投稿文へ", sub: "（ ）は問いが出たうち", emph: -1, vals: fr.map(() => null) };
   QK.forEach((q, j) => { const i = j + 2, p = pct(q.sk, q.sh) || 0;
     colSkip.vals[i] = { p, pt: fp(p, p && p < 10 ? 1 : 0), n: q.sk, zero: !q.sk, drill: q.sk ? drill(`「${q.l}」をとばしたチャット`, s => !!(s.st[q.k] && s.st[q.k].src === "skip")) : "", tip: `<b>${q.l}</b>：その問いが出た ${q.sh} 件のうち ${q.sk} 件が答えずに進んだ` }; if (q.sk && p === skMax) colSkip.emph = i;
     const pe = pct(q.ea, q.sh) || 0; colEarly.vals[i] = { p: pe, pt: fp(pe, pe && pe < 10 ? 1 : 0), n: q.ea, zero: !q.ea, drill: q.ea ? drill(`「${q.l}」で先に投稿文へ進んだチャット`, s => s.early === q.k) : "", tip: `<b>${q.l}</b>：その問いが出た ${q.sh} 件のうち ${q.ea} 件が、ここで先に投稿文をつくった` }; if (q.ea && pe === eaMaxP) colEarly.emph = i; });
@@ -1388,12 +1450,10 @@ function renderFlow(F, ALL) {
   const md = median(R.map(s => s.dur)), ansOf = s => ANS_KEYS.filter(k => s.st[k] && s.st[k].src !== "skip").length, ansN = mean(R.map(ansOf));
   const ansDist = [4, 3, 2, 1, 0].map(n => R.filter(s => ansOf(s) === n).length);
   const ANS_SEG = [["4つ", "var(--o4)"], ["3つ", "var(--o3)"], ["2つ", "var(--o2)"], ["1つ", "var(--o1)", "var(--ink)"], ["0", "var(--none)", "var(--gray-ink)"]];
-  const ansHtml = `<div class="pan">${panel("答えた問いの数（平均）", ansN == null ? null : ansN / 4 * 100, "気持ち・どこが・だれと・しめ の 4 つのうち", { v: fn(ansN, 1), unit: "／ 4" })}${panel("任意の問いにも答えた", pct(exY, ex.length), `最後まで答えた ${ex.length} 件のうち（ひみつの部屋）`)}</div>
-    <h4 style="margin:14px 0 6px">いくつ答えたか（投稿文まで行ったチャット）</h4><div class="lg">${ANS_SEG.map(x => `<span><i style="background:${x[1]}"></i>${x[0]}</span>`).join("")}</div>${stack100([{ label: "答えた問い", vals: ansDist, drills: [4, 3, 2, 1, 0].map(n => drill(`答えた問いが ${n ? n + " つ" : "0"}のチャット（投稿文まで）`, s => !!s.reached && ansOf(s) === n)) }], ANS_SEG)}`;
+  const ansHtml = `<div class="agrid"><div class="pan">${panel("答えた問いの数（平均）", ansN == null ? null : ansN / 4 * 100, "気持ち・どこが・だれと・しめ の 4 つのうち", { v: fn(ansN, 1), unit: "／ 4" })}${panel("任意の問いにも答えた", pct(exY, ex.length), `最後まで答えた ${ex.length} 件のうち（ひみつの部屋）`)}</div><div>
+    <h4 style="margin:0 0 6px">いくつ答えたか（投稿文まで行ったチャット）</h4><div class="lg">${ANS_SEG.map(x => `<span><i style="background:${x[1]}"></i>${x[0]}</span>`).join("")}</div>${stack100([{ label: "答えた問い", vals: ansDist, drills: [4, 3, 2, 1, 0].map(n => drill(`答えた問いが ${n ? n + " つ" : "0"}のチャット（投稿文まで）`, s => !!s.reached && ansOf(s) === n)) }], ANS_SEG)}</div></div>`;
   // かかった時間
-  const DUR = [["〜1分", v => v < 60], ["1〜2分", v => v >= 60 && v < 120], ["2〜3分", v => v >= 120 && v < 180], ["3〜5分", v => v >= 180 && v < 300], ["5分〜", v => v >= 300]];
-  const mb = md == null ? -1 : DUR.findIndex(([, f]) => f(md));
-  const durBars = hbars(DUR.map(([l, f], i) => { const v = R.filter(s => f(s.dur)).length; return { label: l, v, e: i === mb, txt: `<b>${v}</b> 件　${fpk(v, R.length)}`, drill: v ? drill(`投稿文までの時間が ${l} のチャット`, s => !!s.reached && f(s.dur)) : "" }; }));
+  const durChart = durHist({ secs: R.map(s => s.dur), label: "投稿文ができるまでの時間の分布", drill: (l, lo, hi) => drill(`投稿文までの時間が ${l} のチャット`, s => !!s.reached && s.dur / 60 >= lo && s.dur / 60 < hi) });
   const QT = [["text1", "ひとこと"], ["feel", "気持ち"], ["why", "どこが"], ["who", "だれと"], ["reflect", "みがきの間"], ["next", "しめ"]].map(([k, l]) => [l, median(F.filter(s => s.st[k]).map(s => s.st[k].sec)), F.filter(s => s.st[k]).length]);
   const qtMax = Math.max(...QT.map(x => x[1] || 0)), qtTop = QT.find(x => x[1] === qtMax);
   const stepBars = hbars(QT.map(([l, v, n]) => ({ label: l, v: v || 0, e: v === qtMax, txt: `<b>${fsec(v)}</b>`, tip: `<b>${l}</b>：中央値 ${fsec(v)}（${n} 件）` })));
@@ -1437,24 +1497,24 @@ function renderFlow(F, ALL) {
   const CM = F.filter(s => s.comment), themes = countBy(CM.map(s => s.theme)), thMax = themes.length ? themes[0][1] : 0;
   const thBars = hbars(themes.map(([l, v]) => ({ label: l, v, e: v === thMax, txt: `<b>${v}</b> 件　${fpk(v, CM.length)}`, drill: drill(`運営へのコメント：${l}`, s => !!s.comment && s.theme === l, { fb: true }) })));
 
-  $("p-flow").innerHTML = lead("Coach はどれだけ使われ、投稿まで届いたか", "①始めてからコピーまで → ②コピーのあと次の 1 本へ → ③利用時間 → ④使った人の評価 の順に見ます。数える単位は、②は人、ほかはチャットです。") +
+  $("p-flow").innerHTML = lead("Coach はどれだけ使われ、投稿文のコピーまで届いたか", "投稿したかどうかは記録できないので、投稿文をコピーしたところまでを見ます。①始めてからコピーまで → ②コピーのあと次の 1 本へ → ③利用時間 → ④使った人の評価 の順に見ます。数える単位はチャットです（「何本コピーした人が多いか」だけ人）。") +
     `<div class="grid">` + card({ id: "c-key", cls: "c12", q: "主な数字", why: `いま選んでいる絞り込みでの数字です。日ごとの値を下に添えています。${nIP ? `ほかに、いま書いている途中のチャットが ${nIP} 件あります（集計にはまだ入れていません）。` : ""}`, body: keyHtml }) + `</div>` +
     `<h3 class="subh">① 始めてからコピーまで<small>どこで止まる・とばす・どこに時間がかかる</small></h3><div class="grid">` +
-    card({ id: "c-funnel", cls: "c12", q: "1 本の中で、どこで人が減るか", a: worst > 0 ? `<span>いちばん減るのは <b>${esc(fr[worst - 1][0])} → ${esc(fr[worst][0])}</b>（−${worstLoss} 件、−${fpk(worstLoss, fr[worst - 1][1], 1)}）。問いの中では <b>${esc(qWorst[0])}</b>（−${qWorst[1]} 件）。</span>` : "", why: "始めたチャットを 100% として、各段まで進んだ数。「ここまでで投稿文をつくる」で先に進んだ人は、やめた人に数えません。",
+    card({ id: "c-funnel", cls: "c12", q: "1 本の中で、どこで人が減るか", a: worst > 0 ? `<span>いちばん減るのは <b>${esc(fr[worst - 1][0])} → ${esc(fr[worst][0])}</b>（<b>－${worstLoss} 件</b>（－${fpk(worstLoss, fr[worst - 1][1], 1)}））。問いの中では <b>${esc(qWorst[0])}</b>（<b>－${qWorst[1]} 件</b>）。</span>` : "", why: "始めたチャットを 100% として、各段まで進んだ数。「ここまでで投稿文をつくる」で先に進んだ人は、やめた人に数えません。",
       body: `<div class="scroll">${fFull}</div><p class="note">前の段から減った＝その段に進まずにやめた件数（前の段のうちの%）。とばした＝その問いが出たうち、答えずに次へ進んだ割合（みがきの間は「どれもちがう」「出なかった」）。ここで投稿文へ＝その問いが出たうち、そこで先に投稿文をつくった割合（やめた人には数えません）。マゼンタの字＝その列でいちばん多い問い。</p>` }) +
-    card({ cls: "c4", q: "いくつの問いに答えたか", a: `<span>平均 <b>${fn(ansN, 1)}</b> / 4 問。4 つとも答えたのは ${fpk(ansDist[0], R.length)}。</span>`, body: ansHtml }) +
-    card({ cls: "c8", q: "1 本にかかった時間", a: `<span>投稿文までの時間は中央値 <b>${fsec(md)}</b>。いちばん時間がかかる問いは <b>${esc(qtTop ? qtTop[0] : "−")}</b>（${fsec(qtMax)}）。</span>`,
-      body: `<div class="three"><div><h4>1 本あたりの時間（投稿文まで）</h4>${durBars}<p class="note">色＝中央値の入る帯。AI の待ち時間を含みます。</p></div><div><h4>問いごとの時間（中央値）</h4>${stepBars}<p class="note">問いが出てから答えるまで。</p></div><div><h4>何本目の時間（中央値）</h4>${nthBars}<p class="note">コピーしたチャット。何本目＝この端末でコピーした通算の本数。</p></div></div>` }) +
-    card({ id: "c-features", cls: "c12", q: "チャットの機能は、どれくらい使われているか", a: `<span>いちばん使われているのは <b>${esc(featTop[0])}</b>（${fp(featTop[1])}）、少ないのは <b>${esc(featLow[0])}</b>（${fp(featLow[1])}）。</span>`, why: "写真・見本・投稿イメージ・AI の案・手直し・話し方・文字の大きさなど、チャットの中の機能ごとに、使った割合。", body: featHtml }) +
+    card({ cls: "c12", q: "いくつの問いに答えたか", a: `<span>平均 <b>${fn(ansN, 1)}</b> / 4 問。4 つとも答えたのは ${fpk(ansDist[0], R.length)}。</span>`, body: ansHtml }) +
+    card({ cls: "c12", q: "1 本にかかった時間", a: `<span>投稿文までの時間は中央値 <b>${fsec(md)}</b>。いちばん時間がかかる問いは <b>${esc(qtTop ? qtTop[0] : "−")}</b>（${fsec(qtMax)}）。</span>`,
+      body: `<div class="tgrid"><div><h4>1 本にかかった時間（始めてから投稿文ができるまで）</h4>${durChart}<p class="note">棒の上＝チャットの件数（全体のうちの割合）。区切りの幅は、遅いほうから 1 割の時間までが 8 本以内に入るように自動で決めます。AI の待ち時間や、途中で会場を回っていた時間も含みます。</p></div><div><h4>問いごとの時間（中央値）</h4>${stepBars}<p class="note">問いが出てから答えるまで。</p></div><div><h4>何本目の時間（中央値）</h4>${nthBars}<p class="note">コピーしたチャット。何本目＝この端末でコピーした通算の本数。</p></div></div>` }) +
     card({ id: "c-who", cls: "c12", q: "どんな人が使っているか（立場）", why: "使った人の、立場ごとの内訳。人＝全体の何%か。コピー率＝始めたチャットのうちコピーまで行った割合で、ほかの立場の人より、ぶれを見込んでもはっきり高い・低いところに ↑↓ と色（良し悪しではない差）。10 件未満は灰色の参考値。行を押すと、その人たちのチャットを一覧で見られます。", body: `<div class="scroll">${table([["区分"], ["人（全体のうち）"], ["チャット", "n"], ["コピー率", "n"]], segRows)}</div>` }) +
-    `</div><h3 class="subh">② コピーのあと、次の 1 本へ<small>ステンドグラス（本日の DROP）は、もう 1 本につながっているか</small></h3><div class="grid">` +
-    card({ cls: "c6", q: "本日の DROP を見たあと、もう 1 本つくったか", a: `<span>コピーのあと、次の 1 本を始めたのは <b>${fp(nxAll.p)}</b>。${nxLow ? `いちばん低いのは ${nxLows.map(([l]) => `<b>${esc(NXL[l] || l)}</b>`).join("と")}（${fp(nxLow[1].p)}${nxLows.length > 1 ? "・同率" : ""}）で、そのときの「本日の DROP」の文や演出を見直す候補です。` : ""}</span>`,
-      why: "ステンドグラス（本日の DROP）が「次の写真で、もう1本つくる」につながっているかを見ます。数字＝コピーした投稿文のうち、同じ人が次のチャットを始めた割合（時間は問わない。右の図は、次の 1 本もコピーまでしたか）。",
-      body: `${nxBars}<p class="note">帯の右端＝100%。10 件未満は参考値（灰色の数字）。マウスを乗せると、ぶれの幅が出ます。</p>` }) +
-    card({ id: "c-retention", cls: "c6", q: "n 本目のあと、次の 1 本もコピーしたか", a: r5 && r5.at ? (() => { const d = r4 && r4.at ? diffCI(r4.go, r4.at, r5.go, r5.at) : null, lv = !d || r5.at < SMALL ? 0 : d[2] < 0 ? 2 : d[1] > 0 ? 4 : 0, word = lv === 2 ? "下がった" : lv === 4 ? "上がった" : "はっきりしない"; return `${sig(lv, word)}<span>5 本目（バラ窓がそろう）のあとに次の 1 本もコピーした人は <b>${fp(r5.p)}</b>（${r5.go}/${r5.at} 人）。4 本目のあとは ${fp(r4.p)}（${r4.go}/${r4.at} 人）${d ? `で、差は ${d[0] > 0 ? "+" : ""}${d[0].toFixed(0)}pt（ぶれの幅 ${d[1].toFixed(0)}〜${d[2].toFixed(0)}pt）` : ""}。</span>`; })() : "",
-      why: "n 本目をコピーした人のうち、n+1 本目もコピーした人の割合（通算・日をまたいでも数える）。白い点は 10 人未満の参考値。", body: retChart,
-      table: table([["n 本目 → n+1 本目"], ["n 本目をコピーした人", "n"], ["続けた人", "n"], ["割合", "n"]], ret.map(r => ({ thin: r.at < SMALL, cls: r.n === 5 ? "hi" : "", cells: [`${r.n} → ${r.n + 1}`, `${r.at}`, `${r.go}`, fp(r.p)] }))) }) +
-    card({ cls: "c12", q: "何本コピーした人が多いか", a: `<span>5 本（バラ窓がそろう）で止まった人は <b>${dist[4][1]}</b> 人。</span>`, why: "人ごとの、いちばん大きい通算の本数（この端末でコピーした数）。", body: distBars }) +
+    `</div><h3 class="subh">② コピーのあと、次の 1 本へ<small>ステンドグラス（本日の DROP）は、もう 1 本につながっているか・チャットの機能は使われているか</small></h3><div class="grid">` +
+    card({ cls: "c6", q: "本日の DROP を見たあと、もう 1 本つくったか", a: `<span>コピーのあと次の 1 本を始めたのは <b>${fp(nxAll.p)}</b>（${nxAll.k}/${nxAll.n} 本）。${nxLow ? `いちばん低いのは <b>${nxLows.map(([l]) => esc(NXL[l] || l)).join("・")}</b>（${fp(nxLow[1].p)}${nxLows.length > 1 ? "・同率" : ""}）。` : ""}</span>`,
+      why: "コピーした投稿文のうち、同じ人が次のチャットを始めた割合（時間は問わない）。",
+      body: `${nxBars}<p class="note">点線＝すべての値。色＝いちばん低いところ。薄い棒＝10 件未満の参考値。マウスを乗せると、ぶれの幅が出ます。</p>` }) +
+    card({ id: "c-retention", cls: "c6", q: "n 本目のコピー率", a: r1 && r1.at ? `<span>1 本目のコピー率は <b>${fp(r1.p)}</b>${r5 && r5.at ? `、5 本目（バラ窓がそろう）は <b>${fp(r5.p)}</b>（${r5.go}/${r5.at} 件${r5.at < SMALL ? "・参考" : ""}）` : ""}。</span>` : "",
+      why: "n 本目のチャットのうち、コピーまで行った割合。n 本目＝その人（端末）がそれまでにコピーした本数＋1。点線＝すべてのチャットのコピー率。白い点は 10 件未満の参考値。", body: retChart,
+      table: table([["n 本目"], ["始めたチャット", "n"], ["コピーした", "n"], ["コピー率", "n"]], ret.map(r => ({ thin: r.at < SMALL, cls: r.n === 5 ? "hi" : "", cells: [`${r.n} 本目`, `${r.at}`, `${r.go}`, fp(r.p)] }))) }) +
+    card({ cls: "c12", q: "何本コピーした人が多いか", a: `<span>5 本（バラ窓がそろう）で止まった人は <b>${dist[4][1]}</b> 人。</span>`, why: "人ごとの、いちばん大きい通算の本数（この端末でコピーした数）。棒を押すと、その人たちの投稿文を、人ごとに 1 本目から順に出します。", body: distBars }) +
+    card({ id: "c-features", cls: "c12", q: "チャットの機能は、どれくらい使われているか", a: `<span>いちばん使われているのは <b>${esc(featTop[0])}</b>（${fp(featTop[1])}）、少ないのは <b>${esc(featLow[0])}</b>（${fp(featLow[1])}）。</span>`, why: "写真・見本・投稿イメージ・AI の案・手直し・話し方・文字の大きさなど、チャットの中の機能ごとに、使った割合。", body: featHtml }) +
     `</div><h3 class="subh">③ 利用時間<small>いつ使われ、そのうちどれだけコピーまで行ったか（日×時間帯）</small></h3><div class="grid">` +
     card({ id: "c-hours", cls: "c12", q: "いつ使われ、どれだけコピーまで行ったか（日×時間帯）", a: sTop ? `<span>いちばん多く始めたのは <b>${sTop.d} ${sTop.h}時台</b>（${sTop.n} 件）。${cLow ? `コピーまで行った割合がいちばん低いのは <b>${cLow.d} ${cLow.h}時台</b>（${fp(cLow.p)}、${cLow.n} 件のうち ${cLow.k} 件）。` : ""}</span>` : "",
       why: "棒の高さ＝その 1 時間に始めたチャットの数。濃い部分＝そのうちコピーまで行った数。上の数字＝コピーまで行った割合。灰色の数字は参考値（10 件未満、またはまだ書いている途中のチャットがある時間）。点線の枠は、開場前・閉場後・まだ来ていない時間。",
@@ -1466,9 +1526,9 @@ function renderFlow(F, ALL) {
 }
 
 /* =====================================================================
-   タブ：投稿の質（中身と KPI）
+   タブ：みがきの質（Coach でみがいた投稿の中身と KPI）
 ===================================================================== */
-/* ---------- 投稿の質（中身と KPI） ---------- */
+/* ---------- みがきの質（中身と KPI） ---------- */
 function renderQuality(F) {
   const B = base(F), C = B.C;
   // 5 つの要素
@@ -1533,7 +1593,7 @@ function renderQuality(F) {
   const tagOf = n => { const [t, v] = n.split(":"); return `<span>${esc(t)}</span>${esc(v)}`; };
   const coHtml = `<div class="pairs">${co.map(x => `<div class="pr"${drill(`${x.a.replace(":", "：")} × ${x.b.replace(":", "：")} が出た投稿`, s => { if (!s.copied) return false; const ns = nodesOf(s); return ns.includes(x.a) && ns.includes(x.b); })} ${tipAttr(`${esc(x.a.replace(":", "："))} × ${esc(x.b.replace(":", "："))}<br>${x.c} 本・偶然に出る数の ${x.lift.toFixed(1)} 倍`)}><div class="pt">${tagOf(x.a)}<em>×</em>${tagOf(x.b)}</div><div class="pb"><i style="width:calc((100% - 150px) * ${(x.c / coMax).toFixed(4)})${x === hiL ? ";background:var(--emph)" : ""}"></i><b>${x.c}</b> 本<span class="lift${x.lift >= 1.5 ? " up" : x.lift <= .67 ? " dn" : ""}">${x.lift >= 1.5 ? "↑" : x.lift <= .67 ? "↓" : ""}偶然の ${x.lift.toFixed(1)} 倍</span></div></div>`).join("")}</div>`;
 
-  $("p-quality").innerHTML = lead("Coach でできた投稿の中身は、良いか", `コピーされた投稿文（${C.length} 本）と、チャットの答え方を見ます。KPI はチャットの答えから読む「手がかり」です。事前→事後の変化は効果検証ダッシュボードで見ます。`) +
+  $("p-quality").innerHTML = lead("Coach でみがいた投稿文の中身は、良いか", `コピーされた投稿文（${C.length} 本）と、チャットの答え方を見ます。KPI はチャットの答えから読む「手がかり」です。事前→事後の変化は効果検証ダッシュボードで見ます。`) +
     `<h3 class="subh">① だれの言葉で書かれたか<small>Coach の AI の案と、本人のことばの割合</small></h3><div class="grid">` +
     card({ id: "c-author", cls: "c5", q: "投稿文は、だれの言葉か", a: CA.length ? `<span>自分の言葉の文は <b>${fpk(auN[2], CA.length)}</b>、AI の案は ${fpk(auN[0] + auN[1], CA.length)}（そのうち手で直したのは ${fpk(auN[1], auN[0] + auN[1])}）。</span>` : "",
       why: "コピーした投稿文が、AI の案か、自分の言葉の文か（コピーした投稿文のうち）。",
@@ -1558,14 +1618,14 @@ function renderQuality(F) {
 }
 
 /* =====================================================================
-   タブ：システム／投稿の一覧／使い方 ＋ 画面の動き
+   タブ：システム／やりとり一覧／使い方 ＋ 画面の動き
 ===================================================================== */
-const TAB_L = { about: "使い方", flow: "投稿の量", quality: "投稿の質", posts: "投稿の一覧" };
+const TAB_L = { about: "使い方", flow: "使われ方", quality: "みがきの質", posts: "やりとり一覧" };
 /* 「根拠を見る」などで飛ぶ先：カードの id → [タブ, 見出し] */
 const FINDS = [
   { card: "c-key", tab: "flow", q: "Coach はどれだけ使われたか", see: "使った人・始めたチャット・コピーされた投稿文・コピー率・1 人あたり・2 本以上の人・使いごこち（日ごとの値つき）" },
-  { card: "c-funnel", tab: "flow", q: "どこで止まり、どこに時間がかかるか", see: "ファネル（前の段から減った・とばした・ここで投稿文へ）、いくつの問いに答えたか、1 本・問いごと・何本目の時間、チャットの機能、どんな人が使っているか" },
-  { card: "c-retention", tab: "flow", q: "何本つづくか", see: "本日の DROP のあと次の 1 本へ、n 本目→n+1 本目（ステンドグラスの節目）、何本コピーした人が多いか" },
+  { card: "c-funnel", tab: "flow", q: "どこで止まり、どこに時間がかかるか", see: "ファネル（前の段から減った・とばした・ここで投稿文へ）、いくつの問いに答えたか、1 本・問いごと・何本目の時間、どんな人が使っているか" },
+  { card: "c-retention", tab: "flow", q: "何本つづくか", see: "本日の DROP のあと次の 1 本へ、n 本目のコピー率（ステンドグラスの節目）、何本コピーした人が多いか、チャットの機能の使われ方" },
   { card: "c-hours", tab: "flow", q: "いつ使われ、どれだけコピーまで行ったか", see: "日×時間帯の、始めたチャットと、そのうちコピーまで行った割合（利用時間）" },
   { card: "c-rating", tab: "flow", q: "使った人の評価は", see: "使いごこち（5 段階）と、運営へのコメントで多いこと" },
   { card: "c-author", tab: "quality", q: "投稿文は、だれの言葉か", see: "AI の案をそのまま・手で直した・自分の言葉の文、問いごとに自分のことば／ヒント／とばした" },
@@ -1578,7 +1638,7 @@ const FINDS = [
 
 /* ---------- システム（アプリ開発・エンジニア） ---------- */
 let POSTQ = { q: "", st: "", lim: 40, open: null }, POSTL = [];
-/** 投稿の一覧に出ているチャットを CSV で保存（Excel で開ける。名前は「名前を伏せる」に従う） */
+/** やりとり一覧に出ているチャットを CSV で保存（Excel で開ける。名前は「名前を伏せる」に従う） */
 function postsCsv() {
   const st = s => (s.copied ? "コピー" : s.noCopy ? "コピーせず" : s.reached ? "投稿文まで" : "途中でやめた");
   const iso = t => { if (!t) return ""; const d = new Date(t), z = n => String(n).padStart(2, "0"); return `${ymd(d)} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`; };   // この端末の時刻（日本時間）で
@@ -1595,20 +1655,24 @@ function renderPosts(F) {
   const st = s => (s.copied ? ["コピー", "c-copy"] : s.noCopy ? ["コピーせず", "c-nocopy"] : s.reached ? ["投稿文まで", "c-nocopy"] : ["途中でやめた", "c-drop"]);
   const q = POSTQ.q.trim();
   const L = DF.filter(s => (!POSTQ.st || st(s)[0] === POSTQ.st) && (!q || [s.text1, s.final, nameOf(s), s.topic, s.who, FB ? s.comment : ""].join(" ").includes(q))).sort((a, b) => b.t0 - a.t0);
+  // 人ごと（「何本コピーした人が多いか」から）：本数の多い人から、人の中は 1 本目 → n 本目
+  const BP = !!(D && D.byPerson), PN = new Map();
+  if (BP) { L.forEach(s => PN.set(s.pkey, Math.max(PN.get(s.pkey) || 0, s.postTotal || 0))); const first = new Map(); L.forEach(s => first.set(s.pkey, Math.min(first.get(s.pkey) ?? Infinity, s.t0))); L.sort((a, b) => (PN.get(b.pkey) - PN.get(a.pkey)) || (first.get(a.pkey) - first.get(b.pkey)) || (a.postTotal - b.postTotal) || (a.t0 - b.t0)); }
   POSTL = L;
-  const rows = L.slice(0, POSTQ.lim).map(s => {
+  const rows = L.slice(0, POSTQ.lim).map((s, i, A) => {
     const [l, c] = st(s);
+    const grp = BP && (i === 0 || A[i - 1].pkey !== s.pkey) ? `<tr class="pgrp"><td colspan="${NC}"><b>${esc(nameOf(s))}</b><span>${PN.get(s.pkey)} 本コピー${s.profile ? `・${esc(s.profile)}` : ""}</span></td></tr>` : "";
     const main = `<tr class="prow" data-sid="${s.id}" tabindex="0"><td class="n">${mdhm(s.t0)}</td><td>${esc(nameOf(s))}</td><td class="n">${s.copied ? s.postTotal + " 本目" : "−"}</td><td>${esc(s.text1) || '<span style="color:var(--gray-ink2)">（なし）</span>'}</td><td class="txt">${esc(s.final)}</td>${FB ? `<td class="txt fbc">${s.rating != null ? `<b>${s.rating}</b> / 5` : "−"}${s.comment ? `<br>${esc(s.comment)}` : ""}</td>` : ""}<td>${esc(s.who)}</td><td>${s.ana == null ? "−" : s.ana ? sig(4, "使える") : sig(0, "まだ")}</td><td><span class="chip ${c}">${l}</span></td></tr>`;
-    if (POSTQ.open !== s.id) return main;
+    if (POSTQ.open !== s.id) return grp + main;
     const src = ["feel", "why", "who", "next"].map(k => s.st[k] ? `${STOP_L[k]}：${{ own: "自分のことば", hint: "ヒントから", skip: "とばした" }[s.st[k].src]}（${fsec(s.st[k].sec)}）` : "").filter(Boolean).join("<br>");
-    return main + `<tr class="pdet"><td colspan="${NC}"><dl class="pdet-g">
+    return grp + main + `<tr class="pdet"><td colspan="${NC}"><dl class="pdet-g">
       <div><dt>気持ち・どこが</dt><dd>${esc(s.feels.join("・") || "−")}${s.ownFeel ? `（${esc(s.ownFeel)}）` : ""}<br>${esc(s.why.join("・") || "−")}</dd><dt>しめ・今日の発見</dt><dd>${esc(s.next.join("・") || "−")}<br>${esc(s.finds.join("・") || "−")}</dd></div>
       <div><dt>答え方</dt><dd>${src || "−"}</dd><dt>みがきの間</dt><dd>${esc(s.rf.how || "−")}</dd></div>
       <div><dt>AI</dt><dd>ヒント ${esc(s.hint.st || "−")}・投稿文 ${esc(s.ai.st || "−")}（${fsec(s.ai.sec)}、${s.ai.n} 案）<br>選んだ：${esc(s.chosen || "−")}${s.edited ? "・手で直した" : ""}</dd><dt>KPI の手がかり（本人の答え）</dt><dd>${KPI4.filter(([k]) => s.kpi[k]).map(([, l]) => l).join("・") || "なし"}／AI：${esc(KPI_L[s.aiKpi])}</dd></div>
       </dl></td></tr>`;
   }).join("");
-  $("p-posts").innerHTML = lead("投稿の一覧", "投稿文とチャットの答え。行を押すと、答え方・AI・KPI の手がかりの詳細を開きます。ほかのタブのグラフの棒・マス・札を押すと、当てはまるチャットだけをここに出します。") +
-    `<div class="card c12">${D ? `<div class="drillbar"><span class="dl">絞り込み中</span><b>${esc(D.label)}</b><span class="dn">${DF.length} 件${D.all ? "（今日の記録から。上の絞り込みは使っていません）" : ""}</span><span class="sp"></span><button type="button" class="btn" id="drillBack">← もとの図へ</button><button type="button" class="btn" id="drillClear">絞り込みを解除</button></div>` : ""}<div class="ptools"><label class="vh" for="pq">ことばで探す</label><input type="search" id="pq" placeholder="ことばで探す（ひとこと・投稿文・話題・だれと）" value="${esc(POSTQ.q)}"><label for="pst" class="vh">状態</label><select id="pst"><option value="">すべての状態</option>${["コピー", "コピーせず", "投稿文まで", "途中でやめた"].map(x => `<option ${POSTQ.st === x ? "selected" : ""}>${x}</option>`).join("")}</select><span class="note" style="margin:0">${L.length} 件</span><button type="button" class="btn sm" id="pcsv"${SANDBOX ? ' disabled title="claude.ai の中では保存できません（リポジトリの HTML では使えます）"' : ' title="いま一覧に出ているチャットを 1 行ずつ CSV で保存します（名前は「名前を伏せる」に従います）"'}>CSV で保存</button></div>
+  $("p-posts").innerHTML = lead("やりとり一覧", "1 本のチャットごとに、問いへの答えと、できた投稿文（コピーされたか）を並べます。行を押すと、答え方・AI・KPI の手がかりの詳細を開きます。ほかのタブのグラフの棒・マス・札を押すと、当てはまるチャットだけをここに出します。") +
+    `<div class="card c12">${D ? `<div class="drillbar"><span class="dl">絞り込み中</span><b>${esc(D.label)}</b><span class="dn">${BP ? `${new Set(DF.map(s => s.pkey)).size} 人・` : ""}${DF.length} 件${D.all ? "（今日の記録から。上の絞り込みは使っていません）" : ""}</span><span class="sp"></span><button type="button" class="btn" id="drillBack">← もとの図へ</button><button type="button" class="btn" id="drillClear">絞り込みを解除</button></div>` : ""}<div class="ptools"><label class="vh" for="pq">ことばで探す</label><input type="search" id="pq" placeholder="ことばで探す（ひとこと・投稿文・話題・だれと）" value="${esc(POSTQ.q)}"><label for="pst" class="vh">状態</label><select id="pst"><option value="">すべての状態</option>${["コピー", "コピーせず", "投稿文まで", "途中でやめた"].map(x => `<option ${POSTQ.st === x ? "selected" : ""}>${x}</option>`).join("")}</select><span class="note" style="margin:0">${L.length} 件</span><button type="button" class="btn sm" id="pcsv"${SANDBOX ? ' disabled title="claude.ai の中では保存できません（リポジトリの HTML では使えます）"' : ' title="いま一覧に出ているチャットを 1 行ずつ CSV で保存します（名前は「名前を伏せる」に従います）"'}>CSV で保存</button></div>
     <div class="scroll"><table class="t"><thead><tr><th class="n">開始</th><th>人</th><th class="n">通算</th><th>ひとこと</th><th>投稿文</th>${FB ? "<th>使いごこち・運営へのコメント</th>" : ""}<th>だれと</th><th>分析に</th><th>状態</th></tr></thead><tbody>${rows}</tbody></table></div>
     ${L.length > POSTQ.lim ? `<p style="text-align:center;margin:12px 0 0"><button type="button" class="tab" id="pmore" style="border:1px solid var(--line2);border-radius:8px;padding:6px 14px">もっと見る（あと ${L.length - POSTQ.lim} 件）</button></p>` : ""}</div>`;
 }
@@ -1617,12 +1681,12 @@ function renderPosts(F) {
 function renderAbout() {
   const steps = [
     ["データを選ぶ", "右上の「データの読み込み方を選ぶ」で、記録用 GAS・CSV・デモを切りかえます。記録用 GAS のときは、5 分か 10 分ごとに自動で読み直せます。"],
-    ["タブを選ぶ", "「投稿の量」で、どれだけ使われ、投稿まで届いたか・続いたかを、「投稿の質」で投稿の内容と KPI の手がかりを見ます。迷ったら下の「知りたいことから探す」を押してください。"],
+    ["タブを選ぶ", "「使われ方」で、Coach がどれだけ使われ、投稿文のコピーまで届いたか・続いたかを、「みがきの質」で、Coach でみがいた投稿文の内容と KPI の手がかりを見ます。迷ったら下の「知りたいことから探す」を押してください。"],
     ["絞り込む", "上の「日・立場」で絞ると、すべての数字がその人たちだけの値に変わります。"],
-    ["くわしく見る", "図にマウスを乗せると、件数などのくわしい数字が出ます。棒・マス・下線の数字を押すと、当てはまるチャットだけを「投稿の一覧」に出します（「← もとの図へ」で戻れます）。"]
+    ["くわしく見る", "図にマウスを乗せると、件数などのくわしい数字が出ます。棒・マス・下線の数字を押すと、当てはまるチャットだけを「やりとり一覧」に出します（「← もとの図へ」で戻れます）。"]
   ];
   const stepHtml = `<div class="steps">${steps.map(([h, t], i) => `<div class="step"><h4><span class="no">${i + 1}</span>${esc(h)}</h4><p>${esc(t)}</p></div>`).join("")}</div>`;
-  // 2 列（左＝投稿の量、右＝投稿の質）。列の上と下の線をそろえ、量・質の両方にまたがる投稿の一覧は下に横いっぱい
+  // 2 列（左＝使われ方、右＝みがきの質）。列の上と下の線をそろえ、両方にまたがるやりとり一覧は下に横いっぱい
   const fbtn = r => `<button type="button" class="fd" data-goto="${r.tab}" data-card="${r.card || ""}"><span class="fq">${esc(r.q)} <span class="ft">→</span></span><span class="fs">${esc(r.see)}</span></button>`;
   const fcol = t => `<div class="fcol"><h4 class="fh">${esc(TAB_L[t])}</h4>${FINDS.filter(r => r.tab === t).map(fbtn).join("")}</div>`;
   const finder = `<div class="finder">${fcol("flow")}${fcol("quality")}</div><div class="finder-all"><h4 class="fh">${esc(TAB_L.posts)}</h4>${FINDS.filter(r => r.tab === "posts").map(fbtn).join("")}</div>`;
@@ -1642,7 +1706,7 @@ function renderAbout() {
     ["コピー率", "始めたチャットのうち、コピーまで行った割合。1 人あたりの本数と「2 本以上」は、コピーした人のうちで数えます"],
     ["やめた・とばした", "その問いでやめた＝その問いが出たあと、投稿文ができる前に閉じたチャット。「ここまでで投稿文へ」で先に進んだ人は、やめたに数えません。とばした＝答えずに次へ進んだチャット"],
     ["KPI の手がかり", "本人の答え（だれと・しめ・今日の発見・その人のふだん）から読みます。AI の読み取りは、一致を見るためだけに使います"],
-    ["書いている途中", `「開始」の記録だけで始めて ${CONFIG.IN_PROGRESS_MIN} 分以内のチャットは、まだ書いている途中として集計に入れません（投稿の量の「主な数字」に件数を書きます）`],
+    ["書いている途中", `「開始」の記録だけで始めて ${CONFIG.IN_PROGRESS_MIN} 分以内のチャットは、まだ書いている途中として集計に入れません（使われ方の「主な数字」に件数を書きます）`],
     ["名前", "名前は既定では出します。画面を人に見せるときは右上の「名前を伏せる」をオンにします（参加者001 のような番号になります）。人ごとのランキングは作りません"]
   ];
   const ruleHtml = `<dl class="rules">${rules.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join("")}</dl>`;
@@ -1810,7 +1874,7 @@ $("tablist").addEventListener("click", e => { const b = e.target.closest("[data-
 $("tablist").addEventListener("keydown", e => { if (!["ArrowRight", "ArrowLeft"].includes(e.key)) return; const i = TABS.indexOf(CUR), j = (i + (e.key === "ArrowRight" ? 1 : -1) + TABS.length) % TABS.length; go(TABS[j]); $("t-" + TABS[j]).focus(); });
 document.addEventListener("click", e => {
   const dk = e.target.closest("[data-drill]");
-  if (dk) {   // 図のその部分 → 投稿の一覧（当てはまるチャットだけ）
+  if (dk) {   // 図のその部分 → やりとり一覧（当てはまるチャットだけ）
     const x = DRL[+dk.dataset.drill]; if (!x) return;
     const cards = [...$("p-" + CUR).querySelectorAll(".card")];
     DRILL = { ...x, from: CUR, fromIdx: cards.indexOf(dk.closest(".card")) };
