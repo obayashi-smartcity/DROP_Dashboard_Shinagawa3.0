@@ -1071,7 +1071,7 @@ function stack100(rows, segs) {
 /** 日ごとの時間帯の棒（日が行）。棒の高さ＝始めたチャット、濃い部分＝そのうちコピーまで行った数、上の数字＝コピーまで行った割合。
     o.days: [{ label, cells: [{ na, n, k, thin, tip, drill }] }]、o.hours: 列の名前、o.emph: { d, i }（注目のマス） */
 function dayHourBars(o) {
-  const W = o.w || 1000, L = 112, R = 8, rowH = 112, T = 6, n = o.hours.length, cw = (W - L - R) / n, bw = Math.min(46, cw * .62);
+  const W = o.w || 1000, L = o.lw || 112, R = 8, rowH = 112, T = 6, n = o.hours.length, cw = (W - L - R) / n, bw = Math.min(46, cw * .62);
   const max = Math.max(1, ...o.days.flatMap(d => d.cells.map(c => c.n || 0))), bh = 66;
   const H = T + o.days.length * rowH + 22;
   let g = "";
@@ -1143,6 +1143,9 @@ const bucketOf = k => (BUCKETS.find(b => b[1](k)) || BUCKETS[0])[0];
 const KPI4 = [["c1", "①挑戦"], ["c2", "②属性横断"], ["c3", "③心理的安全性"], ["att", "街への愛着"]];
 const KPI_L = Object.fromEntries(KPI4.concat([["none", "該当なし"]]));
 
+/** その人がこの端末でコピーした通算の本数（0 本もある）。コピーしたチャットは「通算何本目」、しなかったチャットは「次にコピーすれば何本目」なので －1 */
+const copiedTot = s => s.copied ? (s.postTotal || 1) : Math.max(0, (s.postTotal || 1) - 1);
+function totByPerson(L) { const m = new Map(); L.forEach(s => m.set(s.pkey, Math.max(m.get(s.pkey) ?? 0, copiedTot(s)))); return m; }
 function base(F) {
   const T1 = F.filter(s => s.st.text1), R = F.filter(s => s.reached), C = F.filter(s => s.copied);
   const A = C.filter(s => s.ana != null);
@@ -1399,10 +1402,10 @@ function renderFlow(F, ALL) {
   const pts = ret.map(r => ({ x: `${r.n}本目`, v: r.at ? r.p : null, n: r.at, e: r.n === 5, lab: r.at >= SMALL ? fp(r.p) : "", tip: `<b>${r.n} 本目のチャット</b>${r.n === 5 ? "（バラ窓がそろう）" : r.n === 10 ? "（金のふちどり）" : ""}<br>始めた ${r.at} 件のうち ${r.go} 件をコピー（${fp(r.p)}）${r.at < SMALL ? "<br>10 件未満の参考値" : `<br>${ciText(r.go, r.at)}`}` }));
   const retChart = lineChart({ points: pts, w: 620, h: 250, max: 100, step: 25, unit: "%", ref: allCopy, refLabel: `すべて ${fp(allCopy)}`, vlines: [{ i: 4, on: true, label: "バラ窓がそろう" }, { i: 9, on: true, label: "金のふちどり" }], label: "n 本目のチャットのコピー率" });
   // 通算本数の分布（人）
-  const maxT = new Map(); F.filter(s => s.copied).forEach(s => maxT.set(s.pkey, Math.max(maxT.get(s.pkey) || 0, s.postTotal)));
-  const DB = [["1本", v => v === 1], ["2本", v => v === 2], ["3本", v => v === 3], ["4本", v => v === 4], ["5本", v => v === 5], ["6〜9本", v => v >= 6 && v <= 9], ["10本以上", v => v >= 10]];
+  const maxT = totByPerson(F);   // 使った人ぜんぶ（0 本の人もふくむ）
+  const DB = [["0本", v => v === 0], ["1本", v => v === 1], ["2本", v => v === 2], ["3本", v => v === 3], ["4本", v => v === 4], ["5本", v => v === 5], ["6〜9本", v => v >= 6 && v <= 9], ["10本以上", v => v >= 10]];
   const vals = [...maxT.values()], dist = DB.map(([l, f]) => [l, vals.filter(f).length]);
-  const distBars = hbars(DB.map(([l, f], i) => { const v = dist[i][1]; return { label: l, v, e: l === "5本", txt: `<b>${v}</b> 人　${fpk(v, vals.length)}`, drill: v ? drill(`通算 ${l} コピーした人`, s => !!s.copied && f(maxT.get(s.pkey) || 0), { byPerson: true }) : "" }; }));
+  const distBars = hbars(DB.map(([l, f], i) => { const v = dist[i][1]; return { label: l, v, e: l === "5本", txt: `<b>${v}</b> 人　${fpk(v, vals.length)}`, drill: v ? drill(i === 0 ? "コピーしなかった人（通算 0 本）" : `通算 ${l} コピーした人`, s => f(maxT.get(s.pkey) ?? 0) && (i === 0 || !!s.copied), { byPerson: true }) : "" }; }));
   // 次の 1 本
   const C = F.filter(s => s.copied), nxAll = nextAfter(C), nxDay = nextAfter(C.filter(s => !s.night)), nxNight = nextAfter(C.filter(s => s.night));
   const nxB = BUCKETS.map(([l, f]) => [l, nextAfter(C.filter(s => f(s.postTotal)))]);
@@ -1426,7 +1429,7 @@ function renderFlow(F, ALL) {
     return { h, n: st.length, k, p, thin: st.length < SMALL || live, tip: st.length ? `<b>${d} ${h}時台に始めたチャット</b><br>${st.length} 件・そのうちコピーまで ${k} 件（${fp(p)}）${st.length < SMALL ? "<br>10 件未満の参考値" : live ? "<br>まだ書いている途中のチャットがあるので参考値" : ""}` : `<b>${d} ${h}時台</b><br>始めたチャットなし`, drill: st.length ? drill(`${d} ${h}時台に始めたチャット`, s => s.t0 >= a && s.t0 < b) : "" }; }) }));
   let sTop = null, cLow = null;
   DH.forEach((r, ri) => r.cells.forEach((c, ci) => { if (c.na) return; if (!sTop || c.n > sTop.n) sTop = { ...c, d: r.d }; if (!c.thin && c.n && (!cLow || c.p < cLow.p)) cLow = { ...c, d: r.d, ri, ci }; }));
-  const dhChart = dayHourBars({ days: DH, hours: hours.map(h => h + "時"), emph: cLow ? { d: cLow.ri, i: cLow.ci } : null, label: "日と時間帯ごとの、始めたチャットと、そのうちコピーまで行った数" });
+  const dhChart = dayHourBars({ w: 620, lw: 96, days: DH, hours: hours.map(h => h + "時"), emph: cLow ? { d: cLow.ri, i: cLow.ci } : null, label: "日と時間帯ごとの、始めたチャットと、そのうちコピーまで行った数" });
   // 立場・話し方・文字の大きさ
   const B0 = base(F), allPer = B0.C.length / (B0.copiers || 1);
   const seg = (label, pf) => { const G = base(F.filter(pf)); const per = G.C.length / (G.copiers || 1); return { label, G, per, pf }; };
@@ -1457,13 +1460,13 @@ function renderFlow(F, ALL) {
   const ansHtml = `<div class="agrid"><div class="pan">${panel("答えた問いの数（平均）", ansN == null ? null : ansN / 4 * 100, "気持ち・どこが・だれと・しめ の 4 つのうち", { v: fn(ansN, 1), unit: "／ 4" })}${panel("任意の問いにも答えた", pct(exY, ex.length), `最後まで答えた ${ex.length} 件のうち（ひみつの部屋）`)}</div><div>
     <h4 style="margin:0 0 6px">いくつ答えたか（投稿文まで行ったチャット）</h4><div class="lg">${ANS_SEG.map(x => `<span><i style="background:${x[1]}"></i>${x[0]}</span>`).join("")}</div>${stack100([{ label: "答えた問い", vals: ansDist, drills: [4, 3, 2, 1, 0].map(n => drill(`答えた問いが ${n ? n + " つ" : "0"}のチャット（投稿文まで）`, s => !!s.reached && ansOf(s) === n)) }], ANS_SEG)}</div></div>`;
   // かかった時間
-  const durChart = durHist({ secs: R.map(s => s.dur), label: "投稿文ができるまでの時間の分布", drill: (l, lo, hi) => drill(`投稿文までの時間が ${l} のチャット`, s => !!s.reached && s.dur / 60 >= lo && s.dur / 60 < hi) });
+  const durChart = durHist({ secs: R.map(s => s.dur), label: "投稿文ができるまでの時間の分布", drill: (l, lo, hi) => drill(`投稿文までの時間が ${l} のチャット`, s => !!s.reached && s.dur / 60 >= lo && s.dur / 60 < hi, { dur: true }) });
   const QT = [["text1", "ひとこと"], ["feel", "気持ち"], ["why", "どこが"], ["who", "だれと"], ["reflect", "みがきの間"], ["next", "しめ"]].map(([k, l]) => [l, median(F.filter(s => s.st[k]).map(s => s.st[k].sec)), F.filter(s => s.st[k]).length]);
   const qtMax = Math.max(...QT.map(x => x[1] || 0)), qtTop = QT.find(x => x[1] === qtMax);
   const stepBars = hbars(QT.map(([l, v, n]) => ({ label: l, v: v || 0, e: v === qtMax, txt: `<b>${fsec(v)}</b>`, tip: `<b>${l}</b>：中央値 ${fsec(v)}（${n} 件）` })));
   const NTH = [["1本目", k => k === 1], ["2本目", k => k === 2], ["3〜5本目", k => k >= 3 && k <= 5], ["6本目以降", k => k >= 6]].map(([l, f]) => { const L = Cc.filter(s => f(s.postTotal)); return [l, median(L.map(s => s.dur)), L.length, f]; });
   const nthMax = Math.max(...NTH.map(x => x[1] || 0));
-  const nthBars = hbars(NTH.map(([l, v, n, f]) => ({ label: l, v: v || 0, n, e: v != null && v === nthMax, txt: `<b>${fsec(v)}</b>（${n} 件）`, drill: n ? drill(`${l}のチャット（コピーしたもの）`, s => !!s.copied && f(s.postTotal)) : "" })));
+  const nthBars = hbars(NTH.map(([l, v, n, f]) => ({ label: l, v: v || 0, n, e: v != null && v === nthMax, txt: `<b>${fsec(v)}</b>（${n} 件）`, drill: n ? drill(`${l}のチャット（コピーしたもの）`, s => !!s.copied && f(s.postTotal), { dur: true }) : "" })));
   // 始めた時刻：コピーと同じ「日×時間帯」のマス
 
   // ---- チャットの機能の使われ方（パネル）
@@ -1481,7 +1484,7 @@ function renderFlow(F, ALL) {
   const KDL = d => `${d}${live(d) ? `（${hm(CTX.now)} まで）` : ""}`;
   const perDay = f => KD.length > 1 ? `<div class="kd">${KD.map(d => `<span>${esc(KDL(d))} <b>${f(F.filter(s => s.day === d))}</b></span>`).join("")}</div>` : "";
   const copiersOf = L => uniq(L.filter(s => s.copied).map(s => s.pkey)).length;
-  const maxTot = L => { const m = new Map(); L.filter(s => s.copied).forEach(s => m.set(s.pkey, Math.max(m.get(s.pkey) || 0, s.postTotal))); return [...m.values()]; };
+  const maxTot = L => [...totByPerson(L).values()];   // 0 本の人もふくむ
   const multiP = L => { const v = maxTot(L); return pct(v.filter(x => x >= 2).length, v.length); };
   const RT = Cc.filter(s => s.rating != null), rtMean = mean(RT.map(s => s.rating));
   const KT = [
@@ -1489,8 +1492,8 @@ function renderFlow(F, ALL) {
     { l: "始めたチャット", v: `${F.length}`, u: "件", s: "写真をえらぶ画面から", d: L => `${L.length} 件`, drill: drill("始めたチャット（すべて）", () => true) },
     { l: "コピーされた投稿文", v: `${Cc.length}`, u: "本", s: `コピーした人 ${copiersOf(F)} 人`, d: L => `${L.filter(s => s.copied).length} 本`, drill: drill("コピーされた投稿文", s => !!s.copied) },
     { l: "コピー率", v: fp(pct(Cc.length, F.length)), u: "", s: (([lo, hi]) => `始めたチャットのうち${lo == null ? "" : `・ぶれの幅 ${lo.toFixed(0)}〜${hi.toFixed(0)}%`}`)(wilson(Cc.length, F.length)), d: L => fpk(L.filter(s => s.copied).length, L.length) },
-    { l: "1 人あたり", v: fn(Cc.length / (copiersOf(F) || 1), 1), u: "本", s: "コピーした人の平均", d: L => `${fn(L.filter(s => s.copied).length / (copiersOf(L) || 1), 1)} 本` },
-    { l: "2 本以上コピーした人", v: fp(multiP(F)), u: "", s: "コピーした人のうち（通算）", d: L => fp(multiP(L)) },
+    { l: "1 人あたり", v: fn(Cc.length / (uniq(F.map(s => s.pkey)).length || 1), 1), u: "本", s: "使った人の平均（0 本の人もふくむ）", d: L => `${fn(L.filter(s => s.copied).length / (uniq(L.map(s => s.pkey)).length || 1), 1)} 本` },
+    { l: "2 本以上コピーした人", v: fp(multiP(F)), u: "", s: "使った人のうち（0 本の人もふくむ・通算）", d: L => fp(multiP(L)) },
     { l: "使いごこち", v: fn(rtMean, 1), u: "／5", s: `答えた ${RT.length} 人・4 以上 ${fpk(RT.filter(s => s.rating >= 4).length, RT.length)}`, d: L => fn(mean(L.filter(s => s.copied && s.rating != null).map(s => s.rating)), 1), drill: drill("使いごこちに答えたチャット", s => s.rating != null) }
   ];
   const keyHtml = `<div class="tiles ktiles">${KT.map(t => `<div class="tile"${t.drill || ""}><div class="l">${esc(t.l)}</div><div class="v">${t.v}${t.u ? `<small>${esc(t.u)}</small>` : ""}</div><div class="s">${t.s}</div>${perDay(L => t.d(L))}</div>`).join("")}</div>`;
@@ -1508,22 +1511,22 @@ function renderFlow(F, ALL) {
       body: `<div class="scroll">${fFull}</div><p class="note">前の段から減った＝その段に進まずにやめた件数（前の段のうちの%）。とばした＝その問いが出たうち、答えずに次へ進んだ割合（みがきの間は「どれもちがう」「出なかった」）。ここで投稿文へ＝その問いが出たうち、そこで先に投稿文をつくった割合（やめた人には数えません）。マゼンタの字＝その列でいちばん多い問い。</p>` }) +
     card({ cls: "c12", q: "いくつの問いに答えたか", a: `<span>平均 <b>${fn(ansN, 1)}</b> / 4 問。4 つとも答えたのは ${fpk(ansDist[0], R.length)}。</span>`, body: ansHtml }) +
     card({ cls: "c12", q: "1 本にかかった時間", a: `<span>投稿文までの時間は中央値 <b>${fsec(md)}</b>。いちばん時間がかかる問いは <b>${esc(qtTop ? qtTop[0] : "−")}</b>（${fsec(qtMax)}）。</span>`,
-      body: `<div class="tgrid"><div><h4>1 本にかかった時間（始めてから投稿文ができるまで）</h4>${durChart}<p class="note">棒の上＝チャットの件数（全体のうちの割合）。区切りは 20 分までは 5 分ごと、そのあとは 20〜30 分・30〜60 分・60〜120 分・120 分〜（「〜」は以上・未満）。AI の待ち時間や、途中で会場を回っていた時間も含みます。</p></div><div class="tsub"><div class="tsub-g"><div><div class="tsub-h">補足：時間の内訳</div><h4>どの問いに時間がかかるか</h4>${stepBars}<p class="note">問いごとの中央値。問いが出てから答えるまで。</p></div><div><div class="tsub-h">補足：本数との関係</div><h4>複数本つくると、時間は変わるか</h4>${nthBars}<p class="note">何本目ごとの、1 本にかかった時間の中央値（コピーしたチャット）。何本目＝この端末でコピーした通算の本数。</p></div></div></div></div>` }) +
-    card({ id: "c-who", cls: "c12", q: "どんな人が使っているか（立場）", why: "使った人の、立場ごとの内訳。人＝全体の何%か。コピー率＝始めたチャットのうちコピーまで行った割合で、ほかの立場の人より、ぶれを見込んでもはっきり高い・低いところに ↑↓ と色（良し悪しではない差）。10 件未満は灰色の参考値。行を押すと、その人たちのチャットを一覧で見られます。", body: `<div class="scroll">${table([["区分"], ["人（全体のうち）"], ["チャット", "n"], ["コピー率", "n"]], segRows)}</div>` }) +
-    card({ id: "c-hours", cls: "c12", q: "いつ使われ、どれだけコピーまで行ったか（日×時間帯）", a: sTop ? `<span>いちばん多く始めたのは <b>${sTop.d} ${sTop.h}時台</b>（${sTop.n} 件）。${cLow ? `コピーまで行った割合がいちばん低いのは <b>${cLow.d} ${cLow.h}時台</b>（${fp(cLow.p)}、${cLow.n} 件のうち ${cLow.k} 件）。` : ""}</span>` : "",
+      body: `<div class="tgrid"><div><h4>1 本にかかった時間（始めてから投稿文ができるまで）</h4>${durChart}<p class="note">棒の上＝チャットの件数（全体のうちの割合）。区切りは 20 分までは 5 分ごと、そのあとは 20〜30 分・30〜60 分・60〜120 分・120 分〜（「〜」は以上・未満）。AI の待ち時間や、途中で会場を回っていた時間も含みます。</p></div><div class="tsub"><div class="tsub-g"><div><div class="tsub-h">補足：時間の内訳</div><h4>どの問いに時間がかかるか</h4>${stepBars}<p class="note">問いごとの中央値。問いが出てから答えるまで。</p></div><div><div class="tsub-h">補足：本数との関係</div><h4>複数本つくると、時間は変わるか</h4>${nthBars}<p class="note">何本目ごとの、1 本にかかった時間の中央値（コピーしたチャットだけ。0 本の人は入りません）。何本目＝この端末でコピーした通算の本数。</p></div></div></div></div>` }) +
+    card({ id: "c-who", cls: "c6", q: "どんな人が使っているか（立場）", why: "使った人の、立場ごとの内訳。人＝全体の何%か。コピー率＝始めたチャットのうちコピーまで行った割合で、ほかの立場の人より、ぶれを見込んでもはっきり高い・低いところに ↑↓ と色（良し悪しではない差）。10 件未満は灰色の参考値。行を押すと、その人たちのチャットを一覧で見られます。", body: `<div class="scroll">${table([["区分"], ["人（全体のうち）"], ["チャット", "n"], ["コピー率", "n"]], segRows)}</div>` }) +
+    card({ id: "c-hours", cls: "c6", q: "いつ使われ、どれだけコピーまで行ったか（日×時間帯）", a: sTop ? `<span>いちばん多く始めたのは <b>${sTop.d} ${sTop.h}時台</b>（${sTop.n} 件）。${cLow ? `コピーまで行った割合がいちばん低いのは <b>${cLow.d} ${cLow.h}時台</b>（${fp(cLow.p)}、${cLow.n} 件のうち ${cLow.k} 件）。` : ""}</span>` : "",
       why: "棒の高さ＝その 1 時間に始めたチャットの数。濃い部分＝そのうちコピーまで行った数。上の数字＝コピーまで行った割合。灰色の数字は参考値（10 件未満、またはまだ書いている途中のチャットがある時間）。点線の枠は、開場前・閉場後・まだ来ていない時間。",
       body: `<div class="lg"><span><i style="background:var(--struct2)"></i>コピーまで行った</span><span><i style="background:var(--gray)"></i>コピーまで行かなかった</span><span><i style="background:var(--emph)"></i>コピーまで行った割合がいちばん低い時間</span></div><div class="scroll">${dhChart}</div>` }) +
-    `</div><h3 class="subh">② コピーのあと、次の 1 本へ<small>ステンドグラス（本日の DROP）は、もう 1 本につながっているか・チャットの機能は使われているか</small></h3><div class="grid">` +
-    card({ cls: "c6", q: "本日の DROP を見たあと、もう 1 本つくったか", a: `<span>コピーのあと次の 1 本を始めたのは <b>${fp(nxAll.p)}</b>（${nxAll.k}/${nxAll.n} 本）。${nxLow ? `いちばん低いのは <b>${nxLows.map(([l]) => esc(NXL[l] || l)).join("・")}</b>（${fp(nxLow[1].p)}${nxLows.length > 1 ? "・同率" : ""}）。` : ""}</span>`,
-      why: "コピーした投稿文のうち、同じ人が次のチャットを始めた割合（時間は問わない）。",
-      body: `${nxBars}<p class="note">点線＝すべての値。色＝いちばん低いところ。薄い棒＝10 件未満の参考値。マウスを乗せると、ぶれの幅が出ます。</p>` }) +
+    `</div><h3 class="subh">② コピーのあと、次の 1 本へ<small>何本コピーしたか・n 本目もコピーまで行くか・ステンドグラス（本日の DROP）はもう 1 本につながっているか・チャットの機能</small></h3><div class="grid">` +
+    card({ id: "c-copies", cls: "c12", q: "何本コピーした人が多いか", a: `<span>使った ${vals.length} 人のうち、1 本もコピーしなかった人は <b>${dist[0][1]}</b> 人（${fpk(dist[0][1], vals.length)}）。5 本（バラ窓がそろう）で止まった人は <b>${dist[5][1]}</b> 人。</span>`, why: "人ごとの、通算でコピーした本数（この端末）。0 本＝使ったが、まだ 1 本もコピーしていない人もふくめます。棒を押すと、その人たちのやりとりを、人ごとに 1 本目から順に出します。", body: distBars }) +
     card({ id: "c-retention", cls: "c6", q: "n 本目のコピー率", a: r1 && r1.at ? `<span>1 本目のコピー率は <b>${fp(r1.p)}</b>${r5 && r5.at ? `、5 本目（バラ窓がそろう）は <b>${fp(r5.p)}</b>（${r5.go}/${r5.at} 件${r5.at < SMALL ? "・参考" : ""}）` : ""}。</span>` : "",
       why: "n 本目のチャットのうち、コピーまで行った割合。n 本目＝その人（端末）がそれまでにコピーした本数＋1。点線＝すべてのチャットのコピー率。白い点は 10 件未満の参考値。", body: retChart,
       table: table([["n 本目"], ["始めたチャット", "n"], ["コピーした", "n"], ["コピー率", "n"]], ret.map(r => ({ thin: r.at < SMALL, cls: r.n === 5 ? "hi" : "", cells: [`${r.n} 本目`, `${r.at}`, `${r.go}`, fp(r.p)] }))) }) +
-    card({ cls: "c12", q: "何本コピーした人が多いか", a: `<span>5 本（バラ窓がそろう）で止まった人は <b>${dist[4][1]}</b> 人。</span>`, why: "人ごとの、いちばん大きい通算の本数（この端末でコピーした数）。棒を押すと、その人たちの投稿文を、人ごとに 1 本目から順に出します。", body: distBars }) +
+    card({ cls: "c6", q: "本日の DROP を見たあと、もう 1 本つくったか", a: `<span>コピーのあと次の 1 本を始めたのは <b>${fp(nxAll.p)}</b>（${nxAll.k}/${nxAll.n} 本）。${nxLow ? `いちばん低いのは <b>${nxLows.map(([l]) => esc(NXL[l] || l)).join("・")}</b>（${fp(nxLow[1].p)}${nxLows.length > 1 ? "・同率" : ""}）。` : ""}</span>`,
+      why: "コピーした投稿文のうち、同じ人が次のチャットを始めた割合（時間は問わない）。コピーが起点なので 0 本の人は入りません。",
+      body: `${nxBars}<p class="note">点線＝すべての値。色＝いちばん低いところ。薄い棒＝10 件未満の参考値。マウスを乗せると、ぶれの幅が出ます。</p>` }) +
     card({ id: "c-features", cls: "c12", q: "チャットの機能は、どれくらい使われているか", a: `<span>いちばん使われているのは <b>${esc(featTop[0])}</b>（${fp(featTop[1])}）、少ないのは <b>${esc(featLow[0])}</b>（${fp(featLow[1])}）。</span>`, why: "写真・見本・投稿イメージ・AI の案・手直し・話し方・文字の大きさなど、チャットの中の機能ごとに、使った割合。", body: featHtml }) +
     `</div><h3 class="subh">③ 使った人の評価<small>コピーのあとに任意で聞く使いごこちと、運営へのコメント</small></h3><div class="grid">` +
-    card({ id: "c-rating", cls: "c5", q: "使いごこちは何点か", a: `<span>平均 <b>${fn(rtMean, 1)}</b> / 5（${RT.length} 人）。4 以上は <b>${fpk(RT.filter(s => s.rating >= 4).length, RT.length)}</b>。</span>`, why: "このチャットの使いごこちを 5 段階で（イベントの満足度ではありません）。答えるのは任意で、コピーした人だけです。棒を押すと、その点をつけたチャットの一覧が、投稿文と運営へのコメントを並べて出ます。", body: rtBars }) +
+    card({ id: "c-rating", cls: "c5", q: "使いごこちは何点か", a: `<span>平均 <b>${fn(rtMean, 1)}</b> / 5（${RT.length} 人）。4 以上は <b>${fpk(RT.filter(s => s.rating >= 4).length, RT.length)}</b>。</span>`, why: "このチャットの使いごこちを 5 段階で（イベントの満足度ではありません）。答えるのは任意で、コピーのあとに聞くので 0 本の人は入りません。棒を押すと、その点をつけたチャットの一覧が、投稿文と運営へのコメントを並べて出ます。", body: rtBars }) +
     card({ id: "c-comments", cls: "c7", q: "コメントで多いこと", a: themes.length ? `<span>いちばん多いのは <b>${esc(themes[0][0])}</b> について（${themes[0][1]} 件／コメント ${CM.length} 件）。</span>` : "<span>コメントはまだありません。</span>", why: "運営へのコメント（任意）を、ことばで分けて数えています。棒を押すと、そのコメントを書いたチャットの一覧が、投稿文と運営へのコメントを並べて出ます。", body: thBars }) +
     `</div>`
 }
@@ -1629,7 +1632,7 @@ const FINDS = [
   { card: "c-key", tab: "flow", q: "Coach はどれだけ使われたか", see: "使った人・始めたチャット・コピーされた投稿文・コピー率・1 人あたり・2 本以上の人・使いごこち（日ごとの値つき）" },
   { card: "c-funnel", tab: "flow", q: "どこで止まり、どこに時間がかかるか", see: "ファネル（前の段から減った・とばした・ここで投稿文へ）、いくつの問いに答えたか、1 本にかかった時間（補足：問いごとの内訳・複数本つくると変わるか）、どんな人が使っているか" },
   { card: "c-hours", tab: "flow", q: "いつ使われ、どれだけコピーまで行ったか", see: "日×時間帯の、始めたチャットと、そのうちコピーまで行った割合（利用時間）" },
-  { card: "c-retention", tab: "flow", q: "何本つづくか", see: "本日の DROP のあと次の 1 本へ、n 本目のコピー率（ステンドグラスの節目）、何本コピーした人が多いか、チャットの機能の使われ方" },
+  { card: "c-copies", tab: "flow", q: "何本つづくか", see: "何本コピーした人が多いか（0 本の人もふくむ）、n 本目のコピー率（ステンドグラスの節目）、本日の DROP のあと次の 1 本へ、チャットの機能の使われ方" },
   { card: "c-rating", tab: "flow", q: "使った人の評価は", see: "使いごこち（5 段階）と、運営へのコメントで多いこと" },
   { card: "c-author", tab: "quality", q: "投稿文は、だれの言葉か", see: "AI の案をそのまま・手で直した・自分の言葉の文、問いごとに自分のことば／ヒント／とばした" },
   { card: "c-elements", tab: "quality", q: "投稿の中身は具体的か。本数を重ねても薄まらないか", see: "5 つの要素、通算の本数ごとの自分のことば・分析に使える・しめが薄い・AI の案・手直し" },
@@ -1654,18 +1657,18 @@ function postsCsv() {
   downloadCsv(`drop_coach_posts_${ymd(new Date())}.csv`, [cols.map(c => c[0])].concat(POSTL.map(s => cols.map(c => c[1](s)))));
 }
 function renderPosts(F) {
-  const D = DRILL, FB = !!(D && D.fb), NC = FB ? 9 : 8, DF = D ? F.filter(s => { try { return !!D.pred(s); } catch (e) { return false; } }) : F;
+  const D = DRILL, FB = !!(D && D.fb), DU = !!(D && D.dur), NC = 8 + (FB ? 1 : 0) + (DU ? 1 : 0), DF = D ? F.filter(s => { try { return !!D.pred(s); } catch (e) { return false; } }) : F;
   const st = s => (s.copied ? ["コピー", "c-copy"] : s.noCopy ? ["コピーせず", "c-nocopy"] : s.reached ? ["投稿文まで", "c-nocopy"] : ["途中でやめた", "c-drop"]);
   const q = POSTQ.q.trim();
   const L = DF.filter(s => (!POSTQ.st || st(s)[0] === POSTQ.st) && (!q || [s.text1, s.final, nameOf(s), s.topic, s.who, FB ? s.comment : ""].join(" ").includes(q))).sort((a, b) => b.t0 - a.t0);
   // 人ごと（「何本コピーした人が多いか」から）：本数の多い人から、人の中は 1 本目 → n 本目
   const BP = !!(D && D.byPerson), PN = new Map();
-  if (BP) { L.forEach(s => PN.set(s.pkey, Math.max(PN.get(s.pkey) || 0, s.postTotal || 0))); const first = new Map(); L.forEach(s => first.set(s.pkey, Math.min(first.get(s.pkey) ?? Infinity, s.t0))); L.sort((a, b) => (PN.get(b.pkey) - PN.get(a.pkey)) || (first.get(a.pkey) - first.get(b.pkey)) || (a.postTotal - b.postTotal) || (a.t0 - b.t0)); }
+  if (BP) { L.forEach(s => PN.set(s.pkey, Math.max(PN.get(s.pkey) ?? 0, copiedTot(s)))); const first = new Map(); L.forEach(s => first.set(s.pkey, Math.min(first.get(s.pkey) ?? Infinity, s.t0))); L.sort((a, b) => (PN.get(b.pkey) - PN.get(a.pkey)) || (first.get(a.pkey) - first.get(b.pkey)) || (a.postTotal - b.postTotal) || (a.t0 - b.t0)); }
   POSTL = L;
   const rows = L.slice(0, POSTQ.lim).map((s, i, A) => {
     const [l, c] = st(s);
     const grp = BP && (i === 0 || A[i - 1].pkey !== s.pkey) ? `<tr class="pgrp"><td colspan="${NC}"><b>${esc(nameOf(s))}</b><span>${PN.get(s.pkey)} 本コピー${s.profile ? `・${esc(s.profile)}` : ""}</span></td></tr>` : "";
-    const main = `<tr class="prow" data-sid="${s.id}" tabindex="0"><td class="n">${mdhm(s.t0)}</td><td>${esc(nameOf(s))}</td><td class="n">${s.copied ? s.postTotal + " 本目" : "−"}</td><td>${esc(s.text1) || '<span style="color:var(--gray-ink2)">（なし）</span>'}</td><td class="txt">${esc(s.final)}</td>${FB ? `<td class="txt fbc">${s.rating != null ? `<b>${s.rating}</b> / 5` : "−"}${s.comment ? `<br>${esc(s.comment)}` : ""}</td>` : ""}<td>${esc(s.who)}</td><td>${s.ana == null ? "−" : s.ana ? sig(4, "使える") : sig(0, "まだ")}</td><td><span class="chip ${c}">${l}</span></td></tr>`;
+    const main = `<tr class="prow" data-sid="${s.id}" tabindex="0"><td class="n">${mdhm(s.t0)}</td><td>${esc(nameOf(s))}</td><td class="n">${s.copied ? s.postTotal + " 本目" : "−"}</td>${DU ? `<td class="n">${s.dur != null ? esc(fsec(s.dur)) : "−"}</td>` : ""}<td>${esc(s.text1) || '<span style="color:var(--gray-ink2)">（なし）</span>'}</td><td class="txt">${esc(s.final)}</td>${FB ? `<td class="txt fbc">${s.rating != null ? `<b>${s.rating}</b> / 5` : "−"}${s.comment ? `<br>${esc(s.comment)}` : ""}</td>` : ""}<td>${esc(s.who)}</td><td>${s.ana == null ? "−" : s.ana ? sig(4, "使える") : sig(0, "まだ")}</td><td><span class="chip ${c}">${l}</span></td></tr>`;
     if (POSTQ.open !== s.id) return grp + main;
     const src = ["feel", "why", "who", "next"].map(k => s.st[k] ? `${STOP_L[k]}：${{ own: "自分のことば", hint: "ヒントから", skip: "とばした" }[s.st[k].src]}（${fsec(s.st[k].sec)}）` : "").filter(Boolean).join("<br>");
     return grp + main + `<tr class="pdet"><td colspan="${NC}"><dl class="pdet-g">
@@ -1676,7 +1679,7 @@ function renderPosts(F) {
   }).join("");
   $("p-posts").innerHTML = lead("やりとり一覧", "1 本のチャットごとに、問いへの答えと、できた投稿文（コピーされたか）を並べます。行を押すと、答え方・AI・KPI の手がかりの詳細を開きます。ほかのタブのグラフの棒・マス・札を押すと、当てはまるチャットだけをここに出します。") +
     `<div class="card c12">${D ? `<div class="drillbar"><span class="dl">絞り込み中</span><b>${esc(D.label)}</b><span class="dn">${BP ? `${new Set(DF.map(s => s.pkey)).size} 人・` : ""}${DF.length} 件${D.all ? "（今日の記録から。上の絞り込みは使っていません）" : ""}</span><span class="sp"></span><button type="button" class="btn" id="drillBack">← もとの図へ</button><button type="button" class="btn" id="drillClear">絞り込みを解除</button></div>` : ""}<div class="ptools"><label class="vh" for="pq">ことばで探す</label><input type="search" id="pq" placeholder="ことばで探す（ひとこと・投稿文・話題・だれと）" value="${esc(POSTQ.q)}"><label for="pst" class="vh">状態</label><select id="pst"><option value="">すべての状態</option>${["コピー", "コピーせず", "投稿文まで", "途中でやめた"].map(x => `<option ${POSTQ.st === x ? "selected" : ""}>${x}</option>`).join("")}</select><span class="note" style="margin:0">${L.length} 件</span><button type="button" class="btn sm" id="pcsv"${SANDBOX ? ' disabled title="claude.ai の中では保存できません（リポジトリの HTML では使えます）"' : ' title="いま一覧に出ているチャットを 1 行ずつ CSV で保存します（名前は「名前を伏せる」に従います）"'}>CSV で保存</button></div>
-    <div class="scroll"><table class="t"><thead><tr><th class="n">開始</th><th>人</th><th class="n">通算</th><th>ひとこと</th><th>投稿文</th>${FB ? "<th>使いごこち・運営へのコメント</th>" : ""}<th>だれと</th><th>分析に</th><th>状態</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="scroll"><table class="t"><thead><tr><th class="n">開始</th><th>人</th><th class="n">通算</th>${DU ? '<th class="n">かかった時間</th>' : ""}<th>ひとこと</th><th>投稿文</th>${FB ? "<th>使いごこち・運営へのコメント</th>" : ""}<th>だれと</th><th>分析に</th><th>状態</th></tr></thead><tbody>${rows}</tbody></table></div>
     ${L.length > POSTQ.lim ? `<p style="text-align:center;margin:12px 0 0"><button type="button" class="tab" id="pmore" style="border:1px solid var(--line2);border-radius:8px;padding:6px 14px">もっと見る（あと ${L.length - POSTQ.lim} 件）</button></p>` : ""}</div>`;
 }
 
@@ -1705,6 +1708,7 @@ function renderAbout() {
   const colorHtml = `<div class="cl">${colors.map(([a, b, c]) => `<div>${a}</div><b>${esc(b)}</b><span>${esc(c)}</span>`).join("")}</div>`;
   const rules = [
     ["数える単位", "人＝ニックネーム＋端末 ID、チャット＝セッション ID。図の説明に、どちらで数えたかを書いています"],
+    ["コピーした本数", "人ごとの本数は、使ったが 1 本もコピーしていない人（0 本）もふくめて数えます（「何本コピーした人が多いか」「1 人あたり」「2 本以上コピーした人」）。コピーした投稿文から始まる図（「本日の DROP を見たあと、もう 1 本つくったか」「複数本つくると、時間は変わるか」「使いごこち」「みがきの質」のタブ）は、コピーがないと数えられないので 0 本の人は入りません"],
     ["割合とぶれの幅", "割合には件数を添え、主な割合には「ぶれの幅」を出します。件数が少ないと割合は上下にぶれるので、おおむねこの間に入ると言える幅です（統計でいう 95% 信頼区間）。10 件未満は灰色の参考値です"],
     ["コピー率", "始めたチャットのうち、コピーまで行った割合。1 人あたりの本数と「2 本以上」は、コピーした人のうちで数えます"],
     ["やめた・とばした", "その問いでやめた＝その問いが出たあと、投稿文ができる前に閉じたチャット。「ここまでで投稿文へ」で先に進んだ人は、やめたに数えません。とばした＝答えずに次へ進んだチャット"],
