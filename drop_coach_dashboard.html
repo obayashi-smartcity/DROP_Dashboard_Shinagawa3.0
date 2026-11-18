@@ -221,9 +221,13 @@ table.t td.thin{color:var(--gray-ink2)}
 .three{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;align-items:start}
 .three h4,.two h4{font-size:13px;color:var(--struct2);margin:0 0 8px}
 @media (max-width:1100px){.two,.three{grid-template-columns:1fr}}
-.tgrid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr) minmax(0,1fr);gap:16px 28px;align-items:start}
+.tgrid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,2fr);gap:16px 28px;align-items:start}
+.tsub{border-left:1px solid var(--line2);padding-left:24px;align-self:stretch;padding-top:2px}
+.tsub-h{display:inline-block;font-size:12px;font-weight:700;color:var(--ink2);background:var(--soft);border:1px solid var(--line);border-radius:999px;padding:1px 10px;margin:0 0 8px}
+.tsub-g{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px 24px}
+.tsub-g>div+div{border-left:1px dashed var(--line2);padding-left:24px}
 .agrid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:16px 28px;align-items:center}
-@media (max-width:1100px){.tgrid,.agrid{grid-template-columns:1fr}}
+@media (max-width:1100px){.tgrid,.agrid,.tsub-g{grid-template-columns:1fr}.tsub{border-left:0;border-top:1px solid var(--line2);padding:14px 0 0}.tsub-g>div+div{border-left:0;padding-left:0;border-top:1px dashed var(--line2);padding-top:14px}}
 .mgroups{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
 @media (max-width:1100px){.mgroups{grid-template-columns:1fr}}
 .mg{border:1px solid var(--line);border-radius:10px;padding:8px 12px 4px;background:var(--soft)}
@@ -735,7 +739,7 @@ function makeSession(P, t0, total) {
   // 所要時間
   const stepSum = Object.values(s.st).reduce((a, x) => a + x.sec, 0);
   // 実際の記録では中央値 15 分ほど（答えの合間に会場を回る・人と話す時間を含む）。やめた人は短め
-  const idle = 60 * (s.reached ? 5 + 22 * rnd() ** 1.4 + (rnd() < .1 ? 10 + 30 * rnd() : 0) : 1 + 8 * rnd() ** 1.6);
+  const idle = 60 * (s.reached ? 5 + 22 * rnd() ** 1.4 + (rnd() < .1 ? 10 + 30 * rnd() : 0) + (rnd() < .04 ? 40 + 110 * rnd() : 0) : 1 + 8 * rnd() ** 1.6);
   s.dur = between(6, 20) + stepSum + idle + (s.reached ? (s.ai.sec || 0) * Math.max(1, s.ai.n) + between(5, 25) : 0) + s.photoRedo * 15;
   s.end = addSec(t0, s.dur);
   // コピーのあと：会社の見え方（1 日 1 回）・使いごこち・宝箱
@@ -920,13 +924,13 @@ function card(o) {
 function table(cols, rows, o = {}) {
   return `<table class="t ${o.cls || ""}"><thead><tr>${cols.map(c => `<th class="${c[1] || ""}">${esc(c[0])}</th>`).join("")}</tr></thead><tbody>${rows.map(r => `<tr class="${r.cls || ""}"${r.drill || ""}>${r.cells.map((v, i) => `<td class="${(cols[i] && cols[i][1]) || ""} ${r.thin ? "thin" : ""}">${v}</td>`).join("")}</tr>`).join("")}</tbody></table>`;
 }
-/** 時間の分布（縦棒）。区切りの幅は、遅いほうから 1 割の値までが 8 本以内に収まる 1・2・3・5・10・15・20・30 分から選ぶ（決め打ちしない）。
- *  o: {secs, unit:"件", drill(label, lo, hi)} 。中央値の入る棒をマゼンタにし、上に「中央値」の印 */
+/** 時間の分布（縦棒）。区切り（分）は運営が決めたもの：5 分ごとに 20 分まで、そのあと 20〜30・30〜60・60〜120・120 分〜。
+ *  o: {secs, unit:"件", drill(label, lo, hi), edges?} 。中央値の入る棒をマゼンタにし、上に「中央値」の印 */
+const DUR_EDGES = [0, 5, 10, 15, 20, 30, 60, 120];
 function durHist(o) {
   const v = o.secs.filter(x => x != null && isFinite(x)); if (!v.length) return '<p class="note">まだデータがありません</p>';
-  const p90 = quant(v, .9) / 60, md = median(v) / 60;
-  const step = [1, 2, 3, 5, 10, 15, 20, 30].find(s => Math.ceil(p90 / s) <= 8) || 30, nb = Math.max(3, Math.ceil(p90 / step));
-  const bins = Array.from({ length: nb + 1 }, (_, i) => { const lo = i * step, hi = i < nb ? (i + 1) * step : Infinity; return { lo, hi, label: hi === Infinity ? `${lo}分〜` : `${lo}〜${hi}分`, n: v.filter(x => x / 60 >= lo && x / 60 < hi).length }; });
+  const md = median(v) / 60, E = o.edges || DUR_EDGES;
+  const bins = E.map((lo, i) => { const hi = i < E.length - 1 ? E[i + 1] : Infinity; return { lo, hi, label: hi === Infinity ? `${lo}分〜` : `${lo}〜${hi}分`, n: v.filter(x => x / 60 >= lo && x / 60 < hi).length }; });
   const W = 640, H = 250, L = 10, R = 10, T = 52, B = 30, bw = (W - L - R) / bins.length, max = Math.max(1, ...bins.map(b => b.n));
   const mi = bins.findIndex(b => md >= b.lo && md < b.hi);
   let g = `<line x1="${L}" x2="${W - R}" y1="${H - B}" y2="${H - B}" stroke="var(--line2)"/>`;
@@ -1497,15 +1501,18 @@ function renderFlow(F, ALL) {
   const CM = F.filter(s => s.comment), themes = countBy(CM.map(s => s.theme)), thMax = themes.length ? themes[0][1] : 0;
   const thBars = hbars(themes.map(([l, v]) => ({ label: l, v, e: v === thMax, txt: `<b>${v}</b> 件　${fpk(v, CM.length)}`, drill: drill(`運営へのコメント：${l}`, s => !!s.comment && s.theme === l, { fb: true }) })));
 
-  $("p-flow").innerHTML = lead("Coach はどれだけ使われ、投稿文のコピーまで届いたか", "投稿したかどうかは記録できないので、投稿文をコピーしたところまでを見ます。①始めてからコピーまで → ②コピーのあと次の 1 本へ → ③利用時間 → ④使った人の評価 の順に見ます。数える単位はチャットです（「何本コピーした人が多いか」だけ人）。") +
+  $("p-flow").innerHTML = lead("Coach はどれだけ使われ、投稿文のコピーまで届いたか", "投稿したかどうかは記録できないので、投稿文をコピーしたところまでを見ます。①始めてからコピーまで（利用時間も） → ②コピーのあと次の 1 本へ → ③使った人の評価 の順に見ます。数える単位はチャットです（「何本コピーした人が多いか」だけ人）。") +
     `<div class="grid">` + card({ id: "c-key", cls: "c12", q: "主な数字", why: `いま選んでいる絞り込みでの数字です。日ごとの値を下に添えています。${nIP ? `ほかに、いま書いている途中のチャットが ${nIP} 件あります（集計にはまだ入れていません）。` : ""}`, body: keyHtml }) + `</div>` +
-    `<h3 class="subh">① 始めてからコピーまで<small>どこで止まる・とばす・どこに時間がかかる</small></h3><div class="grid">` +
+    `<h3 class="subh">① 始めてからコピーまで<small>どこで止まる・とばす・どこに時間がかかる・いつ使われたか</small></h3><div class="grid">` +
     card({ id: "c-funnel", cls: "c12", q: "1 本の中で、どこで人が減るか", a: worst > 0 ? `<span>いちばん減るのは <b>${esc(fr[worst - 1][0])} → ${esc(fr[worst][0])}</b>（<b>－${worstLoss} 件</b>（－${fpk(worstLoss, fr[worst - 1][1], 1)}））。問いの中では <b>${esc(qWorst[0])}</b>（<b>－${qWorst[1]} 件</b>）。</span>` : "", why: "始めたチャットを 100% として、各段まで進んだ数。「ここまでで投稿文をつくる」で先に進んだ人は、やめた人に数えません。",
       body: `<div class="scroll">${fFull}</div><p class="note">前の段から減った＝その段に進まずにやめた件数（前の段のうちの%）。とばした＝その問いが出たうち、答えずに次へ進んだ割合（みがきの間は「どれもちがう」「出なかった」）。ここで投稿文へ＝その問いが出たうち、そこで先に投稿文をつくった割合（やめた人には数えません）。マゼンタの字＝その列でいちばん多い問い。</p>` }) +
     card({ cls: "c12", q: "いくつの問いに答えたか", a: `<span>平均 <b>${fn(ansN, 1)}</b> / 4 問。4 つとも答えたのは ${fpk(ansDist[0], R.length)}。</span>`, body: ansHtml }) +
     card({ cls: "c12", q: "1 本にかかった時間", a: `<span>投稿文までの時間は中央値 <b>${fsec(md)}</b>。いちばん時間がかかる問いは <b>${esc(qtTop ? qtTop[0] : "−")}</b>（${fsec(qtMax)}）。</span>`,
-      body: `<div class="tgrid"><div><h4>1 本にかかった時間（始めてから投稿文ができるまで）</h4>${durChart}<p class="note">棒の上＝チャットの件数（全体のうちの割合）。区切りの幅は、遅いほうから 1 割の時間までが 8 本以内に入るように自動で決めます。AI の待ち時間や、途中で会場を回っていた時間も含みます。</p></div><div><h4>問いごとの時間（中央値）</h4>${stepBars}<p class="note">問いが出てから答えるまで。</p></div><div><h4>何本目の時間（中央値）</h4>${nthBars}<p class="note">コピーしたチャット。何本目＝この端末でコピーした通算の本数。</p></div></div>` }) +
+      body: `<div class="tgrid"><div><h4>1 本にかかった時間（始めてから投稿文ができるまで）</h4>${durChart}<p class="note">棒の上＝チャットの件数（全体のうちの割合）。区切りは 20 分までは 5 分ごと、そのあとは 20〜30 分・30〜60 分・60〜120 分・120 分〜（「〜」は以上・未満）。AI の待ち時間や、途中で会場を回っていた時間も含みます。</p></div><div class="tsub"><div class="tsub-g"><div><div class="tsub-h">補足：時間の内訳</div><h4>どの問いに時間がかかるか</h4>${stepBars}<p class="note">問いごとの中央値。問いが出てから答えるまで。</p></div><div><div class="tsub-h">補足：本数との関係</div><h4>複数本つくると、時間は変わるか</h4>${nthBars}<p class="note">何本目ごとの、1 本にかかった時間の中央値（コピーしたチャット）。何本目＝この端末でコピーした通算の本数。</p></div></div></div></div>` }) +
     card({ id: "c-who", cls: "c12", q: "どんな人が使っているか（立場）", why: "使った人の、立場ごとの内訳。人＝全体の何%か。コピー率＝始めたチャットのうちコピーまで行った割合で、ほかの立場の人より、ぶれを見込んでもはっきり高い・低いところに ↑↓ と色（良し悪しではない差）。10 件未満は灰色の参考値。行を押すと、その人たちのチャットを一覧で見られます。", body: `<div class="scroll">${table([["区分"], ["人（全体のうち）"], ["チャット", "n"], ["コピー率", "n"]], segRows)}</div>` }) +
+    card({ id: "c-hours", cls: "c12", q: "いつ使われ、どれだけコピーまで行ったか（日×時間帯）", a: sTop ? `<span>いちばん多く始めたのは <b>${sTop.d} ${sTop.h}時台</b>（${sTop.n} 件）。${cLow ? `コピーまで行った割合がいちばん低いのは <b>${cLow.d} ${cLow.h}時台</b>（${fp(cLow.p)}、${cLow.n} 件のうち ${cLow.k} 件）。` : ""}</span>` : "",
+      why: "棒の高さ＝その 1 時間に始めたチャットの数。濃い部分＝そのうちコピーまで行った数。上の数字＝コピーまで行った割合。灰色の数字は参考値（10 件未満、またはまだ書いている途中のチャットがある時間）。点線の枠は、開場前・閉場後・まだ来ていない時間。",
+      body: `<div class="lg"><span><i style="background:var(--struct2)"></i>コピーまで行った</span><span><i style="background:var(--gray)"></i>コピーまで行かなかった</span><span><i style="background:var(--emph)"></i>コピーまで行った割合がいちばん低い時間</span></div><div class="scroll">${dhChart}</div>` }) +
     `</div><h3 class="subh">② コピーのあと、次の 1 本へ<small>ステンドグラス（本日の DROP）は、もう 1 本につながっているか・チャットの機能は使われているか</small></h3><div class="grid">` +
     card({ cls: "c6", q: "本日の DROP を見たあと、もう 1 本つくったか", a: `<span>コピーのあと次の 1 本を始めたのは <b>${fp(nxAll.p)}</b>（${nxAll.k}/${nxAll.n} 本）。${nxLow ? `いちばん低いのは <b>${nxLows.map(([l]) => esc(NXL[l] || l)).join("・")}</b>（${fp(nxLow[1].p)}${nxLows.length > 1 ? "・同率" : ""}）。` : ""}</span>`,
       why: "コピーした投稿文のうち、同じ人が次のチャットを始めた割合（時間は問わない）。",
@@ -1515,11 +1522,7 @@ function renderFlow(F, ALL) {
       table: table([["n 本目"], ["始めたチャット", "n"], ["コピーした", "n"], ["コピー率", "n"]], ret.map(r => ({ thin: r.at < SMALL, cls: r.n === 5 ? "hi" : "", cells: [`${r.n} 本目`, `${r.at}`, `${r.go}`, fp(r.p)] }))) }) +
     card({ cls: "c12", q: "何本コピーした人が多いか", a: `<span>5 本（バラ窓がそろう）で止まった人は <b>${dist[4][1]}</b> 人。</span>`, why: "人ごとの、いちばん大きい通算の本数（この端末でコピーした数）。棒を押すと、その人たちの投稿文を、人ごとに 1 本目から順に出します。", body: distBars }) +
     card({ id: "c-features", cls: "c12", q: "チャットの機能は、どれくらい使われているか", a: `<span>いちばん使われているのは <b>${esc(featTop[0])}</b>（${fp(featTop[1])}）、少ないのは <b>${esc(featLow[0])}</b>（${fp(featLow[1])}）。</span>`, why: "写真・見本・投稿イメージ・AI の案・手直し・話し方・文字の大きさなど、チャットの中の機能ごとに、使った割合。", body: featHtml }) +
-    `</div><h3 class="subh">③ 利用時間<small>いつ使われ、そのうちどれだけコピーまで行ったか（日×時間帯）</small></h3><div class="grid">` +
-    card({ id: "c-hours", cls: "c12", q: "いつ使われ、どれだけコピーまで行ったか（日×時間帯）", a: sTop ? `<span>いちばん多く始めたのは <b>${sTop.d} ${sTop.h}時台</b>（${sTop.n} 件）。${cLow ? `コピーまで行った割合がいちばん低いのは <b>${cLow.d} ${cLow.h}時台</b>（${fp(cLow.p)}、${cLow.n} 件のうち ${cLow.k} 件）。` : ""}</span>` : "",
-      why: "棒の高さ＝その 1 時間に始めたチャットの数。濃い部分＝そのうちコピーまで行った数。上の数字＝コピーまで行った割合。灰色の数字は参考値（10 件未満、またはまだ書いている途中のチャットがある時間）。点線の枠は、開場前・閉場後・まだ来ていない時間。",
-      body: `<div class="lg"><span><i style="background:var(--struct2)"></i>コピーまで行った</span><span><i style="background:var(--gray)"></i>コピーまで行かなかった</span><span><i style="background:var(--emph)"></i>コピーまで行った割合がいちばん低い時間</span></div><div class="scroll">${dhChart}</div>` }) +
-    `</div><h3 class="subh">④ 使った人の評価<small>コピーのあとに任意で聞く使いごこちと、運営へのコメント</small></h3><div class="grid">` +
+    `</div><h3 class="subh">③ 使った人の評価<small>コピーのあとに任意で聞く使いごこちと、運営へのコメント</small></h3><div class="grid">` +
     card({ id: "c-rating", cls: "c5", q: "使いごこちは何点か", a: `<span>平均 <b>${fn(rtMean, 1)}</b> / 5（${RT.length} 人）。4 以上は <b>${fpk(RT.filter(s => s.rating >= 4).length, RT.length)}</b>。</span>`, why: "このチャットの使いごこちを 5 段階で（イベントの満足度ではありません）。答えるのは任意で、コピーした人だけです。棒を押すと、その点をつけたチャットの一覧が、投稿文と運営へのコメントを並べて出ます。", body: rtBars }) +
     card({ id: "c-comments", cls: "c7", q: "コメントで多いこと", a: themes.length ? `<span>いちばん多いのは <b>${esc(themes[0][0])}</b> について（${themes[0][1]} 件／コメント ${CM.length} 件）。</span>` : "<span>コメントはまだありません。</span>", why: "運営へのコメント（任意）を、ことばで分けて数えています。棒を押すと、そのコメントを書いたチャットの一覧が、投稿文と運営へのコメントを並べて出ます。", body: thBars }) +
     `</div>`
@@ -1586,7 +1589,7 @@ function renderQuality(F) {
   const qaOwn = qaRows.filter(r => r.k !== "reflect").map(r => [r.label, pct(r.vals[0], r.n)]).filter(r => r[1] != null), qaHi = qaOwn.slice().sort((a, b) => b[1] - a[1])[0], qaLo = qaOwn.slice().sort((a, b) => a[1] - b[1])[0];
   // ---- 本数ごとの小さな棒（指標ごと。通算の本数は淡→濃の紫）
   const BCOL = ["#BFAAEF", "#A58BE0", "#8F6CD0", "#6239A0", "#351162"];
-  const BM = [["自分のことばで答えた", b => b.own.p, "答えた問いのうち"], ["分析に使える投稿", b => b.ana, "5 つの要素から"], ["しめが薄い", b => b.flat, "「とくにない」「今の気持ちでしめる」"], ["AI の案を選んだ", b => b.ai, "コピーした投稿文のうち"], ["文を手で直した", b => b.ed, "コピーした投稿文のうち"]];
+  const BM = [["自分のことばで答えた", b => b.own.p, "答えた問いのうち"], ["分析に使える投稿", b => b.ana, "5 つの要素から（仮の目安）"], ["しめが薄い", b => b.flat, "「とくにない」「今の気持ちでしめる」"], ["AI の案を選んだ", b => b.ai, "コピーした投稿文のうち"], ["文を手で直した", b => b.ed, "コピーした投稿文のうち"]];
   const bmHtml = `<div class="lg">${bk.map((b, i) => `<span><i style="background:${BCOL[i]}"></i>${esc(b.l)}（${b.n} 本）</span>`).join("")}</div><div class="bmw">${BM.map(([l, f, sub]) => `<div class="bm"><div class="bml">${esc(l)}<small>${esc(sub)}</small></div>${bk.map((b, i) => { const v = f(b), thin = b.n < SMALL; return `<div class="bmr"${b.n ? drill(`通算 ${b.l}の投稿`, s => !!s.copied && b.f(s.postTotal)) : ""} ${tipAttr(`<b>${b.l}</b>（${b.n} 本）<br>${l}：${fp(v)}${thin ? "<br>10 本未満の参考値" : ""}`)}><span class="bmk">${esc(b.l)}</span><div class="bmt"><i style="width:${v == null ? 0 : Math.max(.5, v).toFixed(1)}%;background:${BCOL[i]}"></i></div><span class="bmv${thin ? " thin" : ""}">${fp(v)}</span></div>`; }).join("")}</div>`).join("")}</div>`;
   // ---- いっしょに出やすい組み合わせ（棒＋偶然の何倍か）
   const coMax = Math.max(1, ...co.map(x => x.c));
@@ -1602,7 +1605,7 @@ function renderQuality(F) {
       why: "その問いに来たチャットのうち、自分のことばで答えた・ヒント（みがきの間は候補）から選んだ・とばした割合。Coach のヒントがどれだけ答えを助けているかを見ます。",
       body: `<div class="lg">${QSRC.map(x => `<span><i style="background:${x[2]}"></i>${x[1]}</span>`).join("")}</div>${stack100(qaRows, QSRC.map(x => [x[1], x[2], x[3]]))}<p class="note">みがきの間は、候補から選ぶのがふつうの問いです（自分のことば＝候補を直して使った、とばした＝「どれもちがう」「出なかった」）。上の一文の「多い・少ない」には入れていません。</p>` }) +
     `</div><h3 class="subh">② 中身は具体的か<small>AI が投稿文から読み取った 5 つの要素と、本数を重ねたときの変化</small></h3><div class="grid">` +
-    card({ id: "c-elements", cls: "c12", q: "投稿に 5 つの要素が書けているか", a: `<span>分析に使える投稿は <b>${fp(B.anaP)}</b>。いちばん書けていないのは <b>${esc(weakest[0])}</b>（具体的 ${fp(weakest[1])}）。</span>`, why: "AI が投稿文から読み取った具体さ。分析に使える＝何を・なぜが具体的、誰の立場があり、変化か次の一歩がある。", body: `<div class="lg"><span><i style="background:var(--o4)"></i>具体的</span><span><i style="background:var(--o2)"></i>あいまい</span><span><i style="background:var(--none)"></i>無い</span></div>${elChart}` }) +
+    card({ id: "c-elements", cls: "c12", q: "投稿に 5 つの要素が書けているか", a: `<span>分析に使える投稿（仮の目安）は <b>${fp(B.anaP)}</b>。いちばん書けていないのは <b>${esc(weakest[0])}</b>（具体的 ${fp(weakest[1])}）。</span>`, why: "AI が投稿文を読んで、5 つの要素それぞれが「具体的／あいまい／無い」のどれかを判定したものです。", body: `<div class="lg"><span><i style="background:var(--o4)"></i>具体的</span><span><i style="background:var(--o2)"></i>あいまい</span><span><i style="background:var(--none)"></i>無い</span></div>${elChart}<p class="note"><b>「分析に使える投稿」は仮の目安です。</b>次の 3 つがそろった投稿を数えています：① 何を と なぜ が具体的 ② 誰の立場 が書けている（あいまいでも可）③ 変化 か 次の一歩 のどちらかが書けている。5 つの要素は、11/13 の定例で示した Coach のねらい（「何を・誰の・なぜ・どう変わった・次に何をしたい」まで書かれた投稿を増やす）から取ったもので、決まった基準ではありません。</p>` }) +
     card({ id: "c-quality-bucket", cls: "c12", q: "本数を重ねると、中身は薄まるか", a: `${sig(lvQ, lvQ === 2 ? "下がった" : "はっきりしない")}<span>自分のことばで答えた割合は 1〜5 本目 ${fp(oe.p)} → 6 本目以降 ${fp(ol.p)}${dOwn ? `（差 ${dOwn[0].toFixed(0)}pt、ぶれの幅 ${dOwn[1].toFixed(0)}〜${dOwn[2].toFixed(0)}pt）` : ""}。分析に使える投稿は ${fpk(ae.filter(s => s.ana).length, ae.length)} → ${fpk(al.filter(s => s.ana).length, al.length)}${dAna ? `（差のぶれの幅 ${dAna[1].toFixed(0)}〜${dAna[2].toFixed(0)}pt）` : ""}。</span>`,
       why: "通算の本数ごとに、コピーされた投稿文をくらべます。ステンドグラスで本数を伸ばしたときに、中身が薄くなっていないかの確認。どの棒も帯の右端が 100%。10 本未満は灰色の数字（参考値）。", body: bmHtml }) +
     `</div><h3 class="subh">③ KPI の手がかり<small>コピーされた投稿文のうち、本人の答え（だれと・しめ・今日の発見・その人のふだん）に手がかりがある割合</small></h3><div class="grid" id="c-kpi">${kcards}</div><div class="grid">` +
@@ -1624,9 +1627,9 @@ const TAB_L = { about: "使い方", flow: "使われ方", quality: "みがきの
 /* 「根拠を見る」などで飛ぶ先：カードの id → [タブ, 見出し] */
 const FINDS = [
   { card: "c-key", tab: "flow", q: "Coach はどれだけ使われたか", see: "使った人・始めたチャット・コピーされた投稿文・コピー率・1 人あたり・2 本以上の人・使いごこち（日ごとの値つき）" },
-  { card: "c-funnel", tab: "flow", q: "どこで止まり、どこに時間がかかるか", see: "ファネル（前の段から減った・とばした・ここで投稿文へ）、いくつの問いに答えたか、1 本・問いごと・何本目の時間、どんな人が使っているか" },
-  { card: "c-retention", tab: "flow", q: "何本つづくか", see: "本日の DROP のあと次の 1 本へ、n 本目のコピー率（ステンドグラスの節目）、何本コピーした人が多いか、チャットの機能の使われ方" },
+  { card: "c-funnel", tab: "flow", q: "どこで止まり、どこに時間がかかるか", see: "ファネル（前の段から減った・とばした・ここで投稿文へ）、いくつの問いに答えたか、1 本にかかった時間（補足：問いごとの内訳・複数本つくると変わるか）、どんな人が使っているか" },
   { card: "c-hours", tab: "flow", q: "いつ使われ、どれだけコピーまで行ったか", see: "日×時間帯の、始めたチャットと、そのうちコピーまで行った割合（利用時間）" },
+  { card: "c-retention", tab: "flow", q: "何本つづくか", see: "本日の DROP のあと次の 1 本へ、n 本目のコピー率（ステンドグラスの節目）、何本コピーした人が多いか、チャットの機能の使われ方" },
   { card: "c-rating", tab: "flow", q: "使った人の評価は", see: "使いごこち（5 段階）と、運営へのコメントで多いこと" },
   { card: "c-author", tab: "quality", q: "投稿文は、だれの言葉か", see: "AI の案をそのまま・手で直した・自分の言葉の文、問いごとに自分のことば／ヒント／とばした" },
   { card: "c-elements", tab: "quality", q: "投稿の中身は具体的か。本数を重ねても薄まらないか", see: "5 つの要素、通算の本数ごとの自分のことば・分析に使える・しめが薄い・AI の案・手直し" },
