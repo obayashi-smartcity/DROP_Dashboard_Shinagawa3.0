@@ -38,7 +38,7 @@ h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.35}
 .brand{display:flex;align-items:center;gap:10px;margin-right:6px}
 .brand .mk{width:30px;height:30px;border-radius:9px;background:#fff;color:var(--struct);display:grid;place-items:center;font-weight:700;font-size:15px}
 .brand b{font-size:15px;letter-spacing:.2px;display:block;line-height:1.2}
-.brand small{font-size:11.5px;opacity:.78;display:block}
+.brand small{font-size:12px;opacity:.82;display:block;margin-top:3px;line-height:1.3}
 .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 11px;font-size:12px;background:rgba(255,255,255,.12);white-space:nowrap}
 .pill.demo{background:var(--mid);color:#3b2a00;font-weight:700}
 .pill .dot{width:8px;height:8px;border-radius:50%;background:#7fd1a4}
@@ -477,7 +477,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 24px 30px;font-size:12px;color:v
     </article>
     <article class="choice">
       <div class="choice-h"><span class="step">方法 3</span><h3>デモデータで見る</h3></div>
-      <p class="grow">記録がまだ無いときに、画面の見え方を確かめるための架空のデータを表示します（CULTURE SNACK 2026 の 2 日間、2 日目の 16:30 までを想定）。実際の記録ではありません。</p>
+      <p>記録がまだ無いときに、画面の見え方を確かめるための架空のデータを表示します（CULTURE SNACK 2026 の 2 日間、2 日目の 16:30 までを想定）。実際の記録ではありません。</p>
       <button class="btn lg" id="demoBtn" type="button">デモデータを表示</button>
     </article>
   </div>
@@ -1625,7 +1625,7 @@ function renderAbout() {
   // 2 列（左＝投稿の量、右＝投稿の質）。列の上と下の線をそろえ、量・質の両方にまたがる投稿の一覧は下に横いっぱい
   const fbtn = r => `<button type="button" class="fd" data-goto="${r.tab}" data-card="${r.card || ""}"><span class="fq">${esc(r.q)} <span class="ft">→</span></span><span class="fs">${esc(r.see)}</span></button>`;
   const fcol = t => `<div class="fcol"><h4 class="fh">${esc(TAB_L[t])}</h4>${FINDS.filter(r => r.tab === t).map(fbtn).join("")}</div>`;
-  const finder = `<div class="finder">${fcol("flow")}${fcol("quality")}</div><div class="finder-all"><h4 class="fh">${esc(TAB_L.posts)}（量・質のどちらの図からも）</h4>${FINDS.filter(r => r.tab === "posts").map(fbtn).join("")}</div>`;
+  const finder = `<div class="finder">${fcol("flow")}${fcol("quality")}</div><div class="finder-all"><h4 class="fh">${esc(TAB_L.posts)}</h4>${FINDS.filter(r => r.tab === "posts").map(fbtn).join("")}</div>`;
   const sw = cs => `<span class="sw">${cs.map(c => `<i style="background:${c}"></i>`).join("")}</span>`;
   const colors = [
     [sw(["var(--emph)"]), "注目", "その図で、いちばん見てほしいところ。1 つの図に 1 つ（同じ値が並ぶときは、すべて）"],
