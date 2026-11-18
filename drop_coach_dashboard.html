@@ -310,6 +310,13 @@ table.rec .bc b{font-variant-numeric:tabular-nums}
 /* パネル（大きな数字＋メーター） */
 .pan{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
 @media (min-width:1100px){.pan5{grid-template-columns:repeat(5,1fr)}}
+/* 1 段に並べるパネル（数字は控えめに） */
+@media (min-width:1100px){.pan1row{grid-template-columns:repeat(var(--n),minmax(0,1fr));gap:8px}}
+.pan1row .pn{padding:8px 10px;display:flex;flex-direction:column}
+.pan1row .pn .l{min-height:2.9em;line-height:1.45}
+.pan1row .pn .v{font-size:18px;margin:2px 0 5px}
+.pan1row .pn .mt{height:6px}
+.pan1row .pn .s{line-height:1.45}
 .pn{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
 .pn .l{font-size:12px;font-weight:700;color:var(--ink2)}
 .pn .v{font-size:24px;font-weight:700;margin:2px 0 6px;font-variant-numeric:tabular-nums;white-space:nowrap}
@@ -1478,7 +1485,7 @@ function renderFlow(F, ALL) {
     ["行を言いかえた", pct(aiPicked.filter(s => s.swaps > 0).length, aiPicked.length), `AI の案を選んだうち・平均 ${fn(mean(aiPicked.map(s => s.swaps)), 1)} 回`, s => !!s.reached && /^AI/.test(s.chosen) && s.swaps > 0],
     ["話し方を「関西弁」にした", pct(F.filter(s => s.voice === "関西弁").length, F.filter(s => s.voice).length), "話し方の記録があるチャットのうち（ほかは「だよ」）", s => s.voice === "関西弁"], ["文字を大きくした", pct(F.filter(s => s.big).length, F.filter(s => s.big != null).length), "チャットのうち", s => !!s.big]];
   const FV = FEAT.filter(x => x[1] != null), featTop = FV.slice().sort((a, b) => b[1] - a[1])[0] || ["−", null], featLow = FV.slice().sort((a, b) => a[1] - b[1])[0] || ["−", null];
-  const featHtml = `<div class="pan pan5">${FEAT.map(([l, p, sub, pf]) => panel(l, p, sub, { drill: p ? drill(`${l}チャット`.replace("ありチャット", "ありのチャット").replace("たチャット", "たチャット"), pf) : "" })).join("")}</div>`;
+  const featHtml = `<div class="pan pan1row" style="--n:${FEAT.length}">${FEAT.map(([l, p, sub, pf]) => panel(l, p, sub, { drill: p ? drill(`${l}チャット`.replace("ありチャット", "ありのチャット").replace("たチャット", "たチャット"), pf) : "" })).join("")}</div>`;
   // ---- 主な数字（日ごとの値を添える）
   const KD = CTX.days.filter(d => F.some(s => s.day === d)), live = d => d === CTX.today && !CTX.complete;
   const KDL = d => `${d}${live(d) ? `（${hm(CTX.now)} まで）` : ""}`;
