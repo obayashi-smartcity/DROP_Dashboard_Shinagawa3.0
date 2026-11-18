@@ -518,7 +518,7 @@
    - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v9）の /exec URL（★ 同上）。記録と「チャットの設定」の配布
    - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
 ===================================================================== */
-const APP_VERSION = "chat-v5.5 (2026-11-17)";
+const APP_VERSION = "chat-v5.6 (2026-11-18)";
 const CONFIG = {
   // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
   GAS_URL: "https://script.google.com/macros/s/AKfycbzdkIa8xnE0useu-5tuXMfLTBXCU80_9yhhpN0C6pcxnkePNdfR2jtVZ51PqyAb3XRe/exec",   // 仕上げ用 GAS（DROP_COACH_GPT v10）
@@ -1689,6 +1689,13 @@ async function handleRepick(file) {
    - subject：問いの言い方に使う話題（「コーヒーの、どこがおいしかった？」）
    - feel_options・why_options・find_options・shime_options：各問いの「迷ったらヒント」に、運営の選択肢と並べて出す候補
 ===================================================================== */
+/** AI の呼び出しを 1 回ずつ記録する（記録JSON の ai_calls。運営の「AI の調子・待ち時間」に使う）。kind：ヒント／みがきの間／投稿文 */
+function noteCall(kind, t0, res) {
+  if (!S) return;
+  const status = res && res.ok ? "OK" : res && res.code === "TIMEOUT" ? "TIMEOUT" : "ERROR";
+  (S.calls = S.calls || []).push({ kind, at: new Date(t0).toISOString(), status, sec: Math.round((now() - t0) / 100) / 10 });
+  if (S.calls.length > 40) S.calls = S.calls.slice(-40);
+}
 async function fireHint() {
   if (!CONFIG.HINT_ON || !gasOn() || !S || (S.hint && S.hint.status !== "待ち") || RT.hintBusy) return;
   const g = RT.gen, sid = S.sid, t0 = now();
@@ -1700,6 +1707,7 @@ async function fireHint() {
     if (PHOTO.imgAi) body.target.image_data = PHOTO.imgAi;
     const res = await post(body, CONFIG.GAS_URL);
     if (g !== RT.gen || !S || S.sid !== sid) return;
+    noteCall("ヒント", t0, res);
     const sec = Math.round((now() - t0) / 100) / 10;
     S.hint = res.ok && res.result ? { status: "OK", cached: !!res.cached, elapsed_sec: sec, ...res.result } : { status: res.code || "ERROR", message: res.message || "", elapsed_sec: sec };
     save();
@@ -1724,6 +1732,7 @@ async function fireReflect() {
     const answers = [{ q: "気持ち", a: ownAndPicks("feel") }, { q: "どこが", a: ownAndPicks("why") }].filter(x => x.a);
     const res = await post({ action: "reflect", variant: "chat", token: getToken(CONFIG.KEYS.TOKEN), context: { event: CONFIG.EVENT, voice: aiVoice() }, target: { text: S.ans.text1 }, answers }, CONFIG.GAS_URL, 30000);
     if (g !== RT.gen || !S || S.sid !== sid) return;
+    noteCall("みがきの間", t0, res);
     const opts = res.ok && res.result ? (res.result.options || []).filter(Boolean).slice(0, 3) : [];
     S.reflect = opts.length ? { status: "OK", options: opts, elapsed_sec: Math.round((now() - t0) / 100) / 10 } : { status: "none", code: res.code || "ERROR" };
     save();
@@ -2453,6 +2462,7 @@ async function runAI() {
   if (!res.ok && res.code === "AUTH") { LS.del(CONFIG.KEYS.TOKEN); if (await autoLogin()) res = await post({ ...body, token: getToken(CONFIG.KEYS.TOKEN) }, CONFIG.GAS_URL); }
   stop();
   if (g !== RT.gen) return "error";
+  noteCall("投稿文", t0, res);
   S.ai = { status: res.ok ? "OK" : (res.code || "ERROR"), message: res.ok ? "" : (res.message || ""), cached: !!res.cached,
     model: res.model || "", prompt_version: res.prompt_version || "", elapsed_sec: Math.round((now() - t0) / 100) / 10, images_used: res.images_used || 0, result: res.ok ? res.result : null };
   if (res.ok && res.result && ((res.result.lines || []).length || res.result.rewrite)) {
@@ -2565,7 +2575,8 @@ function buildRecord(end) {
     ai: S.ai ? { status: S.ai.status, message: S.ai.message, cached: S.ai.cached, model: S.ai.model, prompt_version: S.ai.prompt_version, elapsed_sec: S.ai.elapsed_sec, result: cd ? cd.result : ((S.drafts || []).slice(-1)[0] || {}).result || S.ai.result } : { status: "" },
     hint: { status: h.status || "", elapsed_sec: h.elapsed_sec, cached: !!h.cached, subject: h.subject || "", feel_options: h.feel_options || [], why_options: h.why_options || [], find_options: h.find_options || [], shime_options: h.shime_options || [] },
     own: S.own || {}, src: S.src || {},
-    reflect: S.reflect ? { status: S.reflect.status || "", options: S.reflect.options || [], text: S.reflect.text || "", how: S.reflect.how || (S.reflect.status === "none" ? "出なかった" : "") } : { status: "", text: "", how: "" },
+    reflect: S.reflect ? { status: S.reflect.status || "", options: S.reflect.options || [], text: S.reflect.text || "", how: S.reflect.how || (S.reflect.status === "none" ? "出なかった" : ""), elapsed_sec: S.reflect.elapsed_sec ?? null } : { status: "", text: "", how: "" },
+    ai_calls: (S.calls || []).slice(),   // v5.6：AI の呼び出しごとの 時刻・種類（ヒント／みがきの間／投稿文）・待ち時間・結果
     line_swaps: S.lineSwaps || 0, company_view: S.companyView || "", secret_visits: S.secretVisits || 0, no_copy: !!S.noCopy,
     // v5：かけら集め（自分のことば＝キラ・任意の問い＝レア）・おまけの宝箱（おすすめ）
     game: { kira: kiraCount(), rare: rareCount(), pieces: PIECES.filter(([id]) => pieceOn(id)).length },

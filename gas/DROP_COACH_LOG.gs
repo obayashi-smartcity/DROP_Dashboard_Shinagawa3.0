@@ -1,10 +1,18 @@
 /**
- * DROP Coach V3 フォルダ — 記録用 Google Apps Script（Web アプリ）  v9.1（2026/11/16・チャット画面 v5 用）
+ * DROP Coach V3 フォルダ — 記録用 Google Apps Script（Web アプリ）  v9.2（2026/11/18・チャット画面 v5.6・分析画面 v3 用）
  * ------------------------------------------------------------
  * drop_coach_chat.html（チャット）から直接呼ばれ、チャット 1 回分（1 セッション）を
  * Google スプレッドシートに 1 行追記する。drop_coach_dashboard.html（分析画面）からは管理者だけが読み出せる。
  * もう 1 つの役割：運営が分析画面の「チャットの設定」で保存した「選択肢と重み」を settings シートにためて、チャットに配る。
  * ★ V1・V2 のログ用 GAS とは別のプロジェクトとして新しく作る（記録先のスプレッドシートも V3 用に新しく作る）
+ *
+ * ■ v9.2 の変更（2026/11/18・分析画面 v3 用）
+ *   - export に json_mode:"last" を追加：記録JSON を、同じセッションのいちばん下の行にだけ残して返す（ほかの行は空）。
+ *     1 セッションで 3〜6 行になるため、読み出しが数分の 1 の大きさになる。分析画面 v3 はセッションのいちばん新しい記録JSON しか使わない
+ *   - json_mode を送らない（または "all"）ときは、いままでどおり全部の行に記録JSON を入れて返す（v2.2 の分析画面もそのまま動く）
+ *   - 列・シートは変えない。更新しなくても分析画面 v3 は動く（そのときは読み出しが重いだけ）
+ *   - 更新：コードを貼りかえて保存 → デプロイを管理 → 編集 → バージョン「新バージョン」→ デプロイ（URL は変わらない）
+ *   - チャット v5.6 は、記録JSON に ai_calls（AI の呼び出しごとの 時刻・種類・待ち時間・結果）と reflect.elapsed_sec を入れる（列は足さない）
  *
  * ■ v9.1 の変更（2026/11/16 午後・チャット画面 v5 用）
  *   - 終了に「おすすめ」を追加：コピーのあとの「ごほうびの宝箱」（このあとのおすすめ 3 つ）を開けた・詳しく見た・☆を付けたときに 1 行
@@ -47,7 +55,8 @@
  * ■ アクション（POST / Content-Type: text/plain / body は JSON 文字列）
  *   { "action":"login", "name":"...", "password":"..." } → { ok:true, token, expires_in, admin }
  *   { "action":"log", "token":"...", "session":{ …チャット記録（drop_chat_v4 形式。HTML の buildRecord() を参照）… } } → { ok:true, sheet, row }
- *   { "action":"export", "token":"（管理者のトークン）", "limit":3000, "json":false } → { ok:true, sheet, header:[…], rows:[[…], …], total }
+ *   { "action":"export", "token":"（管理者のトークン）", "limit":3000, "json":false, "json_mode":"last" } → { ok:true, sheet, header:[…], rows:[[…], …], total, truncated }
+ *     json:true で記録JSON の列も返す。json_mode:"last" なら、同じセッションのいちばん下の行にだけ記録JSON を入れる（v9.2）
  *   { "action":"settings" } → { ok:true, version:"設定3", saved_at, saved_by, settings:{…}|null }（null ＝まだ保存がない → チャットは初期値）
  *   { "action":"save_settings", "token":"（管理者）", "settings":{…}, "note":"メモ", "base_version":"設定3" } → { ok:true, version:"設定4" }
  *     base_version がいまの版と違う（ほかの人が先に保存した）ときは CONFLICT。force:true で上書き
@@ -96,7 +105,7 @@ const CACHE_MAX_SEC = 21600;
 const FAIL_WINDOW_SEC = 900;
 const MAX_LEN = { NAME: 40, ID: 64, TEXT: 400, SHORT: 120, FIELD: 1000, ITEMS: 12, MSG: 300, META: 80, JSON_CELL: 45000 };
 const KEY = { FAIL: 'chatlog_auth_fail', TOKEN: 'chatlogtok_', SETTINGS: 'chatlog_settings_cur' };
-const SERVICE_VERSION = 9.1;
+const SERVICE_VERSION = 9.2;
 
 class AppError extends Error {
   constructor(code, message) { super(message); this.code = code; }
@@ -221,7 +230,16 @@ function handleExport_(req) {
     values = a.map((r, i) => r.concat(b[i]));
   }
   values = values.map(r => r.map(v => (v instanceof Date ? v.toISOString() : v)));
-  return json_({ ok: true, sheet: sh.getName(), header: header, rows: values, total: last - 1, truncated: from > 2 });
+  // v9.2：記録JSON は同じセッションのいちばん下の行にだけ残す（読み出しを軽くする）
+  if (withJson && req.json_mode === 'last') {
+    const si = LOG_HEADER.indexOf('セッションID'), seen = {};
+    for (let i = values.length - 1; i >= 0; i--) {
+      const sid = String(values[i][si] || '');
+      if (!sid) continue;
+      if (seen[sid]) values[i][ji] = ''; else seen[sid] = true;
+    }
+  }
+  return json_({ ok: true, sheet: sh.getName(), header: header, rows: values, total: last - 1, truncated: from > 2, json_mode: withJson ? (req.json_mode === 'last' ? 'last' : 'all') : 'none' });
 }
 
 /** チャット記録（drop_chat_v4）→ 1 行。値はすべて検証・丸めてから書く */
