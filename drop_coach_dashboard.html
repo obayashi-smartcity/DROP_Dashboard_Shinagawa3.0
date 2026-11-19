@@ -89,6 +89,7 @@ h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.45}
 .fbar .cnt{margin-left:auto;font-size:12.5px;color:var(--ink2)}
 .fbar .cnt b{font-size:15px;color:var(--ink)}
 .fbar .note-now{font-size:12.5px;color:var(--struct2);font-weight:700}
+.endnote{display:block;margin-top:3px;font-size:12px;color:var(--ink2);white-space:nowrap}
 .vb{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:700;color:var(--struct);background:var(--struct-soft);border-radius:999px;padding:1px 8px;white-space:nowrap}
 .ktiles .kd.kv{border-top:1px dashed var(--line);padding-top:4px;margin-top:4px}
 .fbar .fnote{flex-basis:100%;margin:0;font-size:12.5px;line-height:1.6;color:var(--ink);background:var(--struct-faint);border-radius:8px;padding:6px 10px}
@@ -535,7 +536,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 24px 30px;font-size:12px;color:v
   <div class="fbar" id="fbar" role="group" aria-label="絞り込み">
     <div class="f"><label for="fDay">日</label><select id="fDay"><option value="">すべての日</option></select></div>
     <div class="f"><label for="fProf">立場</label><select id="fProf"><option value="">すべて</option></select></div>
-    <div class="f"><label for="fState">状態</label><select id="fState" title="コピーした／投稿文の途中（投稿文の画面まで来て、まだコピーしていない）／コピーせず（「コピーしないで次へ」で終えた）／途中でやめた（投稿文の前）"><option value="">すべて</option><option value="copy">コピーした</option><option value="mid">投稿文の途中</option><option value="nocopy">コピーせず</option><option value="drop">途中でやめた</option></select></div>
+    <div class="f"><label for="fState">状態</label><select id="fState" title="どこまで進んだか（どのチャットも 1 つだけに入る）：問いの途中でやめた＝投稿文ができる前に止まった／投稿文を見てやめた＝投稿文はできたが、コピーしなかった（「コピーしないで次へ」を押した・何も押さずに止まった の両方）／コピーした"><option value="">すべて</option><option value="drop">問いの途中でやめた</option><option value="seen">投稿文を見てやめた</option><option value="copy">コピーした</option></select></div>
     <div class="f"><label for="fCopies">コピー数（通算）</label><select id="fCopies" title="人ごとの、この端末でコピーした通算の本数（0 本の人もふくむ）。その人のチャットをすべて残します。日で絞ったときは、その日までの通算"><option value="">すべて</option><option value="0">0 本</option><option value="1">1 本</option><option value="2">2 本</option><option value="3">3 本</option><option value="4">4 本</option><option value="5">5 本</option><option value="6">6〜9 本</option><option value="10">10 本以上</option></select></div>
     <div class="f"><label for="fRate">使いごこち</label><select id="fRate" title="コピーのあとに聞く、チャットの使いごこち（5 段階・任意）。「答えていない」は、コピーしたが答えなかったチャット"><option value="">すべて</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option><option value="none">答えていない</option></select></div>
     <div class="f" id="fVarWrap"><label for="fVar">画面の案</label><select id="fVar" title="A 案＝drop_coach_chat.html、B 案＝drop_coach_chat_b.html（11/19〜。ヒントの声かけ・これまでの投稿など）"><option value="">すべて</option><option value="A">A 案</option><option value="B">B 案</option></select></div>
@@ -1698,9 +1699,9 @@ const FINDS = [
 let POSTQ = { q: "", st: "", lim: 40, open: null }, POSTL = [];
 /** やりとり一覧に出ているチャットを CSV で保存（Excel で開ける。名前は「名前を伏せる」に従う） */
 function postsCsv() {
-  const st = s => (s.copied ? "コピー" : s.noCopy ? "コピーせず" : s.reached ? "投稿文の途中" : "途中でやめた");
+  const st = s => (s.copied ? "コピーした" : s.reached ? "投稿文を見てやめた" : "問いの途中でやめた");
   const iso = t => { if (!t) return ""; const d = new Date(t), z = n => String(n).padStart(2, "0"); return `${ymd(d)} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`; };   // この端末の時刻（日本時間）で
-  const cols = [["開始", s => iso(s.t0)], ["終了", s => iso(s.end)], ["日", s => s.day], ["人", s => nameOf(s)], ["端末ID", s => s.device], ["セッションID", s => s.id], ["立場", s => s.profile], ["状態", st], ["画面の案", s => s.variant || ""],
+  const cols = [["開始", s => iso(s.t0)], ["終了", s => iso(s.end)], ["日", s => s.day], ["人", s => nameOf(s)], ["端末ID", s => s.device], ["セッションID", s => s.id], ["立場", s => s.profile], ["状態", st], ["終わり方", s => (!s.copied && s.noCopy ? "コピーしないで次へ" : "")], ["画面の案", s => s.variant || ""],
     ["通算何本目", s => (s.copied ? s.postTotal : "")], ["やめた問い", s => (s.stop ? STOP_L[s.stop] || s.stop : "")], ["所要秒", s => s.dur], ["ひとこと", s => s.text1], ["話題", s => s.topic],
     ["気持ち", s => s.feels.join(" > ")], ["気持ち（自分のことば）", s => s.ownFeel], ["どこが", s => s.why.join("、")], ["だれと", s => s.who], ["どんな人", s => s.whoOwn], ["しめ", s => s.next.join("、")], ["今日の発見", s => s.finds.join("、")], ["その人のふだん", s => s.face],
     ["みがきの間", s => s.reflect], ["みがきの間の選び方", s => s.rf.how], ["投稿文", s => s.final], ["採用", s => s.chosen], ["手で直した", s => (s.edited ? "はい" : "")], ["分析に使える", s => (s.ana == null ? "" : s.ana ? "はい" : "いいえ")],
@@ -1710,7 +1711,7 @@ function postsCsv() {
 }
 function renderPosts(F) {
   const D = DRILL, FB = !!(D && D.fb), DU = !!(D && D.dur), NC = 8 + (FB ? 1 : 0) + (DU ? 1 : 0), DF = D ? F.filter(s => { try { return !!D.pred(s); } catch (e) { return false; } }) : F;
-  const st = s => (s.copied ? ["コピー", "c-copy"] : s.noCopy ? ["コピーせず", "c-nocopy"] : s.reached ? ["投稿文の途中", "c-nocopy"] : ["途中でやめた", "c-drop"]);
+  const st = s => (s.copied ? ["コピーした", "c-copy"] : s.reached ? ["投稿文を見てやめた", "c-nocopy"] : ["問いの途中でやめた", "c-drop"]);
   const q = POSTQ.q.trim();
   const L = DF.filter(s => (!q || [s.text1, s.final, nameOf(s), s.topic, s.who, FB ? s.comment : ""].join(" ").includes(q))).sort((a, b) => b.t0 - a.t0);
   // 人ごと（「何本コピーした人が多いか」から）：本数の多い人から、人の中は 1 本目 → n 本目
@@ -1720,7 +1721,7 @@ function renderPosts(F) {
   const rows = L.slice(0, POSTQ.lim).map((s, i, A) => {
     const [l, c] = st(s);
     const grp = BP && (i === 0 || A[i - 1].pkey !== s.pkey) ? `<tr class="pgrp"><td colspan="${NC}"><b>${esc(nameOf(s))}</b><span>${PN.get(s.pkey)} 本コピー${s.profile ? `・${esc(s.profile)}` : ""}</span></td></tr>` : "";
-    const main = `<tr class="prow" data-sid="${s.id}" tabindex="0"><td class="n">${mdhm(s.t0)}</td><td>${esc(nameOf(s))}</td><td class="n">${s.copied ? s.postTotal + " 本目" : "−"}</td>${DU ? `<td class="n">${s.dur != null ? esc(fsec(s.dur)) : "−"}</td>` : ""}<td>${esc(s.text1) || '<span style="color:var(--gray-ink2)">（なし）</span>'}</td><td class="txt">${esc(s.final)}</td>${FB ? `<td class="txt fbc">${s.rating != null ? `<b>${s.rating}</b> / 5` : "−"}${s.comment ? `<br>${esc(s.comment)}` : ""}</td>` : ""}<td>${esc(s.who)}</td><td>${s.ana == null ? "−" : s.ana ? sig(4, "使える") : sig(0, "まだ")}</td><td><span class="chip ${c}">${l}</span>${s.variant === "B" ? '<span class="vb" title="B 案（drop_coach_chat_b.html）のチャット">B 案</span>' : ""}</td></tr>`;
+    const main = `<tr class="prow" data-sid="${s.id}" tabindex="0"><td class="n">${mdhm(s.t0)}</td><td>${esc(nameOf(s))}</td><td class="n">${s.copied ? s.postTotal + " 本目" : "−"}</td>${DU ? `<td class="n">${s.dur != null ? esc(fsec(s.dur)) : "−"}</td>` : ""}<td>${esc(s.text1) || '<span style="color:var(--gray-ink2)">（なし）</span>'}</td><td class="txt">${esc(s.final)}</td>${FB ? `<td class="txt fbc">${s.rating != null ? `<b>${s.rating}</b> / 5` : "−"}${s.comment ? `<br>${esc(s.comment)}` : ""}</td>` : ""}<td>${esc(s.who)}</td><td>${s.ana == null ? "−" : s.ana ? sig(4, "使える") : sig(0, "まだ")}</td><td><span class="chip ${c}">${l}</span>${!s.copied && s.noCopy ? '<span class="endnote">「コピーしないで次へ」</span>' : ""}${s.variant === "B" ? '<span class="vb" title="B 案（drop_coach_chat_b.html）のチャット">B 案</span>' : ""}</td></tr>`;
     if (POSTQ.open !== s.id) return grp + main;
     const src = ["feel", "why", "who", "next"].map(k => s.st[k] ? `${STOP_L[k]}：${{ own: "自分のことば", hint: "ヒントから", skip: "とばした" }[s.st[k].src]}（${fsec(s.st[k].sec)}）` : "").filter(Boolean).join("<br>");
     return grp + main + `<tr class="pdet"><td colspan="${NC}"><dl class="pdet-g">
@@ -1760,14 +1761,14 @@ function renderAbout() {
   const colorHtml = `<div class="cl">${colors.map(([a, b, c]) => `<div>${a}</div><b>${esc(b)}</b><span>${esc(c)}</span>`).join("")}</div>`;
   const rules = [
     ["数える単位", "人＝ニックネーム＋端末 ID、チャット＝セッション ID。図の説明に、どちらで数えたかを書いています"],
-    ["絞り込み", "状態は、コピーした／投稿文の途中（投稿文の画面まで来て、まだコピーしていない）／コピーせず（「コピーしないで次へ」で終えた）／途中でやめた（投稿文の前）。コピー数は人ごとの通算（0 本ふくむ）で、その人のチャットをすべて残します。日で絞ったときは、その日までの通算。使いごこちはコピーのあとに聞くので、点数で絞るとコピーしたチャットだけになります。状態・使いごこちで絞ると、コピー率やファネルは絞ったチャットの中での値になります"],
+    ["絞り込み", "状態は、どこまで進んだかの 3 段階で、どのチャットも 1 つだけに入ります：問いの途中でやめた（投稿文ができる前に止まった）／投稿文を見てやめた（投稿文はできたがコピーしなかった。「コピーしないで次へ」を押したのも、何も押さずに止まったのもふくむ。押したかどうかは、やりとり一覧の状態の横と CSV の「終わり方」で見られます）／コピーした。コピー数は人ごとの通算（0 本ふくむ）で、その人のチャットをすべて残します。日で絞ったときは、その日までの通算。使いごこちはコピーのあとに聞くので、点数で絞るとコピーしたチャットだけになります。状態・使いごこちで絞ると、コピー率やファネルは絞ったチャットの中での値になります"],
     ["画面の案", "A 案＝drop_coach_chat.html、B 案＝drop_coach_chat_b.html（11/19〜。手が止まったときのヒントの声かけ・これまでの投稿など）。同じ記録シートに入り、記録の ui_variant（無ければアプリ版）で見分けます。B 案の記録があるときだけ、上の絞り込みに「画面の案」が出ます"],
     ["コピーした本数", "人ごとの本数は、使ったが 1 本もコピーしていない人（0 本）もふくめて数えます（「何本コピーした人が多いか」「1 人あたり」「2 本以上コピーした人」）。コピーした投稿文から始まる図（「本日の DROP を見たあと、もう 1 本つくったか」「複数本つくると、時間は変わるか」「使いごこち」「みがきの質」のタブ）は、コピーがないと数えられないので 0 本の人は入りません"],
     ["割合とぶれの幅", "割合には件数を添え、主な割合には「ぶれの幅」を出します。件数が少ないと割合は上下にぶれるので、おおむねこの間に入ると言える幅です（統計でいう 95% 信頼区間）。10 件未満は灰色の参考値です"],
     ["コピー率", "始めたチャットのうち、コピーまで行った割合。1 人あたりの本数と「2 本以上」は、コピーした人のうちで数えます"],
     ["やめた・とばした", "その問いでやめた＝その問いが出たあと、投稿文ができる前に閉じたチャット。「ここまでで投稿文へ」で先に進んだ人は、やめたに数えません。とばした＝答えずに次へ進んだチャット"],
     ["KPI の手がかり", "本人の答え（だれと・しめ・今日の発見・その人のふだん）から読みます。AI の読み取りは、一致を見るためだけに使います"],
-    ["書いている途中", `「開始」の記録だけで始めて ${CONFIG.IN_PROGRESS_MIN} 分以内のチャットは、まだ書いている途中として集計に入れません（使われ方の「主な数字」に件数を書きます）`],
+    ["書いている途中", `「開始」の記録だけで始めて ${CONFIG.IN_PROGRESS_MIN} 分以内のチャットは、まだ書いている途中として集計に入れません（上の「状態」の 3 段階とは別で、どの段階にも入りません）（使われ方の「主な数字」に件数を書きます）`],
     ["名前", "名前は既定では出します。画面を人に見せるときは右上の「名前を伏せる」をオンにします（参加者001 のような番号になります）。人ごとのランキングは作りません"]
   ];
   const ruleHtml = `<dl class="rules">${rules.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join("")}</dl>`;
@@ -1907,8 +1908,8 @@ $("loaderBackBtn").addEventListener("click", () => showView("main"));
 
 /* ---------- 分析の画面 ---------- */
 const FIDS = ["fDay", "fProf", "fState", "fCopies", "fRate", "fVar"];
-/** 状態：コピーした／投稿文の途中（投稿文の画面まで来て、まだコピーしていない）／コピーせず（「コピーしないで次へ」）／途中でやめた（投稿文の前） */
-const stateOf = s => (s.copied ? "copy" : s.noCopy ? "nocopy" : s.reached ? "mid" : "drop");
+/** 状態（3 段階・どのチャットも 1 つだけ）：問いの途中でやめた（投稿文ができる前）／投稿文を見てやめた（投稿文はできたがコピーしなかった。「コピーしないで次へ」も、何も押さずに止まったのも）／コピーした */
+const stateOf = s => (s.copied ? "copy" : s.reached ? "seen" : "drop");
 const COPY_F = { 0: v => v === 0, 1: v => v === 1, 2: v => v === 2, 3: v => v === 3, 4: v => v === 4, 5: v => v === 5, 6: v => v >= 6 && v <= 9, 10: v => v >= 10 };
 function filtered() {
   const d = $("fDay").value, p = $("fProf").value, st = $("fState").value, cp = $("fCopies").value, rt = $("fRate").value, va = $("fVar").value;

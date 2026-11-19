@@ -303,6 +303,7 @@
   .q-step{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:900;color:var(--ink);white-space:nowrap}
   .q-step svg{width:18px;height:18px}
   .q-step.opt{color:#8a5f00}
+  .q-left{flex:none;font-size:11.5px;font-weight:900;color:#fff;background:var(--brown);border-radius:999px;padding:2px 9px;white-space:nowrap}   /* B 案：あと○問で投稿文 */
   .q-ins{font-size:12.5px;color:var(--dim);font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .dock-head .lnk{padding:2px 0;min-height:28px;font-size:12.5px;color:var(--ink-2)}
   .dock-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:2px 1px 4px}
@@ -328,9 +329,10 @@
   /* B 案：手が止まったら、ヒントのボタンを光らせ、ぽとりが小さく声をかける */
   .hint-btn.nudge{border-color:var(--gold);background:#fffaf0;animation:nudgeRing 1.6s ease-out 3}
   @keyframes nudgeRing{0%{box-shadow:0 0 0 0 rgba(227,169,43,.55)}100%{box-shadow:0 0 0 12px rgba(227,169,43,0)}}
-  .nudge-tip{display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:6px 12px 6px 6px;border-radius:4px 16px 16px 16px;background:#fff;box-shadow:var(--sh-1);font-size:13.5px;font-weight:700;color:var(--ink);animation:getin .35s ease both}
-  .nudge-tip .av{width:24px;height:24px;border-radius:50%;background:var(--paper);display:flex;align-items:center;justify-content:center}
-  .nudge-tip .av svg{width:20px;height:20px}
+  .nudge-tip{display:flex;align-items:flex-start;gap:8px;width:fit-content;max-width:100%;margin-top:10px;animation:getin .35s ease both;transform-origin:left top}
+  .nudge-tip .av{flex:none;width:28px;height:28px;border-radius:50%;background:#fff;box-shadow:var(--sh-1);display:flex;align-items:center;justify-content:center}
+  .nudge-tip .av svg{width:24px;height:24px}
+  .nudge-tip .nb{background:#fff;border-radius:4px 16px 16px 16px;box-shadow:var(--sh-1);padding:7px 14px;font-size:14px;font-weight:700;color:var(--ink);line-height:1.5}
   /* B 案：とばす・ここで投稿文へ（いちばん下の白い囲み。主ボタンは入力欄の →） */
   .exits{display:flex;align-items:stretch;width:fit-content;max-width:100%;margin:6px auto 0;border:1.5px solid #d3c1b4;border-radius:999px;background:#fff;overflow:hidden}
   .exits button{background:none;border:none;color:var(--ink);font-size:14px;font-weight:800;min-height:42px;padding:4px 18px;cursor:pointer;white-space:nowrap}
@@ -498,15 +500,26 @@
 /* =====================================================================
    DROP. Coach — 投稿づくりチャット v5（drop_coach_chat.html）  2026/11/16
    ---------------------------------------------------------------------
+   B 案 chat-v5.6b2（2026/11/19 夕方）A 案を試した人の声（問いが多い・ヒントに気づけず投稿まで時間がかかった）を反映
+   - ひみつの部屋（任意の問い）は寄り道に：5 つのかけら（しめ）まで答えたら、そのまま投稿文へ（初めての人は「あなたについて」のあと）。
+     ひみつの部屋は、投稿文の下の「ひみつの部屋へ」から寄ったときだけ聞く（A 案はそのまま任意の問いへ進む）
+   - 投稿文が近いことを見せる：のこりが 3 問以下になったら、問いのカードの右上に「あと○問で投稿文」（最後は「さいごの問い」。「あなたについて」は今までどおり「さいごに」）
+   - 「迷ったらヒント」のボタンを、入力欄のすぐ下へ（個人情報の注記はその下）
+   - あいさつ（A 案 v5.6.1 と同じ）：
+     2 本目以降のあいさつを「おかえり！ 今日の n 本目、通算 m 本目、いってみよう！」に。前の日にコピーした人の、その日の最初も「おかえり」
+     （「今日の1本目、通算○本目」。前は今日の本数だけを見ていたため「はじめまして」のあいさつになっていた）。
+     本数の注記は「本数は、今日・通算とも、この端末でコピーした投稿の数です」に、その日はじめて本数が出るあいさつのときだけ
    B 案 chat-v5.6b（2026/11/19）drop_coach_chat_b.html
    drop_coach_chat.html（A 案・v5.6）と見比べるための別ファイル。GAS・記録先・プロンプトは A 案と同じ。見せ方だけ変える
    - 迷ったらヒント：自由に書く問いで、入力欄が空・何も選んでいない・ヒントを閉じたまま CONFIG.NUDGE_SEC（5 秒）たったら、
-     ボタンを金色の枠で光らせ、ぽとりが小さく「迷ったら、ヒントもあるよ」。1 つの問いで 1 回だけ。「気持ち」の補足からヒントの案内を外した
+     ボタンを金色の枠で光らせ、ボタンの下の行に、ぽとりの小さな吹き出し（チャットと同じく左から）で「迷ったら、ヒントもあるよ」。
+     1 つの問いで 1 回だけ。「気持ち」の補足からヒントの案内を外した
    - 答える欄：送るのは入力欄の「→」だけ。下の「次へ」はヒントを開いた・候補を選んだときだけ出す。
      「この問いをとばす｜ここで投稿文へ」を、いちばん下の白い囲みに 1 行でまとめた（問いのカード右上の小さな「ここで投稿文へ」はなくした）
    - 2 本目以降（通算 1 本以上コピーした人）：部屋の区切りと「かけらゲット」をチャットに流さない（上の地図だけ）。原石の完成は 1 行に
    - これまでの投稿：コピーした投稿文をこの端末に残し、メニューと「本日の DROP」の下から見られる（写真は残さない・ログアウトで消す）
    - 右上：「…」を「≡ メニュー」の文字入りボタンに。「関西弁」ボタンは小さく・目立たなく
+   - 誤字の修正：運営の問い文を だよ／関西弁 にするとき「なにに刺激をもらいましたか？」が「なにに刺激をもらいた？」になっていた → 「もらった？」に（kq）
    - 会話の途中保存（SESSION・PHOTO）は A 案と別の名前（A と B を行き来しても混ざらない）。ログイン・本数・行ってみるリスト・話し方は共有
    - 記録に ui_variant: "B"、nudges（声をかけた問い）、posts_opens（これまでの投稿を開いた回数）
    v5.5（2026/11/17）
@@ -560,7 +573,7 @@
    - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v9）の /exec URL（★ 同上）。記録と「チャットの設定」の配布
    - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
 ===================================================================== */
-const APP_VERSION = "chat-v5.6b (2026-11-19)";
+const APP_VERSION = "chat-v5.6b2 (2026-11-19)";
 const UI_VARIANT = "B";   // 見せ方の B 案（drop_coach_chat_b.html）。記録の ui_variant
 const CONFIG = {
   // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
@@ -794,7 +807,7 @@ const TXT = {
   hello1: ["まいど！ 案内役の「ぽとり」やで。写真1枚から、DROP の投稿文を一緒につくろ", "こんにちは！ 案内役の「ぽとり」です。写真1枚から、DROP の投稿文を一緒につくりましょう", "やあ！ 案内役の「ぽとり」だよ。写真1枚から、DROP の投稿文を一緒につくろう"],
   hello1sub: ["5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成や。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光るで✦", "5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成です。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光ります✦", "5つの部屋をまわって「ことばのかけら」を集めたら、DROP の完成だよ。答えは自分のことばでOK。自分のことばで答えると、かけらがキラッと光るよ✦"],
   nudge: ["迷ったら、ヒントもあるで", "迷ったら、ヒントもありますよ", "迷ったら、ヒントもあるよ"],
-  hello2: ["おかえり！ {n}本目の冒険、いってみよか", "おかえりなさい！ {n}本目の冒険、いってみましょう", "おかえり！ 今日の{n}本目、いってみよう！"],
+  hello2: ["おかえり！ 今日の{n}本目、通算{m}本目、いってみよか", "おかえりなさい！ 今日の{n}本目、通算{m}本目、いってみましょう", "おかえり！ 今日の{n}本目、通算{m}本目、いってみよう！"],
   hello2sub: ["写真とひとことから、また5つのかけらを集めよか", "写真とひとことから、また5つのかけらを集めましょう。", "写真とひとことから、また5つのかけらを集めよう。"],
   hello_want: ["ネタに迷ったら、行ってみるリストの{n}か所はどう？ 行った先の写真でもつくれるで", "ネタに迷ったら、行ってみるリストの{n}か所はいかがですか？ 行った先の写真でもつくれます", "ネタに迷ったら、行ってみるリストの{n}か所はどう？ 行った先の写真でもつくれるよ"],
   login_q: ["はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてな。この端末では1回だけやで", "はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてください。この端末では1回だけです", "はじめに、ニックネーム（ひらがな）と、運営からお知らせしたパスワードを入れてね。この端末では1回だけだよ"],
@@ -833,6 +846,7 @@ const TXT = {
   next_qp2: ["{p}と一緒にいて、なんか残ったことある？ この先につながりそうなことでも、今の気持ちでもええで。それで最後の1行つくろか", "{p}と一緒にいて、何か残ったことはありますか？ この先につながりそうなことでも、今の気持ちでも大丈夫です。それで最後の1行をつくりましょう", "{p}と一緒にいて、なにか残ったことある？ この先につながりそうなことでも、今の気持ちでもいいよ。それで最後の1行をつくろう"],
   next_q: ["ほな、しめの1行いこか。今日のこと、このあとどうなったらええなって思う？ 思いつかんかったら、今の気持ちでしめてもええで", "では、しめの1行です。今日のこと、このあとどうなったらいいなと思いますか？ 思いつかなければ、今の気持ちでしめても大丈夫です", "じゃあ、しめの1行いこう。今日のこと、このあとどうなったらいいなって思う？ 思いつかなかったら、今の気持ちでしめてもいいよ"],
   next_ph: ["例：次は自分も焼いてみたい、今日はいい日だった", "例：次は自分も焼いてみたい、今日はいい日だった", "例：次は自分も焼いてみたい、今日はいい日だった"],
+  opt_skip: ["ここまでで投稿文をつくれるで！ ひみつの部屋（任意）は、投稿文の下の「ひみつの部屋へ」からいつでも寄れるで", "ここまでで投稿文をつくれます！ ひみつの部屋（任意）は、投稿文の下の「ひみつの部屋へ」からいつでも寄れます", "ここまでで投稿文をつくれるよ！ ひみつの部屋（任意）は、投稿文の下の「ひみつの部屋へ」からいつでも寄れるよ"],
   opt_intro: ["もう投稿文つくれるで。よかったら、ひみつの部屋にも寄ってみる？ レアかけらがあると、投稿がもっと光るで（任意）", "もう投稿文をつくれます。よければ、ひみつの部屋にも寄ってみますか？ レアかけらがあると、投稿がもっと光ります（任意）", "もう投稿文をつくれるよ。よかったら、ひみつの部屋にも寄ってみる？ レアかけらがあると、投稿がもっと光るよ（任意）"],
   opt_intro_sub: ["いつでも「投稿文をつくる」で終われるで", "いつでも「投稿文をつくる」で終われます", "いつでも「投稿文をつくる」で終われるよ。あとから寄ることもできるよ"],
   get: ["{p}のかけら、ゲット！", "{p}のかけらをゲット！", "{p}のかけら、ゲット！"],
@@ -888,10 +902,20 @@ const T = (k, a = {}) => { const v = TXT[k]; const s = Array.isArray(v) ? (v[VOI
 const plainArgs = a => { const o = {}; Object.keys(a || {}).forEach(x => { const v = a[x]; o[x] = typeof v === "number" ? v : String(v ?? ""); }); return o; };
 const tMeta = (v, kk, ka) => (v instanceof String && v.k ? { [kk]: v.k, [ka]: plainArgs(v.a) } : {});
 /** 運営が設定した問い文（です・ます）を、話し方に合わせて語尾を変える（だよ口調・関西弁） */
+/** 運営の問い文（です・ます）を、だよ／関西弁にする。
+    「〜ましたか？」は、活用がわかっている動詞だけ た形にする（「もらいましたか？」→「もらった？」）。わからない動詞は です・ます のまま（まちがった活用を出さない）
+    B 案で直した：前は「ましたか？」を一律「た？」にしていたため「なにに刺激をもらいた？」になっていた */
+const KQ_PAST = [["もらいましたか？", "もらった？"], ["思いましたか？", "思った？"], ["会いましたか？", "会った？"], ["使いましたか？", "使った？"], ["買いましたか？", "買った？"],
+  ["行きましたか？", "行った？"], ["書きましたか？", "書いた？"], ["聞きましたか？", "聞いた？"], ["気づきましたか？", "気づいた？"], ["感じましたか？", "感じた？"], ["見ましたか？", "見た？"],
+  ["食べましたか？", "食べた？"], ["来ましたか？", "来た？"], ["知りましたか？", "知った？"], ["なりましたか？", "なった？"], ["ありましたか？", "あった？"], ["しましたか？", "した？"]];
 function kq(q) {
   if (VOICE === "standard") return q;
-  if (VOICE === "casual") return String(q).replace(/どこですか？$/, "どこだった？").replace(/かったですか？$/, "かった？").replace(/でしたか？$/, "だった？").replace(/ましたか？$/, "た？").replace(/ですか？$/, "？");
-  return String(q).replace(/どこですか？$/, "どこやった？").replace(/かったですか？$/, "かった？").replace(/でしたか？$/, "やった？").replace(/ましたか？$/, "た？").replace(/ですか？$/, "？");
+  const t = String(q), hit = KQ_PAST.find(([a]) => t.endsWith(a));
+  if (hit) return t.slice(0, -hit[0].length) + hit[1];
+  if (/ましたか？$/.test(t)) return t;
+  return VOICE === "casual"
+    ? t.replace(/どこですか？$/, "どこだった？").replace(/かったですか？$/, "かった？").replace(/でしたか？$/, "だった？").replace(/ですか？$/, "？")
+    : t.replace(/どこですか？$/, "どこやった？").replace(/かったですか？$/, "かった？").replace(/でしたか？$/, "やった？").replace(/ですか？$/, "？");
 }
 /* 個人情報の注意（どの画面でも同じ文。最初・「このチャットについて」・入力欄の下） */
 const PII_NOTICE = "ひとこと・答え・コメントなど、このチャットのどこにも、名前・連絡先・社員番号など個人がわかることは入れないでください。写真も、人の顔や名札が写ったものはさけてください。";
@@ -1135,6 +1159,11 @@ function sysHtml(m, isNew) {
 }
 function scrollEnd() { requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" })); }
 const PROG_STEPS = ["text1", "feel", "why", "who", "next"];   // 5 つのかけら
+/** B 案：投稿文までに答える問いの数（いまの問いをふくむ。任意の問い・ログイン・写真はふくめない） */
+function leftToPost(st) {
+  const i = STEPS.indexOf(st);
+  return STEPS.filter((x, k) => k >= i && !["login", "photo"].includes(x.id) && !x.optional && (x === st || !S.done.includes(x.id)) && applicable(x)).length;
+}
 const PIECES = [["text1", "できごと"], ["feel", "気持ち"], ["why", "どこが"], ["who", "だれと"], ["next", "しめ"]];
 const pieceOn = id => !!S && S.done.includes(id) && !S.skipped.includes(id);
 function renderProgress() {
@@ -1220,7 +1249,7 @@ function armNudge(st, ta) {
       if (!S || S.sid !== sid || !idle() || S.cur !== st.id || S.phase !== "ask" || !$("dHint") || !$("dNudge")) return;
       RT.nudged[st.id] = true; S.nudges = (S.nudges || []).concat(st.id); save();
       $("dHint").classList.add("nudge");
-      $("dNudge").outerHTML = `<span class="nudge-tip" role="status"><span class="av">${charSvg()}</span>${esc(T("nudge"))}</span>`;
+      $("dNudge").outerHTML = `<div class="nudge-tip" role="status"><span class="av">${charSvg()}</span><span class="nb">${esc(T("nudge"))}</span></div>`;
     }, (CONFIG.NUDGE_SEC || 5) * 1000);
   };
   ta.addEventListener("input", start);
@@ -1304,6 +1333,12 @@ async function ask(st) {
   if (st.kind === "reflect" && !(S.reflect && S.reflect.status === "OK" && (S.reflect.options || []).length)) {
     if (S.reflect) { S.reflect.status = "none"; S.reflect.how = S.reflect.how || "出なかった"; }
     markDone(st); if (!S.skipped.includes(st.id)) S.skipped.push(st.id); save();
+    return advance(st.id, g);
+  }
+  if (st.optional && !S.optIntro && !S.secretVisits) {   // B 案：ひみつの部屋は寄り道。原石ができたことを伝えて、そのまま投稿文へ（寄るのは投稿文の下の「ひみつの部屋へ」から）
+    S.optIntro = true; S.declined = true; save();
+    showDone();
+    if (!await bot(T("opt_skip"))) return;
     return advance(st.id, g);
   }
   if (st.optional && !S.optIntro) {   // 原石ができたことを伝えてから、そのまま任意の問い（ひみつの部屋）へ
@@ -1411,7 +1446,7 @@ function renderDock() {
   const badge = stepBadge(st);
   const ins = { text: st.required ? "必ず書いてください（短くてOK）" : "", photo: "1枚えらぶ", scale: "1〜10", login: "この端末で1回だけ", single: "1つえらぶ", free: "自分のことばで", reflect: "1つえらぶ" }[st.kind] || "";
   const qm = [...S.msgs].reverse().find(m => m.qid === st.id);
-  const head = `<div class="q-card"><div class="avatar">${charSvg()}</div><div class="qc"><div class="q-meta">${badge}<span class="q-ins">${esc(ins)}</span></div>
+  const head = `<div class="q-card"><div class="avatar">${charSvg()}</div><div class="qc"><div class="q-meta">${badge}<span class="q-ins">${esc(ins)}</span>${!st.optional && !["login", "photo", "profile"].includes(st.id) && leftToPost(st) <= 3 ? `<span class="q-left">${leftToPost(st) === 1 ? "さいごの問い" : `あと${leftToPost(st)}問で投稿文`}</span>` : ""}</div>
     ${qm ? `<div class="q-title">${esc(qm.text)}</div>${qm.sub ? `<div class="q-sub">${esc(qm.sub)}</div>` : ""}` : ""}</div></div>`;
   const mini = `${badge}<span class="mq">${esc(qm ? qm.text : stepName(st.id))}</span><span class="mo">答える ▲</span>`;
   const skipBtn = `<button type="button" class="btn text" id="dSkip">とばす</button>`;
@@ -1444,9 +1479,9 @@ function renderDock() {
     const open = !!RT.hintOpen[st.id], sel = RT.sel, txt = RT.freeText[st.id] || "", n = sel.length + (txt.trim() ? 1 : 0);
     const cands = open ? optionsOf(st) : [];
     html = `<div class="inrow"><textarea class="input" id="dIn" rows="1" maxlength="${CONFIG.MAX_FREE}" placeholder="${esc(st.ph ? st.ph() : "")}" enterkeyhint="send" aria-label="自分のことばで答える">${esc(txt)}</textarea><button type="button" class="send" id="dSend" aria-label="送る" ${n ? "" : "disabled"}>${ICON.send}</button></div>
+      <button type="button" class="hint-btn${open ? " open" : ""}" id="dHint" aria-expanded="${open}">${ICON.bulb}${open ? "ヒントをとじる" : "迷ったらヒント"}</button><span id="dNudge"></span>
       <div class="pii">${esc(PII_SHORT)}</div><div class="err" id="dErr"></div>
       ${sel.length && !open ? `${pickHead(sel.length, st.max, "えらんだもの（押すと外せます）")}<div class="chips">${sel.map(x => `<button type="button" class="chip on" data-rm="${esc(x.id)}"><span>${esc(x.label)}</span><span class="ck">×</span></button>`).join("")}</div>` : ""}
-      <button type="button" class="hint-btn${open ? " open" : ""}" id="dHint" aria-expanded="${open}">${ICON.bulb}${open ? "ヒントをとじる" : "迷ったらヒント"}</button><span id="dNudge"></span>
       ${open ? `<div class="hint-box">${pickHead(sel.length, st.max, st.max > 1 ? "近いものをえらぶ（押した順）" : "近いものをえらぶ")}
         ${cands.length ? `<div class="chips${st.max > 1 && sel.length >= st.max ? " full" : ""}">${cands.map(o => { const k = sel.findIndex(x => x.id === o.id); return tile(o, k >= 0, k >= 0 ? `<span class="ord">${st.max === 1 ? "✓" : k + 1}</span>` : ""); }).join("")}</div>` : `<p class="hint">${esc(T("hint_none"))}</p>`}
         <div class="hint" id="dMax" hidden>${st.max ? `選べるのは${st.max}つまでです` : ""}</div></div>` : ""}`;
@@ -2840,17 +2875,18 @@ async function start() {
   save(); renderMsgs(); renderStaff(); lockDock(); warmLogin();
   const g = RT.gen;
   const ps = postStats();
-  const h = { n: ps.n > 0 ? ps.n + 1 : 0, wl: wantList().length }, hp = helloParts(h);
+  // 一度でもコピーした人は「おかえり」：今日の n 本目・通算 m 本目（2 日目の最初は「今日の1本目、通算○本目」。前は今日の本数だけで見ていたため、2 日目の最初が「はじめまして」になっていた）
+  const tot = ps.total || 0, h = { n: tot > 0 ? ps.n + 1 : 0, m: tot > 0 ? tot + 1 : 0, wl: wantList().length }, hp = helloParts(h);
   if (!await bot(hp[0], { sub: hp[1], hello: h })) return;
-  if (h.n === 2) { S.msgs.push({ who: "sys", note: `※「${h.n}本目」は、この端末でコピーした投稿の数です（コピーしなかった投稿は数えません）` }); renderMsgs(); save(); }   // 本数の数え方：その日はじめて本数が出るときだけ。ぽとりのセリフにしない
+  if (h.n === 1 || (h.n === 2 && h.m === 2)) { S.msgs.push({ who: "sys", note: "※本数は、今日・通算とも、この端末でコピーした投稿の数です（コピーしなかった投稿は数えません）" }); renderMsgs(); save(); }   // 本数の数え方：その日はじめて本数が出るときだけ。ぽとりのセリフにしない
   if (h.n && h.wl && !await bot(T("hello_want", { n: h.wl }), { want: true })) return;   // 行ってみるリストは吹き出しを分けて、ボタンで開ける
   S.msgs.push({ who: "bot", notice: true }); renderMsgs(); save();   // 個人情報のおねがい（毎回はじめに）
   await advance(null, g);
 }
 /** あいさつの文（2 本目以降。行ってみるリストは別の吹き出し、本数の数え方は吹き出しの外の注記） */
 function helloParts(h) {
-  if (!h || !h.n) return [String(T("hello1")), String(T("hello1sub"))];
-  return [String(T("hello2", { n: h.n })), String(T("hello2sub"))];
+  if (!h || !(h.m || h.n)) return [String(T("hello1")), String(T("hello1sub"))];
+  return [String(T("hello2", { n: h.n || 1, m: h.m || h.n })), String(T("hello2sub"))];   // m がない古い記録は今日の本数で
 }
 /** それまでの会話を、いまの話し方で言いなおす（ぽとりのセリフ・あいさつ・問い。運営からのお知らせと、あなたの答えはそのまま） */
 function relocalize() {
