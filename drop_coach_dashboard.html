@@ -61,6 +61,22 @@ h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.45}
 .tab:hover{background:var(--struct-faint)}
 .tab[aria-selected="true"]{border-bottom-color:var(--struct)}
 .tab[aria-selected="true"] b{color:var(--struct)}
+/* 見方タブ：分析のタブとは種類のちがう「札」のボタン（開いているときは濃い色で塗る） */
+#t-about{align-self:center;display:flex;align-items:center;gap:8px;border:1px solid var(--line2);border-radius:999px;padding:6px 16px 6px 7px;margin:8px 18px 8px 0;background:#fff;position:relative}
+#t-about::after{content:"";position:absolute;right:-11px;top:4px;bottom:4px;border-right:1px solid var(--line2)}
+#t-about b{display:inline;font-size:13.5px}
+#t-about span:not(.gico){display:inline;margin:0;font-size:12px}
+#t-about .gico{flex:none;width:24px;height:24px;border-radius:50%;background:var(--struct-soft);color:var(--struct);font-weight:700;font-size:14px;display:grid;place-items:center;line-height:1;margin:0}
+#t-about:hover{background:var(--struct-faint)}
+#t-about[aria-selected="true"]{background:var(--struct);border-color:var(--struct)}
+#t-about[aria-selected="true"] b,#t-about[aria-selected="true"] span:not(.gico){color:#fff}
+#t-about[aria-selected="true"] .gico{background:#fff;color:var(--struct)}
+/* 見方のページ：見出しを濃い色の帯に（分析のページと見分ける） */
+.lead.guide{background:var(--struct);border-radius:14px;padding:18px 22px;margin:0 0 16px;align-items:center}
+.lead.guide h2{color:#fff;font-size:21px}
+.lead.guide p{color:#d7e6ea}
+.lead.guide .gchip{flex:none;width:44px;height:44px;border-radius:50%;background:#fff;color:var(--struct);font-weight:800;font-size:24px;display:grid;place-items:center}
+#p-about .card{border-color:var(--struct-soft)}
 
 /* ---------- 絞り込み ---------- */
 .wrap{max-width:1400px;margin:0 auto;padding:16px 24px 48px}
@@ -68,9 +84,14 @@ h1,h2,h3,h4{text-wrap:balance;margin:0;line-height:1.45}
 .fbar .f{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2)}
 .fbar select{border:1px solid var(--line2);border-radius:8px;padding:4px 8px;background:#fff}
 .fbar select.on{border-color:var(--struct);background:var(--struct-faint);font-weight:700}
+#fProf{max-width:170px}
+.fbar{gap:8px 12px}
 .fbar .cnt{margin-left:auto;font-size:12.5px;color:var(--ink2)}
 .fbar .cnt b{font-size:15px;color:var(--ink)}
 .fbar .note-now{font-size:12.5px;color:var(--struct2);font-weight:700}
+.vb{display:inline-block;margin-left:6px;font-size:11.5px;font-weight:700;color:var(--struct);background:var(--struct-soft);border-radius:999px;padding:1px 8px;white-space:nowrap}
+.ktiles .kd.kv{border-top:1px dashed var(--line);padding-top:4px;margin-top:4px}
+.fbar .fnote{flex-basis:100%;margin:0;font-size:12.5px;line-height:1.6;color:var(--ink);background:var(--struct-faint);border-radius:8px;padding:6px 10px}
 .legend{margin:-6px 2px 12px;font-size:12px;color:var(--ink2)}
 .legend summary{display:inline-flex;align-items:baseline;gap:6px;cursor:pointer;list-style:none;font-size:12.5px;font-weight:700;color:var(--struct2);background:#fff;border:1px solid var(--line2);border-radius:999px;padding:3px 12px}
 .legend summary::-webkit-details-marker{display:none}
@@ -503,7 +524,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 24px 30px;font-size:12px;color:v
 <div id="mainView" hidden>
 <nav class="tabs" aria-label="タブ">
   <div class="tabs-in" role="tablist" id="tablist">
-    <button class="tab" role="tab" data-tab="about" id="t-about" aria-controls="p-about"><b>使い方</b><span>見方・数え方・探し方</span></button>
+    <button class="tab" role="tab" data-tab="about" id="t-about" aria-controls="p-about"><span class="gico" aria-hidden="true">?</span><b>見方</b><span>数え方・探し方</span></button>
     <button class="tab" role="tab" data-tab="flow" id="t-flow" aria-controls="p-flow"><b>使われ方</b><span>使われた数・どこで止まる・何本続く・利用時間</span></button>
     <button class="tab" role="tab" data-tab="quality" id="t-quality" aria-controls="p-quality"><b>みがきの質</b><span>投稿の内容・KPIの手がかり</span></button>
     <button class="tab" role="tab" data-tab="posts" id="t-posts" aria-controls="p-posts"><b>やりとり一覧</b><span>検索・1 本ずつの答えと投稿文</span></button>
@@ -514,7 +535,13 @@ footer{max-width:1400px;margin:0 auto;padding:0 24px 30px;font-size:12px;color:v
   <div class="fbar" id="fbar" role="group" aria-label="絞り込み">
     <div class="f"><label for="fDay">日</label><select id="fDay"><option value="">すべての日</option></select></div>
     <div class="f"><label for="fProf">立場</label><select id="fProf"><option value="">すべて</option></select></div>
+    <div class="f"><label for="fState">状態</label><select id="fState" title="コピーした／投稿文の途中（投稿文の画面まで来て、まだコピーしていない）／コピーせず（「コピーしないで次へ」で終えた）／途中でやめた（投稿文の前）"><option value="">すべて</option><option value="copy">コピーした</option><option value="mid">投稿文の途中</option><option value="nocopy">コピーせず</option><option value="drop">途中でやめた</option></select></div>
+    <div class="f"><label for="fCopies">コピー数（通算）</label><select id="fCopies" title="人ごとの、この端末でコピーした通算の本数（0 本の人もふくむ）。その人のチャットをすべて残します。日で絞ったときは、その日までの通算"><option value="">すべて</option><option value="0">0 本</option><option value="1">1 本</option><option value="2">2 本</option><option value="3">3 本</option><option value="4">4 本</option><option value="5">5 本</option><option value="6">6〜9 本</option><option value="10">10 本以上</option></select></div>
+    <div class="f"><label for="fRate">使いごこち</label><select id="fRate" title="コピーのあとに聞く、チャットの使いごこち（5 段階・任意）。「答えていない」は、コピーしたが答えなかったチャット"><option value="">すべて</option><option value="5">5</option><option value="4">4</option><option value="3">3</option><option value="2">2</option><option value="1">1</option><option value="none">答えていない</option></select></div>
+    <div class="f" id="fVarWrap"><label for="fVar">画面の案</label><select id="fVar" title="A 案＝drop_coach_chat.html、B 案＝drop_coach_chat_b.html（11/19〜。ヒントの声かけ・これまでの投稿など）"><option value="">すべて</option><option value="A">A 案</option><option value="B">B 案</option></select></div>
+    <button type="button" class="btn sm" id="fClear" hidden>絞り込みを解除</button>
     <div class="cnt" id="fCount"></div>
+    <p class="fnote" id="fNote" hidden>状態・使いごこちで絞っているあいだは、すべての図が絞ったチャットの中での値になります（例：「コピーした」で絞るとコピー率は 100%、ファネルは途中で減りません）。</p>
   </div>
   <details class="legend">
     <summary>凡例<small>色・記号・押せるところ</small></summary>
@@ -526,7 +553,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 24px 30px;font-size:12px;color:v
       <span><i style="background:var(--o1)"></i><i style="background:var(--o2)"></i><i style="background:var(--o3)"></i><i style="background:var(--o4)"></i>段階・順序</span>
       <span>薄い灰色の数字＝10件未満の参考値</span>
       <span><b style="color:var(--struct)">棒・マス・札・下線の数字を押すと</b>、当てはまるチャットだけを「やりとり一覧」に出します</span>
-      <button type="button" class="lnk" data-goto="about" data-card="c-colors">くわしくは「使い方」→</button>
+      <button type="button" class="lnk" data-goto="about" data-card="c-colors">くわしくは「見方」→</button>
     </div>
   </details>
   <section class="panel" id="p-flow" role="tabpanel" aria-labelledby="t-flow"></section>
@@ -535,7 +562,7 @@ footer{max-width:1400px;margin:0 auto;padding:0 24px 30px;font-size:12px;color:v
   <section class="panel" id="p-about" role="tabpanel" aria-labelledby="t-about"></section>
 </div>
 </div>
-<footer>DROP. Coach 分析ダッシュボード v3（2026-11-18）。記録用 GAS（v9.1 以降。v9.2 で読み出しが軽くなります）の chat_v4 シートを読みます（記録用 GAS・CSV・デモの 3 通り）。デモの数字は架空です。人は「ニックネーム＋端末ID」、チャットは「セッションID」で数えます。</footer>
+<footer>DROP. Coach 分析ダッシュボード v3.1（2026-11-19：絞り込みに状態・コピー数・使いごこち・画面の案〔A／B〕を追加、B 案だけの機能、見方タブの見た目）。記録用 GAS（v9.1 以降。v9.2 で読み出しが軽くなります）の chat_v4 シートを読みます（記録用 GAS・CSV・デモの 3 通り）。デモの数字は架空です。人は「ニックネーム＋端末ID」、チャットは「セッションID」で数えます。</footer>
 <button type="button" class="totop" id="toTop" aria-label="いちばん上へ" title="いちばん上へ"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M5.5 15.5 12 9l6.5 6.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
 <div class="tip" id="tip" role="tooltip"></div>
 <script>
@@ -622,6 +649,9 @@ function makeSession(P, t0, total) {
   const setVer = t0 >= SET_CHANGE ? "設定4" : "設定3";
   const s = { id: "s" + String(++makeSession.n).padStart(4, "0"), pkey: P.key, nick: P.nick, mask: P.mask, device: P.device, profile: P.profile, voice: P.voice, big: P.big,
     day, t0, night, spike, setVer, app: "chat-v5.5", prompt: "v11.1", k, st: {}, rows: 1 };
+  // B 案（11/19〜・見せ方の案）：人ごとに約 4 割。乱数の流れを変えないよう、人の名前から決める
+  const hh = (x, m) => [...String(x)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 9973, 7) % m;
+  if (hh(P.key, 5) < 2) { s.app = "chat-v5.6b"; s.variant = "B"; }
   // どこでやめたか
   const m = first ? 1 : .5;
   const STOPP = { photo: .03 * m, text1: .045 * m, feel: .02 * m, why: .045 * m, who: .03 * m, reflect: .012 * m, next: (setVer === "設定3" ? .085 : .018) * m };
@@ -844,6 +874,12 @@ function demoRows(S) {
       game: { kira: s.kira, rare: s.rare }, big_text: s.big, post_no: s.postNo, post_total: s.postTotal,
       rec: s.rec ? { opened: s.rec.opened, skipped: s.rec.skipped, hist: s.rec.shown, clicked: uniq(s.rec.clicked.map(x => x.id)), saved: uniq(s.rec.saved.map(x => x.id)), rerolls: s.rec.rerolls } : null,
       ai_calls: s.calls.map(c => ({ kind: c[0], at: iso(c[1]), status: c[2], sec: c[3] })) };
+    if (s.variant === "B") {   // B 案だけの記録：ヒントの声かけをした問い・これまでの投稿を開いた回数
+      const hh = (x, m) => [...String(x)].reduce((a, c) => (a * 31 + c.charCodeAt(0)) % 9973, 7) % m;
+      J.ui_variant = "B";
+      J.nudges = ["text1", "feel", "why", "who"].filter((k, i) => s.st[k] && hh(s.id + k, 10) < (k === "text1" ? 3 : 2));
+      J.posts_opens = s.copied && s.postTotal >= 2 ? hh(s.id + "po", 3) : 0;
+    }
     ev.filter(([, t]) => t <= DEMO_NOW).forEach(([e, t], n) => {
       const after = name => ev.findIndex(x => x[0] === name) >= 0 && n >= ev.findIndex(x => x[0] === name);
       const basic = { "タイムスタンプ": iso(t), "Name": s.nick, "セッションID": s.id, "終了": e, "開始": iso(s.t0), "写真": s.photo ? "あり" : "なし", "属性": s.profile, "設定版": s.setVer, "アプリ版": s.app, "端末ID": s.device, "通算何本目": s.postTotal, "この端末で何本目": s.postNo };
@@ -1339,6 +1375,9 @@ function fromRows(header, rows, meta) {
       rating: numOr(last("チャットの評価")), comment, theme: comment ? themeOf(comment) : "",
       rec, exViews: numOr(String(g("ほかの人の例を見た")).split("回")[0]) || 0, previewOpens: numOr(g("投稿イメージを開いた")) || 0,
       extra: String(g("任意の問い")), kira: J.game ? numOr(J.game.kira) : null, rare: J.game ? numOr(J.game.rare) : null,
+      // 画面の案：B 案（drop_coach_chat_b.html・chat-v5.6b）は記録JSON の ui_variant「B」。無ければアプリ版で見分ける
+      variant: J.ui_variant === "B" || /v5\.6b/.test(String(g("アプリ版"))) ? "B" : "A",
+      nudges: Array.isArray(J.nudges) ? J.nudges : null, postsOpens: J.posts_opens != null ? Number(J.posts_opens) || 0 : null,
       rows: list.length
     };
     s.chars = s.final.replace(/\n/g, "").length;
@@ -1484,8 +1523,12 @@ function renderFlow(F, ALL) {
     ["「AI でもう一案」を使った", pct(moreF, aiOkF.length), `AI の案ができた ${aiOkF.length} 件のうち・平均 ${fn(mean(aiOkF.map(s => s.ai.n)), 1)} 案`, s => s.ai.n >= 2], ["文を手で直した", pct(R.filter(s => s.edited).length, R.length), "投稿文まで行ったチャットのうち", s => !!s.reached && !!s.edited],
     ["行を言いかえた", pct(aiPicked.filter(s => s.swaps > 0).length, aiPicked.length), `AI の案を選んだうち・平均 ${fn(mean(aiPicked.map(s => s.swaps)), 1)} 回`, s => !!s.reached && /^AI/.test(s.chosen) && s.swaps > 0],
     ["話し方を「関西弁」にした", pct(F.filter(s => s.voice === "関西弁").length, F.filter(s => s.voice).length), "話し方の記録があるチャットのうち（ほかは「だよ」）", s => s.voice === "関西弁"], ["文字を大きくした", pct(F.filter(s => s.big).length, F.filter(s => s.big != null).length), "チャットのうち", s => !!s.big]];
+  const FB2 = F.filter(s => s.variant === "B");
+  const FEATB = FB2.length ? [["ヒントの声かけが出た", pct(FB2.filter(s => s.nudges && s.nudges.length).length, FB2.filter(s => s.nudges).length), "B 案のチャットのうち（手が 5 秒止まったとき）", s => s.variant === "B" && !!(s.nudges && s.nudges.length)],
+    ["「これまでの投稿」を開いた", pct(FB2.filter(s => s.postsOpens > 0).length, FB2.filter(s => s.postsOpens != null).length), "B 案のチャットのうち", s => s.variant === "B" && s.postsOpens > 0]] : [];
   const FV = FEAT.filter(x => x[1] != null), featTop = FV.slice().sort((a, b) => b[1] - a[1])[0] || ["−", null], featLow = FV.slice().sort((a, b) => a[1] - b[1])[0] || ["−", null];
   const featHtml = `<div class="pan pan1row" style="--n:${FEAT.length}">${FEAT.map(([l, p, sub, pf]) => panel(l, p, sub, { drill: p ? drill(`${l}チャット`.replace("ありチャット", "ありのチャット").replace("たチャット", "たチャット"), pf) : "" })).join("")}</div>`;
+  const featBHtml = FEATB.length ? `<h4 style="margin:14px 0 6px">B 案（drop_coach_chat_b.html）だけの機能</h4><div class="pan pan1row" style="--n:${FEAT.length}">${FEATB.map(([l, p, sub, pf]) => panel(l, p, sub, { drill: p ? drill(`${l}チャット（B 案）`, pf) : "" })).join("")}</div>` : "";
   // ---- 主な数字（日ごとの値を添える）
   const KD = CTX.days.filter(d => F.some(s => s.day === d)), live = d => d === CTX.today && !CTX.complete;
   const KDL = d => `${d}${live(d) ? `（${hm(CTX.now)} まで）` : ""}`;
@@ -1503,7 +1546,9 @@ function renderFlow(F, ALL) {
     { l: "2 本以上コピーした人", v: fp(multiP(F)), u: "", s: "使った人のうち（0 本の人もふくむ・通算）", d: L => fp(multiP(L)) },
     { l: "使いごこち", v: fn(rtMean, 1), u: "／5", s: `答えた ${RT.length} 人・4 以上 ${fpk(RT.filter(s => s.rating >= 4).length, RT.length)}`, d: L => fn(mean(L.filter(s => s.copied && s.rating != null).map(s => s.rating)), 1), drill: drill("使いごこちに答えたチャット", s => s.rating != null) }
   ];
-  const keyHtml = `<div class="tiles ktiles">${KT.map(t => `<div class="tile"${t.drill || ""}><div class="l">${esc(t.l)}</div><div class="v">${t.v}${t.u ? `<small>${esc(t.u)}</small>` : ""}</div><div class="s">${t.s}</div>${perDay(L => t.d(L))}</div>`).join("")}</div>`;
+  const VA = ["A", "B"].filter(v => F.some(s => s.variant === v));
+  const perVar = f => VA.length > 1 ? `<div class="kd kv">${VA.map(v => `<span>${v} 案 <b>${f(F.filter(s => s.variant === v))}</b></span>`).join("")}</div>` : "";
+  const keyHtml = `<div class="tiles ktiles">${KT.map(t => `<div class="tile"${t.drill || ""}><div class="l">${esc(t.l)}</div><div class="v">${t.v}${t.u ? `<small>${esc(t.u)}</small>` : ""}</div><div class="s">${t.s}</div>${perDay(L => t.d(L))}${perVar(L => t.d(L))}</div>`).join("")}</div>`;
   const nIP = (CTX.inProgress || []).length;
   // ---- 使った人の評価
   const RTL = [[5, "◎", "var(--good)"], [4, "○", "var(--good2)"], [3, "△", "var(--mid)"], [2, "×", "var(--bad)"], [1, "×", "var(--bad)"]];
@@ -1512,7 +1557,7 @@ function renderFlow(F, ALL) {
   const thBars = hbars(themes.map(([l, v]) => ({ label: l, v, e: v === thMax, txt: `<b>${v}</b> 件　${fpk(v, CM.length)}`, drill: drill(`運営へのコメント：${l}`, s => !!s.comment && s.theme === l, { fb: true }) })));
 
   $("p-flow").innerHTML = lead("Coach はどれだけ使われ、投稿文のコピーまで届いたか", "投稿したかどうかは記録できないので、投稿文をコピーしたところまでを見ます。①始めてからコピーまで（利用時間も） → ②コピーのあと次の 1 本へ → ③使った人の評価 の順に見ます。数える単位はチャットです（「何本コピーした人が多いか」だけ人）。") +
-    `<div class="grid">` + card({ id: "c-key", cls: "c12", q: "主な数字", why: `いま選んでいる絞り込みでの数字です。日ごとの値を下に添えています。${nIP ? `ほかに、いま書いている途中のチャットが ${nIP} 件あります（集計にはまだ入れていません）。` : ""}`, body: keyHtml }) + `</div>` +
+    `<div class="grid">` + card({ id: "c-key", cls: "c12", q: "主な数字", why: `いま選んでいる絞り込みでの数字です。日ごとの値（A 案・B 案の両方の記録があるときは案ごとの値も）を下に添えています。${nIP ? `ほかに、いま書いている途中のチャットが ${nIP} 件あります（集計にはまだ入れていません）。` : ""}`, body: keyHtml }) + `</div>` +
     `<h3 class="subh">① 始めてからコピーまで<small>どこで止まる・とばす・どこに時間がかかる・いつ使われたか</small></h3><div class="grid">` +
     card({ id: "c-funnel", cls: "c12", q: "1 本の中で、どこで人が減るか", a: worst > 0 ? `<span>いちばん減るのは <b>${esc(fr[worst - 1][0])} → ${esc(fr[worst][0])}</b>（<b>－${worstLoss} 件</b>（－${fpk(worstLoss, fr[worst - 1][1], 1)}））。問いの中では <b>${esc(qWorst[0])}</b>（<b>－${qWorst[1]} 件</b>）。</span>` : "", why: "始めたチャットを 100% として、各段まで進んだ数。「ここまでで投稿文をつくる」で先に進んだ人は、やめた人に数えません。",
       body: `<div class="scroll">${fFull}</div><p class="note">前の段から減った＝その段に進まずにやめた件数（前の段のうちの%）。とばした＝その問いが出たうち、答えずに次へ進んだ割合（みがきの間は「どれもちがう」「出なかった」）。ここで投稿文へ＝その問いが出たうち、そこで先に投稿文をつくった割合（やめた人には数えません）。マゼンタの字＝その列でいちばん多い問い。</p>` }) +
@@ -1531,7 +1576,7 @@ function renderFlow(F, ALL) {
     card({ cls: "c6", q: "本日の DROP を見たあと、もう 1 本つくったか", a: `<span>コピーのあと次の 1 本を始めたのは <b>${fp(nxAll.p)}</b>（${nxAll.k}/${nxAll.n} 本）。${nxLow ? `いちばん低いのは <b>${nxLows.map(([l]) => esc(NXL[l] || l)).join("・")}</b>（${fp(nxLow[1].p)}${nxLows.length > 1 ? "・同率" : ""}）。` : ""}</span>`,
       why: "コピーした投稿文のうち、同じ人が次のチャットを始めた割合（時間は問わない）。コピーが起点なので 0 本の人は入りません。",
       body: `${nxBars}<p class="note">点線＝すべての値。色＝いちばん低いところ。薄い棒＝10 件未満の参考値。マウスを乗せると、ぶれの幅が出ます。</p>` }) +
-    card({ id: "c-features", cls: "c12", q: "チャットの機能は、どれくらい使われているか", a: `<span>いちばん使われているのは <b>${esc(featTop[0])}</b>（${fp(featTop[1])}）、少ないのは <b>${esc(featLow[0])}</b>（${fp(featLow[1])}）。</span>`, why: "写真・見本・投稿イメージ・AI の案・手直し・話し方・文字の大きさなど、チャットの中の機能ごとに、使った割合。", body: featHtml }) +
+    card({ id: "c-features", cls: "c12", q: "チャットの機能は、どれくらい使われているか", a: `<span>いちばん使われているのは <b>${esc(featTop[0])}</b>（${fp(featTop[1])}）、少ないのは <b>${esc(featLow[0])}</b>（${fp(featLow[1])}）。</span>`, why: "写真・見本・投稿イメージ・AI の案・手直し・話し方・文字の大きさなど、チャットの中の機能ごとに、使った割合。", body: featHtml + featBHtml }) +
     `</div><h3 class="subh">③ 使った人の評価<small>コピーのあとに任意で聞く使いごこちと、運営へのコメント</small></h3><div class="grid">` +
     card({ id: "c-rating", cls: "c5", q: "使いごこちは何点か", a: `<span>平均 <b>${fn(rtMean, 1)}</b> / 5（${RT.length} 人）。4 以上は <b>${fpk(RT.filter(s => s.rating >= 4).length, RT.length)}</b>。</span>`, why: "このチャットの使いごこちを 5 段階で（イベントの満足度ではありません）。答えるのは任意で、コピーのあとに聞くので 0 本の人は入りません。棒を押すと、その点をつけたチャットの一覧が、投稿文と運営へのコメントを並べて出ます。", body: rtBars }) +
     card({ id: "c-comments", cls: "c7", q: "コメントで多いこと", a: themes.length ? `<span>いちばん多いのは <b>${esc(themes[0][0])}</b> について（${themes[0][1]} 件／コメント ${CM.length} 件）。</span>` : "<span>コメントはまだありません。</span>", why: "運営へのコメント（任意）を、ことばで分けて数えています。棒を押すと、そのコメントを書いたチャットの一覧が、投稿文と運営へのコメントを並べて出ます。", body: thBars }) +
@@ -1631,9 +1676,9 @@ function renderQuality(F) {
 }
 
 /* =====================================================================
-   タブ：システム／やりとり一覧／使い方 ＋ 画面の動き
+   タブ：システム／やりとり一覧／見方 ＋ 画面の動き
 ===================================================================== */
-const TAB_L = { about: "使い方", flow: "使われ方", quality: "みがきの質", posts: "やりとり一覧" };
+const TAB_L = { about: "見方", flow: "使われ方", quality: "みがきの質", posts: "やりとり一覧" };
 /* 「根拠を見る」などで飛ぶ先：カードの id → [タブ, 見出し] */
 const FINDS = [
   { card: "c-key", tab: "flow", q: "Coach はどれだけ使われたか", see: "使った人・始めたチャット・コピーされた投稿文・コピー率・1 人あたり・2 本以上の人・使いごこち（日ごとの値つき）" },
@@ -1646,16 +1691,16 @@ const FINDS = [
   { card: "c-kpi", tab: "quality", q: "KPI の手がかりは出ているか", see: "①②③・愛着の手がかり（どの答えから・AI と一致・代表の声）、会社の見え方、いっしょに出やすい組み合わせ" },
   { card: "c-feels", tab: "quality", q: "どんな気持ちになり、だれと、このあと何をしたいか", see: "気持ち・だれと一緒だったか・しめの 1 行（このあと）の、多いもの上位" },
   { card: "c-check", tab: "quality", q: "困った投稿や、見せすぎはないか", see: "「いまいち」を選んだ投稿・AI の注意つき投稿。名前を見せたくないときは右上の「名前を伏せる」をオンに" },
-  { tab: "posts", q: "1 件ずつの答えと投稿文を見たい", see: "ことばで探す・状態で絞る・行を押すと答え方・AI・KPI の手がかりの詳細。ほかのタブの図を押すと、当てはまるチャットだけを出す。「CSV で保存」で表計算ソフトへ" }
+  { tab: "posts", q: "1 件ずつの答えと投稿文を見たい", see: "ことばで探す（状態などは上の絞り込みで）・行を押すと答え方・AI・KPI の手がかりの詳細。ほかのタブの図を押すと、当てはまるチャットだけを出す。「CSV で保存」で表計算ソフトへ" }
 ];
 
 /* ---------- システム（アプリ開発・エンジニア） ---------- */
 let POSTQ = { q: "", st: "", lim: 40, open: null }, POSTL = [];
 /** やりとり一覧に出ているチャットを CSV で保存（Excel で開ける。名前は「名前を伏せる」に従う） */
 function postsCsv() {
-  const st = s => (s.copied ? "コピー" : s.noCopy ? "コピーせず" : s.reached ? "投稿文まで" : "途中でやめた");
+  const st = s => (s.copied ? "コピー" : s.noCopy ? "コピーせず" : s.reached ? "投稿文の途中" : "途中でやめた");
   const iso = t => { if (!t) return ""; const d = new Date(t), z = n => String(n).padStart(2, "0"); return `${ymd(d)} ${z(d.getHours())}:${z(d.getMinutes())}:${z(d.getSeconds())}`; };   // この端末の時刻（日本時間）で
-  const cols = [["開始", s => iso(s.t0)], ["終了", s => iso(s.end)], ["日", s => s.day], ["人", s => nameOf(s)], ["端末ID", s => s.device], ["セッションID", s => s.id], ["立場", s => s.profile], ["状態", st],
+  const cols = [["開始", s => iso(s.t0)], ["終了", s => iso(s.end)], ["日", s => s.day], ["人", s => nameOf(s)], ["端末ID", s => s.device], ["セッションID", s => s.id], ["立場", s => s.profile], ["状態", st], ["画面の案", s => s.variant || ""],
     ["通算何本目", s => (s.copied ? s.postTotal : "")], ["やめた問い", s => (s.stop ? STOP_L[s.stop] || s.stop : "")], ["所要秒", s => s.dur], ["ひとこと", s => s.text1], ["話題", s => s.topic],
     ["気持ち", s => s.feels.join(" > ")], ["気持ち（自分のことば）", s => s.ownFeel], ["どこが", s => s.why.join("、")], ["だれと", s => s.who], ["どんな人", s => s.whoOwn], ["しめ", s => s.next.join("、")], ["今日の発見", s => s.finds.join("、")], ["その人のふだん", s => s.face],
     ["みがきの間", s => s.reflect], ["みがきの間の選び方", s => s.rf.how], ["投稿文", s => s.final], ["採用", s => s.chosen], ["手で直した", s => (s.edited ? "はい" : "")], ["分析に使える", s => (s.ana == null ? "" : s.ana ? "はい" : "いいえ")],
@@ -1665,9 +1710,9 @@ function postsCsv() {
 }
 function renderPosts(F) {
   const D = DRILL, FB = !!(D && D.fb), DU = !!(D && D.dur), NC = 8 + (FB ? 1 : 0) + (DU ? 1 : 0), DF = D ? F.filter(s => { try { return !!D.pred(s); } catch (e) { return false; } }) : F;
-  const st = s => (s.copied ? ["コピー", "c-copy"] : s.noCopy ? ["コピーせず", "c-nocopy"] : s.reached ? ["投稿文まで", "c-nocopy"] : ["途中でやめた", "c-drop"]);
+  const st = s => (s.copied ? ["コピー", "c-copy"] : s.noCopy ? ["コピーせず", "c-nocopy"] : s.reached ? ["投稿文の途中", "c-nocopy"] : ["途中でやめた", "c-drop"]);
   const q = POSTQ.q.trim();
-  const L = DF.filter(s => (!POSTQ.st || st(s)[0] === POSTQ.st) && (!q || [s.text1, s.final, nameOf(s), s.topic, s.who, FB ? s.comment : ""].join(" ").includes(q))).sort((a, b) => b.t0 - a.t0);
+  const L = DF.filter(s => (!q || [s.text1, s.final, nameOf(s), s.topic, s.who, FB ? s.comment : ""].join(" ").includes(q))).sort((a, b) => b.t0 - a.t0);
   // 人ごと（「何本コピーした人が多いか」から）：本数の多い人から、人の中は 1 本目 → n 本目
   const BP = !!(D && D.byPerson), PN = new Map();
   if (BP) { L.forEach(s => PN.set(s.pkey, Math.max(PN.get(s.pkey) ?? 0, copiedTot(s)))); const first = new Map(); L.forEach(s => first.set(s.pkey, Math.min(first.get(s.pkey) ?? Infinity, s.t0))); L.sort((a, b) => (PN.get(b.pkey) - PN.get(a.pkey)) || (first.get(a.pkey) - first.get(b.pkey)) || (a.postTotal - b.postTotal) || (a.t0 - b.t0)); }
@@ -1675,7 +1720,7 @@ function renderPosts(F) {
   const rows = L.slice(0, POSTQ.lim).map((s, i, A) => {
     const [l, c] = st(s);
     const grp = BP && (i === 0 || A[i - 1].pkey !== s.pkey) ? `<tr class="pgrp"><td colspan="${NC}"><b>${esc(nameOf(s))}</b><span>${PN.get(s.pkey)} 本コピー${s.profile ? `・${esc(s.profile)}` : ""}</span></td></tr>` : "";
-    const main = `<tr class="prow" data-sid="${s.id}" tabindex="0"><td class="n">${mdhm(s.t0)}</td><td>${esc(nameOf(s))}</td><td class="n">${s.copied ? s.postTotal + " 本目" : "−"}</td>${DU ? `<td class="n">${s.dur != null ? esc(fsec(s.dur)) : "−"}</td>` : ""}<td>${esc(s.text1) || '<span style="color:var(--gray-ink2)">（なし）</span>'}</td><td class="txt">${esc(s.final)}</td>${FB ? `<td class="txt fbc">${s.rating != null ? `<b>${s.rating}</b> / 5` : "−"}${s.comment ? `<br>${esc(s.comment)}` : ""}</td>` : ""}<td>${esc(s.who)}</td><td>${s.ana == null ? "−" : s.ana ? sig(4, "使える") : sig(0, "まだ")}</td><td><span class="chip ${c}">${l}</span></td></tr>`;
+    const main = `<tr class="prow" data-sid="${s.id}" tabindex="0"><td class="n">${mdhm(s.t0)}</td><td>${esc(nameOf(s))}</td><td class="n">${s.copied ? s.postTotal + " 本目" : "−"}</td>${DU ? `<td class="n">${s.dur != null ? esc(fsec(s.dur)) : "−"}</td>` : ""}<td>${esc(s.text1) || '<span style="color:var(--gray-ink2)">（なし）</span>'}</td><td class="txt">${esc(s.final)}</td>${FB ? `<td class="txt fbc">${s.rating != null ? `<b>${s.rating}</b> / 5` : "−"}${s.comment ? `<br>${esc(s.comment)}` : ""}</td>` : ""}<td>${esc(s.who)}</td><td>${s.ana == null ? "−" : s.ana ? sig(4, "使える") : sig(0, "まだ")}</td><td><span class="chip ${c}">${l}</span>${s.variant === "B" ? '<span class="vb" title="B 案（drop_coach_chat_b.html）のチャット">B 案</span>' : ""}</td></tr>`;
     if (POSTQ.open !== s.id) return grp + main;
     const src = ["feel", "why", "who", "next"].map(k => s.st[k] ? `${STOP_L[k]}：${{ own: "自分のことば", hint: "ヒントから", skip: "とばした" }[s.st[k].src]}（${fsec(s.st[k].sec)}）` : "").filter(Boolean).join("<br>");
     return grp + main + `<tr class="pdet"><td colspan="${NC}"><dl class="pdet-g">
@@ -1685,17 +1730,17 @@ function renderPosts(F) {
       </dl></td></tr>`;
   }).join("");
   $("p-posts").innerHTML = lead("やりとり一覧", "1 本のチャットごとに、問いへの答えと、できた投稿文（コピーされたか）を並べます。行を押すと、答え方・AI・KPI の手がかりの詳細を開きます。ほかのタブのグラフの棒・マス・札を押すと、当てはまるチャットだけをここに出します。") +
-    `<div class="card c12">${D ? `<div class="drillbar"><span class="dl">絞り込み中</span><b>${esc(D.label)}</b><span class="dn">${BP ? `${new Set(DF.map(s => s.pkey)).size} 人・` : ""}${DF.length} 件${D.all ? "（今日の記録から。上の絞り込みは使っていません）" : ""}</span><span class="sp"></span><button type="button" class="btn" id="drillBack">← もとの図へ</button><button type="button" class="btn" id="drillClear">絞り込みを解除</button></div>` : ""}<div class="ptools"><label class="vh" for="pq">ことばで探す</label><input type="search" id="pq" placeholder="ことばで探す（ひとこと・投稿文・話題・だれと）" value="${esc(POSTQ.q)}"><label for="pst" class="vh">状態</label><select id="pst"><option value="">すべての状態</option>${["コピー", "コピーせず", "投稿文まで", "途中でやめた"].map(x => `<option ${POSTQ.st === x ? "selected" : ""}>${x}</option>`).join("")}</select><span class="note" style="margin:0">${L.length} 件</span><button type="button" class="btn sm" id="pcsv"${SANDBOX ? ' disabled title="claude.ai の中では保存できません（リポジトリの HTML では使えます）"' : ' title="いま一覧に出ているチャットを 1 行ずつ CSV で保存します（名前は「名前を伏せる」に従います）"'}>CSV で保存</button></div>
+    `<div class="card c12">${D ? `<div class="drillbar"><span class="dl">絞り込み中</span><b>${esc(D.label)}</b><span class="dn">${BP ? `${new Set(DF.map(s => s.pkey)).size} 人・` : ""}${DF.length} 件${D.all ? "（今日の記録から。上の絞り込みは使っていません）" : ""}</span><span class="sp"></span><button type="button" class="btn" id="drillBack">← もとの図へ</button><button type="button" class="btn" id="drillClear">絞り込みを解除</button></div>` : ""}<div class="ptools"><label class="vh" for="pq">ことばで探す</label><input type="search" id="pq" placeholder="ことばで探す（ひとこと・投稿文・話題・だれと）" value="${esc(POSTQ.q)}"><span class="note" style="margin:0">${L.length} 件</span><button type="button" class="btn sm" id="pcsv"${SANDBOX ? ' disabled title="claude.ai の中では保存できません（リポジトリの HTML では使えます）"' : ' title="いま一覧に出ているチャットを 1 行ずつ CSV で保存します（名前は「名前を伏せる」に従います）"'}>CSV で保存</button></div>
     <div class="scroll"><table class="t"><thead><tr><th class="n">開始</th><th>人</th><th class="n">通算</th>${DU ? '<th class="n">かかった時間</th>' : ""}<th>ひとこと</th><th>投稿文</th>${FB ? "<th>使いごこち・運営へのコメント</th>" : ""}<th>だれと</th><th>分析に</th><th>状態</th></tr></thead><tbody>${rows}</tbody></table></div>
     ${L.length > POSTQ.lim ? `<p style="text-align:center;margin:12px 0 0"><button type="button" class="tab" id="pmore" style="border:1px solid var(--line2);border-radius:8px;padding:6px 14px">もっと見る（あと ${L.length - POSTQ.lim} 件）</button></p>` : ""}</div>`;
 }
 
-/* ---------- 使い方 ---------- */
+/* ---------- 見方（この画面の使い方） ---------- */
 function renderAbout() {
   const steps = [
     ["データを選ぶ", "右上の「データの読み込み方を選ぶ」で、記録用 GAS・CSV・デモを切りかえます。記録用 GAS のときは、5 分か 10 分ごとに自動で読み直せます。"],
     ["タブを選ぶ", "「使われ方」で、Coach がどれだけ使われ、投稿文のコピーまで届いたか・続いたかを、「みがきの質」で、Coach でみがいた投稿文の内容と KPI の手がかりを見ます。迷ったら下の「知りたいことから探す」を押してください。"],
-    ["絞り込む", "上の「日・立場」で絞ると、すべての数字がその人たちだけの値に変わります。"],
+    ["絞り込む", "上の「日・立場・状態・コピー数・使いごこち」で絞ると、すべての数字が当てはまるチャットだけの値に変わります（やりとり一覧と CSV も）。"],
     ["くわしく見る", "図にマウスを乗せると、件数などのくわしい数字が出ます。棒・マス・下線の数字を押すと、当てはまるチャットだけを「やりとり一覧」に出します（「← もとの図へ」で戻れます）。"]
   ];
   const stepHtml = `<div class="steps">${steps.map(([h, t], i) => `<div class="step"><h4><span class="no">${i + 1}</span>${esc(h)}</h4><p>${esc(t)}</p></div>`).join("")}</div>`;
@@ -1715,6 +1760,8 @@ function renderAbout() {
   const colorHtml = `<div class="cl">${colors.map(([a, b, c]) => `<div>${a}</div><b>${esc(b)}</b><span>${esc(c)}</span>`).join("")}</div>`;
   const rules = [
     ["数える単位", "人＝ニックネーム＋端末 ID、チャット＝セッション ID。図の説明に、どちらで数えたかを書いています"],
+    ["絞り込み", "状態は、コピーした／投稿文の途中（投稿文の画面まで来て、まだコピーしていない）／コピーせず（「コピーしないで次へ」で終えた）／途中でやめた（投稿文の前）。コピー数は人ごとの通算（0 本ふくむ）で、その人のチャットをすべて残します。日で絞ったときは、その日までの通算。使いごこちはコピーのあとに聞くので、点数で絞るとコピーしたチャットだけになります。状態・使いごこちで絞ると、コピー率やファネルは絞ったチャットの中での値になります"],
+    ["画面の案", "A 案＝drop_coach_chat.html、B 案＝drop_coach_chat_b.html（11/19〜。手が止まったときのヒントの声かけ・これまでの投稿など）。同じ記録シートに入り、記録の ui_variant（無ければアプリ版）で見分けます。B 案の記録があるときだけ、上の絞り込みに「画面の案」が出ます"],
     ["コピーした本数", "人ごとの本数は、使ったが 1 本もコピーしていない人（0 本）もふくめて数えます（「何本コピーした人が多いか」「1 人あたり」「2 本以上コピーした人」）。コピーした投稿文から始まる図（「本日の DROP を見たあと、もう 1 本つくったか」「複数本つくると、時間は変わるか」「使いごこち」「みがきの質」のタブ）は、コピーがないと数えられないので 0 本の人は入りません"],
     ["割合とぶれの幅", "割合には件数を添え、主な割合には「ぶれの幅」を出します。件数が少ないと割合は上下にぶれるので、おおむねこの間に入ると言える幅です（統計でいう 95% 信頼区間）。10 件未満は灰色の参考値です"],
     ["コピー率", "始めたチャットのうち、コピーまで行った割合。1 人あたりの本数と「2 本以上」は、コピーした人のうちで数えます"],
@@ -1724,9 +1771,9 @@ function renderAbout() {
     ["名前", "名前は既定では出します。画面を人に見せるときは右上の「名前を伏せる」をオンにします（参加者001 のような番号になります）。人ごとのランキングは作りません"]
   ];
   const ruleHtml = `<dl class="rules">${rules.map(([a, b]) => `<dt>${esc(a)}</dt><dd>${esc(b)}</dd>`).join("")}</dl>`;
-  $("p-about").innerHTML = lead("この画面の使い方", "") +
+  $("p-about").innerHTML = `<div class="lead guide"><span class="gchip" aria-hidden="true">?</span><div><h2>この画面の見方</h2><p>分析を見る前のページです。操作のしかた・知りたいことから探す・色と記号・数え方の決まりをまとめています。</p></div></div>` +
     `<div class="grid doc">` +
-    card({ cls: "c12", q: "基本の使い方", body: stepHtml }) +
+    card({ cls: "c12", q: "基本の操作", body: stepHtml }) +
     card({ cls: "c12", q: "知りたいことから探す", why: "押すと、その答えが見える図へ移ります。", body: finder }) +
     card({ id: "c-colors", cls: "c6", q: "色と記号の見方", body: colorHtml }) +
     card({ cls: "c6", q: "数え方の決まり", body: ruleHtml }) +
@@ -1759,7 +1806,7 @@ function useData(header, rows, meta) {
   CTX = buildCtx(D); ALL = D.S.filter(s => !s.inProgress);   // 書いている途中のチャットは、まだ集計に入れない
   $("fDay").innerHTML = '<option value="">すべての日</option>' + CTX.days.map(d => `<option value="${esc(d)}">${esc(dayLabel(d))}</option>`).join("");
   $("fProf").innerHTML = '<option value="">すべて</option>' + countBy(ALL.map(s => s.profile)).map(([p]) => `<option>${esc(p)}</option>`).join("");
-  ["fDay", "fProf"].forEach(id => { $(id).value = ""; });
+  FIDS.forEach(id => { $(id).value = ""; });
   POSTQ.open = null;
   updateNow();
   showView("main");
@@ -1855,20 +1902,33 @@ $("demoBtn").addEventListener("click", () => {
   useData(R.header, R.rows, { source: "デモデータ（架空）", demo: true, now: DEMO_NOW, open: DEMO_OPEN, close: DEMO_CLOSE });
 });
 $("switchBtn").addEventListener("click", () => showView("loader"));
+$("fClear").addEventListener("click", () => { FIDS.forEach(id => { $(id).value = ""; }); POSTQ.lim = 40; render(); });
 $("loaderBackBtn").addEventListener("click", () => showView("main"));
 
 /* ---------- 分析の画面 ---------- */
+const FIDS = ["fDay", "fProf", "fState", "fCopies", "fRate", "fVar"];
+/** 状態：コピーした／投稿文の途中（投稿文の画面まで来て、まだコピーしていない）／コピーせず（「コピーしないで次へ」）／途中でやめた（投稿文の前） */
+const stateOf = s => (s.copied ? "copy" : s.noCopy ? "nocopy" : s.reached ? "mid" : "drop");
+const COPY_F = { 0: v => v === 0, 1: v => v === 1, 2: v => v === 2, 3: v => v === 3, 4: v => v === 4, 5: v => v === 5, 6: v => v >= 6 && v <= 9, 10: v => v >= 10 };
 function filtered() {
-  const d = $("fDay").value, p = $("fProf").value;
-  ["fDay", "fProf"].forEach(id => $(id).classList.toggle("on", !!$(id).value));
-  return ALL.filter(s => (!d || s.day === d) && (!p || s.profile === p));
+  const d = $("fDay").value, p = $("fProf").value, st = $("fState").value, cp = $("fCopies").value, rt = $("fRate").value, va = $("fVar").value;
+  FIDS.forEach(id => $(id).classList.toggle("on", !!$(id).value));
+  $("fClear").hidden = !FIDS.some(id => $(id).value);
+  $("fNote").hidden = !(st || rt);
+  let L = ALL.filter(s => (!d || s.day === d) && (!p || s.profile === p) && (!va || s.variant === va));
+  // コピー数：人ごとの通算（0 本ふくむ）。日・立場で絞ったあとの記録で数える＝日で絞ったときは、その日までの通算。その人のチャットはすべて残す
+  if (cp !== "") { const T = totByPerson(L), f = COPY_F[cp]; L = L.filter(s => f(T.get(s.pkey) ?? 0)); }
+  if (st) L = L.filter(s => stateOf(s) === st);
+  if (rt) L = L.filter(s => (rt === "none" ? !!s.copied && s.rating == null : s.rating === +rt));
+  return L;
 }
 function render() {
   if (!CTX) return;
   DRL = [];
   const F = filtered();
   const isAbout = CUR === "about";
-  ["fDay", "fProf"].forEach(id => { $(id).parentElement.hidden = isAbout; });
+  FIDS.forEach(id => { $(id).parentElement.hidden = isAbout; });
+  $("fVarWrap").hidden = isAbout || !ALL.some(s => s.variant === "B");   // B 案の記録があるときだけ
   $("fbar").hidden = isAbout; document.querySelector(".legend").hidden = isAbout;
   $("fCount").innerHTML = isAbout ? "" : `<b>${F.length}</b> 件のチャット・<b>${uniq(F.map(s => s.pkey)).length}</b> 人（全体 ${ALL.length} 件）`;
   TABS.forEach(t => { const on = t === CUR; $("t-" + t).setAttribute("aria-selected", on); $("t-" + t).tabIndex = on ? 0 : -1; $("p-" + t).classList.toggle("on", on); });
@@ -1912,8 +1972,7 @@ document.addEventListener("input", e => {
   if (e.target.id === "pq") { POSTQ.q = e.target.value; POSTQ.lim = 40; const pos = e.target.selectionStart; render(); const el = $("pq"); el.focus(); try { el.setSelectionRange(pos, pos); } catch (er) {} }
 });
 document.addEventListener("change", e => {
-  if (e.target.id === "pst") { POSTQ.st = e.target.value; POSTQ.lim = 40; render(); return; }
-  if (["fDay", "fProf", "maskTog"].includes(e.target.id)) render();
+  if ([...FIDS, "maskTog"].includes(e.target.id)) { POSTQ.lim = 40; render(); }
 });
 window.addEventListener("hashchange", () => { if (CTX) go(location.hash.slice(1), false); });
 showView("loader");
