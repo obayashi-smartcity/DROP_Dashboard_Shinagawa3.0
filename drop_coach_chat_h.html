@@ -448,20 +448,83 @@
   @media (max-width:380px){ .btn{padding:0 14px} .btn.wide{font-size:15px} .btn.sm{padding:0 10px;font-size:14px} }
   @media (max-width:360px){ .brand-t small{display:none} .brand-t b{font-size:19px} .node i{font-size:9.5px} .chips{grid-template-columns:1fr} .chest{width:44px} }
   @media (min-width:900px){ .chat{padding-top:20px} }
+
+  /* =====================================================================
+     H 案のデザイン（トンマナは同じ）
+     - 文字は 3 段（問い 17・本文 16・補足 12.5）、太さは 500／900
+     - 色の役割：こげ茶＝押すもの・えらんだもの／金＝ヒントだけ／しずくの 5 色＝進みぐあいだけ
+     - 角丸：カード 24・チップ 16・ボタンはまる。枠線より影。余白は 8 の倍数。動きは 0.2 秒のフェードと地図だけ
+  ===================================================================== */
+  :root{--fs-q:17px;--fs-b:16px;--fs-s:12.5px}
+  .bubble,.chip,.btn,.input,.alts button,.ln,.cmp-t,.plog-t,.draft,.ex p,.say p,.rate-btns button,.pulse-btns button,.rec h4,.stamp-msg,.menu button,.sheet p,.tag,.lnk,.lnk2,.hint-btn,.seg button,.want b,.photo-tile small{font-size:var(--fs-b)}
+  .q-title,.card-hd b,.sheet-hd b,.photo-tile b,.final,.hint-q,.treasure.opened .tr-hd b{font-size:var(--fs-q)}
+  .bubble .sub,.q-sub,.pii,.hint,.note,.card-foot .cnt,.card-hd .cnt,.cnt-sm,.rec .who,.rec .place,.rec .desc,.rec .why,.rec .kind,.tr-note,.rate-q small,.rate-lab,.plog-hd,.plog-hd b,.plog-note,.maxpill,.q-num,.node i,.glass-night,.sysnote,.err,.rate-sel,.mat span,.want small,.want a,.fixtag,.post-label,.stamp-n,.chip.ai small,.dock-mini .mo,.toast,.photo-chg,.dots{font-size:var(--fs-s)}
+  .rate-q,.rec .btn,.btn.sm{font-size:var(--fs-b)}
+  .bubble,.input,.sheet p,.rec .desc,.q-sub,.pii,.hint,.note,.cnt-sm,.lnk,.mat span,.photo-tile small,.tr-note,.rate-lab,.plog-hd,.plog-note,.want small,.card-foot .cnt,.cmp-t,.final,.draft,.ex p,.say p,.err{font-weight:500}
+  .chip,.btn,.menu button,.tag,.alts button,.seg button,.rate-btns button,.pulse-btns button,.dock-mini .mq,.plog-hd b,.lnk2,.q-title,.q-num,.rec h4,.rec .who,.rec .place,.rate-q,.stamp-msg,.node i,.fixtag,.hint-q,.card-hd b,.ln{font-weight:900}
+  .row{gap:8px;margin-top:8px}
+  .dock-act{padding-top:8px}
+  .chip{border-radius:16px;border-color:transparent;box-shadow:var(--sh-1)}
+  .chip.on{box-shadow:none}
+  .chip.ai{border:1.5px dashed #d9c4b4;box-shadow:none}
+  .btn.ghost{border-color:transparent;box-shadow:var(--sh-1)}
+  .rate-btns button,.pulse-btns button{border-color:transparent;box-shadow:var(--sh-1)}
+  .rec{border-color:transparent}
+  .card,.done-card{border-radius:24px}
+  .msg.new{animation:fade .2s ease}
+  .q-title{animation:fade .2s ease}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  /* 上：1 段（ぽとり・進みぐあい・メニュー） */
+  .appbar-in{padding:8px 6px 8px 12px;gap:8px;min-height:60px}
+  .appbar-in>.mark{width:32px;height:32px;flex:none}
+  .appbar-in>.mark svg{width:32px;height:32px;display:block}
+  .top .quest{flex:1;min-width:0;width:auto;padding:6px 4px 4px;background:#fff;border-radius:18px;box-shadow:var(--sh-1)}
+  .top .quest .path{width:100%}
+  .node i{font-size:10.5px}
+  .menu-btn{flex-direction:column;width:48px;height:48px;padding:0;gap:1px;border:none;background:transparent;color:var(--ink-2)}
+  .menu-btn span{font-size:10px;font-weight:900}
+  .menu-btn svg{width:22px;height:22px}
+  .menu{top:62px}
+  /* 答える欄：問いは 1 行（番号＋問い）・操作は 1 行 */
+  .q-card{display:block;padding:12px 16px;border-radius:6px 18px 18px 18px}
+  .q-line{display:flex;align-items:flex-start;gap:8px}
+  .q-num{flex:none;margin-top:3px;color:#fff;background:var(--brown);border-radius:999px;padding:1px 9px;white-space:nowrap;line-height:1.6}
+  .q-title{margin:0;line-height:1.55}
+  .q-sub{margin:4px 0 0}
+  .ctl{display:flex;align-items:center;gap:0;margin-top:8px;min-height:46px}
+  .ctl .hint-btn{margin-top:0}
+  .ctl-sp{flex:1}
+  .ctl i{width:1.5px;height:18px;background:var(--line);flex:none}
+  .lnk2{background:none;border:none;color:var(--ink-2);min-height:44px;padding:0 12px;cursor:pointer}
+  .lnk2:active{color:var(--ink)}
+  .chips.pills{display:flex;flex-wrap:wrap;gap:8px}
+  .chips.pills .chip{min-height:44px;padding:8px 16px;width:auto}
+  .chips.pills .chip .ck{margin-left:4px}
+  .chips.picked{margin-bottom:8px}
+  .gap8{height:8px}
+  .sheet .hint-q{color:var(--ink);margin-bottom:12px;font-size:var(--fs-q);font-weight:900}
+  .fixtag{display:inline-flex;align-items:center;gap:4px;min-height:32px;margin-top:4px;padding:4px 12px;border-radius:999px;border:none;background:#fff;box-shadow:var(--sh-1);color:var(--ink-2);cursor:pointer;white-space:nowrap}
+  span.fixtag{cursor:default}
+  /* 投稿文：できた文を大きく */
+  .final{white-space:pre-wrap;line-height:1.85;padding:12px 16px;background:var(--paper);border-radius:16px;color:var(--ink)}
+  .card-foot .sp{flex:1}
+  .card-hd .cnt{color:var(--dim)}
+  .post-photo{border-radius:16px}
 </style>
 </head>
 <body>
 <header class="top">
   <div class="appbar-in">
-    <div class="brand"><span class="mark" id="brandMark" aria-hidden="true"></span><span class="brand-t"><b>DROP. Coach</b><small>投稿文づくり</small></span></div>
-    <div class="top-r">
+    <span class="mark" id="brandMark" role="img" aria-label="DROP. Coach"></span>
+    <button type="button" class="quest" id="pvBar" aria-label="進みぐあい（押すと、いまの投稿イメージ）"><span class="path" id="pieces"></span></button>
     <span class="staff-flag" id="staffFlag" hidden>STAFF</span>
-    <button type="button" class="voice-btn" id="voiceBtn" aria-pressed="false" title="ぽとりの話し方を関西弁にする／もどす" hidden><span class="vd" aria-hidden="true"></span>関西弁</button>
+    <button type="button" class="voice-btn" id="voiceBtn" aria-pressed="false" hidden>関西弁</button>
     <button type="button" class="icon-btn menu-btn" id="menuBtn" aria-label="メニュー" aria-expanded="false"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="5" width="18" height="2.4" rx="1.2"/><rect x="3" y="10.8" width="18" height="2.4" rx="1.2"/><rect x="3" y="16.6" width="18" height="2.4" rx="1.2"/></svg><span>メニュー</span></button>
-    </div>
   </div>
   <nav class="menu" id="menu" hidden>
     <button type="button" id="mBig">文字を大きく</button>
+    <button type="button" id="mVoice">関西弁にする</button>
+    <button type="button" id="mTags">投稿文にハッシュタグを付ける</button>
     <button type="button" id="mExamples">ほかの人の例</button>
     <button type="button" id="mWant">☆行ってみるリスト</button>
     <button type="button" id="mPosts">これまでの投稿</button>
@@ -470,9 +533,6 @@
     <button type="button" id="mProfile">「あなたについて」を答え直す</button>
     <button type="button" id="mLogout" hidden>ログアウト</button>
   </nav>
-  <button type="button" class="quest" id="pvBar" aria-label="ことばのかけらの地図（押すと、いまの投稿イメージ）">
-    <span class="quest-in"><span class="path" id="pieces"></span><span class="chest" id="pvOpen"></span></span>
-  </button>
   <div class="iab" id="iab" hidden><div class="iab-in"><span id="iabText"></span><button type="button" class="btn ghost" id="iabCopy">URL をコピー</button><button type="button" class="icon-btn" id="iabX" aria-label="閉じる"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div>
 </header>
 
@@ -504,6 +564,20 @@
 /* =====================================================================
    DROP. Coach — 投稿づくりチャット v5（drop_coach_chat.html）  2026/11/16
    ---------------------------------------------------------------------
+   H 案 chat-v5.6h2（2026/11/19 夜）迷わせずにサクサク進ませる・デザインの洗練（入力 → ヒントの流れは変えない）
+   流れ
+   - 送る方法は入力欄の「→」1 つ（「次へ」はなし）。「あなたについて」は候補を押したら進む
+   - 確かめの 1 タップ（「○○」でいい？）をなくした：書いたことばは裏で区分に当てはめ、答えの吹き出しの下に「区分 ✎」。違えば押して直す（記録の fixes）
+   - どの問いも、まず自分のことばで書く。候補は「ヒント」を押したときだけ（いきなり候補を出すと、そちらを選んでしまうため）
+   - 入力中の「…」の待ち時間・あいづちをなくした。「あなたについて」は最初（ログインのあと）に 1 回だけ
+   画面
+   - 問いは答える欄の 1 か所（「2/5　どこが心に残った？」の 1 行）。操作はどの問いでも「入力欄＋→」の下に「ヒント ｜ とばす ｜ 投稿文へ」の 1 行
+   - ヒントは下から出るシート。候補を押すと閉じて、入力欄の上に入る（記録の hint_opens）
+   - 上は 1 段（ぽとり・進みぐあい・メニュー）。関西弁・ハッシュタグはメニューに
+   デザイン
+   - 文字は 3 段（問い 17・本文 16・補足 12.5）、太さは 500／900。角丸はカード 24・チップ 16・ボタンはまる。枠線より影。動きは 0.2 秒のフェードと地図だけ
+   投稿文
+   - できた文を大きく見せる。「直す」で 1 行ずつの言いかえ・直接の編集。案のタブは 2 案以上のときだけ。コピーのあとは「本日の DROP」（通算○本目）を見せ、おすすめ・質問はその下
    H 案 chat-v5.6h1（2026/11/19）drop_coach_chat_h.html ── B 案（chat-v5.6b2）を複製して作った。GAS・記録先・プロンプトは同じ。見せ方だけ変える
    ねらい：直感的に操作できる／文字を減らしてスムーズに進む／ゲーム性を少し落とし、投稿の中身を考えること以外に頭を使わせない
    - ヒント：ボタンの文字は「ヒント」だけ。金の面のボタンにして目立たせた（開いているあいだは、こげ茶）。手が止まったときは光るだけ（ぽとりの声かけの吹き出しはなし）
@@ -587,14 +661,14 @@
    - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v9）の /exec URL（★ 同上）。記録と「チャットの設定」の配布
    - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
 ===================================================================== */
-const APP_VERSION = "chat-v5.6h1 (2026-11-19)";
+const APP_VERSION = "chat-v5.6h2 (2026-11-19)";
 const UI_VARIANT = "H";   // 見せ方の H 案（drop_coach_chat_h.html）。記録の ui_variant
 const CONFIG = {
   // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
   GAS_URL: "https://script.google.com/macros/s/AKfycbzdkIa8xnE0useu-5tuXMfLTBXCU80_9yhhpN0C6pcxnkePNdfR2jtVZ51PqyAb3XRe/exec",   // 仕上げ用 GAS（DROP_COACH_GPT v10）
   LOG_URL: "https://script.google.com/macros/s/AKfycbzInJasVfcMk61ud2I7Qi8viHEj-lnZ10p7kgKpi_VMzlH7qW8OI3h-MOvmYE9-epd_vw/exec",   // 記録用 GAS（DROP_COACH_LOG v9）
   VOICE: "casual",            // ぽとりの話し方（既定）：casual（〜だよ）／standard（です・ます）／kansai（関西弁）
-  VOICE_TOGGLE: true,         // 右上に「関西弁」ボタンを出す（ワンタップで関西弁 ⇄ 既定の話し方。この端末に保存）
+  VOICE_TOGGLE: false,       // H 案：関西弁の切りかえは右上ではなくメニューに（false でも、メニューからは切りかえられる）         // 右上に「関西弁」ボタンを出す（ワンタップで関西弁 ⇄ 既定の話し方。この端末に保存）
   DATA_SOURCES: ["json/sample_drop.json"],
   EVENT: "culture-snack-2026",
   LOGIN_AT_START: true,       // GAS 設定済み・未ログインなら最初に 1 回だけ名前とパスワードを聞く
@@ -616,7 +690,7 @@ const CONFIG = {
   SEND_SAMPLE_IMAGES: false,  // 見本投稿の写真も AI に渡す（待ち時間が長くなる）
   DROP_URL: "",               // DROP の投稿画面の URL（入れるとコピー後に「DROP を開く」ボタンを出す）
   RECOMMEND_ON: true,         // コピーのあと「ごほうびの宝箱」（このあとのおすすめ 3 つ）を出す。json/cs_contents.json を使う
-  BOT_DELAY: 300, TIMEOUT_MS: 90000, SETTINGS_TIMEOUT_MS: 8000,
+  BOT_DELAY: 0, TIMEOUT_MS: 90000, SETTINGS_TIMEOUT_MS: 8000,
   IMG_MAX_EDGE: 512, IMG_QUALITY: 0.8, PREVIEW_EDGE: 1080, MAX_MB: 30,
   MAX_TEXT1: 100, MAX_DETAIL: 30, MAX_FREE: 40, MAX_FINAL: 300,
   RESUME_HOURS: 6,
@@ -888,7 +962,7 @@ const TXT = {
   compose_lead: ["投稿文つくるで", "投稿文をつくります", "投稿文をつくるね"],
   compose_lead_early: ["投稿文つくるで", "投稿文をつくります", "投稿文をつくるね"],
   compose_ok: ["できたで！", "できました", "できたよ！"],
-  compose_ok_sub: ["行を押すと、言いかえられるで", "行を押すと、言いかえられます", "行を押すと、言いかえられるよ"],
+  compose_ok_sub: ["", "", ""],
   compose_more_sub: ["案{n}ができたで", "案{n}ができました", "案{n}ができたよ"],
   compose_err: ["AI が使えへんかったから、あなたのことばでつくったで", "AI が使えなかったので、あなたのことばでつくりました", "AI が使えなかったから、あなたのことばでつくったよ"],
   compose_empty: ["ひとことだけでも書いてな", "ひとことだけでも書いてください", "ひとことだけでも書いてね"],
@@ -1064,6 +1138,9 @@ const STEPS = [
   { id: "login", kind: "login", count: false,
     when: () => CONFIG.LOGIN_AT_START && anyGas() && !S.noLogin && !getCreds() && !hasTokens(),
     q: () => T("login_q"), sub: () => T("login_sub") },
+  // H 案：「あなたについて」は最初（ログインのあと）に 1 回だけ（投稿文の直前で手が止まらないように）
+  { id: "profile", kind: "single", opts: "profile", count: false,
+    when: () => CONFIG.ASK_PROFILE && !LS.get(CONFIG.KEYS.PROFILE, null), q: () => T("profile_q") },
   { id: "photo", kind: "photo", count: false, q: () => T("photo_q"), sub: () => T("photo_sub") },
   { id: "text1", kind: "text", required: true, max: CONFIG.MAX_TEXT1, multiline: true,
     q: () => T(hasPhoto() ? "text1_q_photo" : "text1_q"), sub: () => T("text1_sub"), ph: () => T("text1_ph") },
@@ -1080,9 +1157,7 @@ const STEPS = [
   { id: "next", kind: "free", opts: "next", max: 2, confirm: true, q: nextQ, sub: () => "", ph: () => T("next_ph") },
   // ここまでが「5 つのかけら」。この先は任意：そのまま流れで聞き、各問いに「投稿文をつくる」を同じ大きさで出す
   { id: "find", kind: "free", opts: "find", max: 2, optional: true, when: () => !S.declined, q: () => T("find_q"), sub: () => T("find_sub"), ph: () => T("find_ph") },
-  { id: "face", kind: "free", opts: "face", max: 1, optional: true, when: () => !S.declined && faceNeeded(), q: () => T("face_q"), sub: () => T("face_sub"), ph: () => T("face_ph") },
-  { id: "profile", kind: "single", opts: "profile", count: false,
-    when: () => CONFIG.ASK_PROFILE && !LS.get(CONFIG.KEYS.PROFILE, null), q: () => T("profile_q") }
+  { id: "face", kind: "free", opts: "face", max: 1, optional: true, when: () => !S.declined && faceNeeded(), q: () => T("face_q"), sub: () => T("face_sub"), ph: () => T("face_ph") }
 ];
 /* 部屋（ダンジョン）：5 つの部屋をまわって、ことばのかけらを集める。任意の問いは「ひみつの部屋」でレアかけら */
 const ROOM = {
@@ -1107,6 +1182,7 @@ function faceNeeded() {
   return ["maker", "otherco", "local"].includes(w) || S.ans.find.some(x => x.id === "unexpected");
 }
 const OPT_STEPS = ["find", "face"];
+const CHIPS_FIRST = [];   // 候補を最初から出す問い。H 案は使わない（まず自分のことばで書いてもらう。いきなり候補を出すと、そちらを選んでしまうため。迷ったらヒント）
 const AI_KEY = { feel: "feel_options", why: "why_options", find: "find_options", next: "shime_options" };   // ヒントに足す AI の候補
 const optRemaining = () => STEPS.filter(st => st.optional && !S.done.includes(st.id) && applicable(st)).length;
 const stepName = id => STEP_LABEL[id] || id || "";
@@ -1137,6 +1213,8 @@ function msgHtml(m, isNew) {
     const rp = isPickMsg(m) && !S.copied ? `<button type="button" class="lnk repick" data-repick="1">${m.photo ? "写真をえらびなおす" : "やっぱり写真をえらぶ"}</button>` : "";
     if (m.photo) return `<div class="${cls}"><div class="pick-col"><div class="bubble photo">${PHOTO.img ? `<img src="${esc(PHOTO.img)}" alt="えらんだ写真">` : '<span class="nophoto">写真（この画面では表示できません）</span>'}</div>${rp}</div></div>`;
     if (rp) return `<div class="${cls}"><div class="pick-col"><div class="bubble muted">${esc(m.text)}</div>${rp}</div></div>`;
+    if (m.auto) return `<div class="${cls}">${S.copied ? `<span class="fixtag">${esc(stepName(m.fix))}：${esc(fixLabel(m.fix))}</span>` : `<button type="button" class="fixtag" data-fix="${esc(m.fix)}" aria-label="${esc(stepName(m.fix))}を直す">${esc(stepName(m.fix))}：${esc(fixLabel(m.fix))} ✎</button>`}</div>`;
+    if (m.fix && !S.copied) return `<div class="${cls}"><div class="pick-col"><div class="bubble">${esc(m.text)}</div><button type="button" class="fixtag" data-fix="${esc(m.fix)}" aria-label="${esc(stepName(m.fix))}の区分を直す">${esc(fixLabel(m.fix))} ✎</button></div></div>`;
     return `<div class="${cls}"><div class="bubble${m.muted ? " muted" : ""}">${esc(m.text)}</div></div>`;
   }
   const av = `<div class="avatar">${charSvg()}</div>`;
@@ -1174,6 +1252,11 @@ function sysHtml(m, isNew) {
   }
   return "";
 }
+function scrollToEl(sel) {
+  const el = document.querySelector(sel); if (!el) return;
+  const top = el.getBoundingClientRect().top + window.scrollY - document.querySelector(".top").offsetHeight - 8;
+  window.scrollTo({ top, behavior: "smooth" });
+}
 function scrollEnd() { requestAnimationFrame(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "smooth" })); }
 const PROG_STEPS = ["text1", "feel", "why", "who", "next"];   // 5 つのかけら
 /** B 案：投稿文までに答える問いの数（いまの問いをふくむ。任意の問い・ログイン・写真はふくめない） */
@@ -1193,8 +1276,8 @@ function renderProgress() {
     return `<span class="node${got ? " got" : ""}${now ? " now" : ""}${fresh.includes(id) ? " pop" : ""}"><span class="gem">${gemSvg(i, got ? "got" : miss ? "miss" : now ? "now" : "empty")}</span><i>${esc(l)}</i></span>`;
   }).join("");
   const el = $("pvOpen");
-  el.className = "chest" + (done.length === PIECES.length ? " full" : "");
-  el.innerHTML = `${dropSvg(done.length === PIECES.length ? null : PIECES.map(([id]) => pieceOn(id)), false)}<i>DROP</i>`;   // H 案：宝箱ではなく、しずく（そろった色だけつく）
+  if (el) el.className = "chest" + (done.length === PIECES.length ? " full" : "");
+  if (el) el.innerHTML = `${dropSvg(done.length === PIECES.length ? null : PIECES.map(([id]) => pieceOn(id)), false)}<i>DROP</i>`;   // H 案：宝箱ではなく、しずく（そろった色だけつく）
   $("pvBar").setAttribute("aria-label", `ことばのかけらの地図：${done.length ? done.map(id => ROOM[id].piece).join("・") + "のかけらを集めた" : "まだかけらはありません"}（押すと、いまの投稿イメージ）`);
   RT.lastPieces = done;
 }
@@ -1368,6 +1451,59 @@ async function ask(st) {
   if (g !== RT.gen) return;
   RT.busy = false; renderDock(); save();
 }
+/** H 案：ひとことから気持ち・だれとが読み取れたら、その問いはとばす（答えは「区分 ✎」で直せる） */
+function autoKnown(st) {
+  if (S.done.includes(st.id)) return false;
+  let ids = [];
+  if (st.id === "feel") ids = S.det.feels.filter(id => { const it = item("feel", id); return it && !it.hidden; }).slice(0, st.max);
+  if (st.id === "who" && S.det.who && item("who", S.det.who)) ids = [S.det.who];
+  if (!ids.length) return false;
+  if (st.id === "who") { const o = item("who", ids[0]); S.ans.who = { id: o.id, label: o.label, detail: "", pre: true }; }
+  else S.ans.feel = ids.map(id => ({ id, label: item("feel", id).label, pre: true, src: "ひとことから" }));
+  S.own[st.id] = ""; S.src[st.id] = "ひとことから（自動）";
+  S.times[st.id] = { shown: now(), answered: now() };
+  markDone(st); S.autoSteps = (S.autoSteps || []).concat(st.id);
+  S.msgs.push({ who: "me", auto: true, fix: st.id }); renderMsgs(); save();
+  return true;
+}
+/** 答えの区分（✎ の文字） */
+function fixLabel(id) {
+  const l = id === "who" ? ((S.ans.who || {}).label || "") : (S.ans[id] || []).filter(x => x.id !== "other").map(x => x.label).join("・");
+  return l || "えらぶ";
+}
+/** H 案：答えの区分を直す（下から出るシート） */
+function openFix(id) {
+  if (!S || S.copied || RT.busy) return;
+  const st = stepOf(id); if (!st || !st.opts) return;
+  let picks = id === "who" ? (S.ans.who ? [S.ans.who.id] : []) : (S.ans[id] || []).filter(x => x.id !== "other").map(x => x.id);
+  const q = { who: T("who_q"), feel: T("feel_q"), next: T("pick_q") }[id] || "";
+  const draw = () => {
+    $("sheetBody").innerHTML = `<p class="hint-q">${esc(q)}</p><div class="chips pills">${V[st.opts].filter(x => !x.hidden && !x.free).map(o => chipHtml(o, picks.includes(o.id))).join("")}</div>
+      <div class="row"><button type="button" class="btn full" id="fixOk" ${picks.length ? "" : "disabled"}>これにする</button></div>`;
+    $("sheetBody").querySelectorAll(".chip[data-id]").forEach(b => b.addEventListener("click", () => {
+      const o = item(st.opts, b.dataset.id); if (!o) return;
+      const k = picks.indexOf(o.id);
+      if (k >= 0) picks.splice(k, 1);
+      else if (st.max === 1 || o.neutral) picks = [o.id];
+      else { picks = picks.filter(p => !(item(st.opts, p) || {}).neutral); if (picks.length >= st.max) { toast(`${st.max}つまでです`); return; } picks.push(o.id); }
+      draw();
+    }));
+    $("fixOk").addEventListener("click", () => applyFix(id, picks));
+  };
+  openSheet(stepName(id) + "を直す", ""); draw();
+}
+function applyFix(id, picks) {
+  if (!picks.length) return;
+  const st = stepOf(id);
+  if (id === "who") { const o = item("who", picks[0]); S.ans.who = { id: o.id, label: o.label, detail: o.neutral ? "" : (S.own.who || ""), pre: false }; }
+  else { const own = (S.ans[id] || []).filter(x => x.id === "other"); S.ans[id] = picks.map(p => { const o = item(st.opts, p); return { id: o.id, label: o.label, src: "本人が直した" }; }).concat(own); }
+  S.src[id] = "本人が直した"; S.fixes = (S.fixes || 0) + 1;
+  closeModal();
+  if (S.phase === "compose") S.composed = composeText();
+  RT.noScroll = true; renderMsgs(); RT.noScroll = false;
+  if (S.phase === "compose") refreshCompose();
+  save(); toast("直しました");
+}
 async function advance(fromId, g = RT.gen) {
   if (g !== RT.gen) return;
   const n = nextStepAfter(fromId);
@@ -1389,7 +1525,7 @@ function gotPiece(id, miss) {
 }
 /** DROP の原石（5 つのかけら）。任意の問いの前、または投稿文の前に 1 回だけ */
 function showDone() {
-  if (UI_VARIANT === "H") return;   // H 案：原石の完成は出さない（上の地図で見せる）
+  if (/^H/.test(UI_VARIANT)) return;   // H 案：原石の完成は出さない（上の地図で見せる）
   if (S.doneShown || !PIECES.some(([id]) => pieceOn(id))) return;
   S.doneShown = true; S.msgs.push({ who: "sys", done: true }); renderMsgs(); save();
 }
@@ -1449,75 +1585,73 @@ function stepBadge(st) {
   if (st.id === "profile") return '<span class="q-step">さいごに</span>';
   return "";
 }
+/** H 案：問いの番号（5 つのかけら）・まとめ・はじめに */
+function stepNum(st) {
+  const i = PIECES.findIndex(([id]) => id === st.id);
+  if (i >= 0) return `${i + 1}/5`;
+  return { reflect: "まとめ", profile: "はじめに", photo: "写真" }[st.id] || "";
+}
+/** 候補のボタン（ぽとりの候補＝白／えらんだもの＝こげ茶） */
+function chipHtml(o, on) {
+  return `<button type="button" class="chip${on ? " on" : ""}${o.ai ? " ai" : ""}" data-id="${esc(o.id)}" aria-pressed="${!!on}"><span>${o.ai ? `<small>${hasPhoto() ? "写真から" : "AIの案"}</small>` : ""}${esc(o.label)}</span>${on ? '<span class="ck">✓</span>' : ""}</button>`;
+}
 function renderDock() {
   if (!S) return;
   if (S.phase === "compose") return renderComposeDock();
   const st = stepOf(S.cur);
   if (!st) { dock(""); return; }
-  const rest = remainingSteps().length;
-  const canExit = S.done.includes("text1") && !["login", "reflect"].includes(st.kind) && rest > 0 && !st.optional;
-  // 回答シート：頭（何問目・どう答えるか・ここで投稿文へ）／入力・ヒント（スクロール）／ボタン（いつも同じ場所）
-  const badge = stepBadge(st);
-  const ins = "";   // H 案：問いの頭の説明（「自分のことばで」など）は出さない
-  const qm = [...S.msgs].reverse().find(m => m.qid === st.id);
-  const head = `<div class="q-card"><div class="avatar">${charSvg()}</div><div class="qc"><div class="q-meta">${badge}<span class="q-ins">${esc(ins)}</span>${!st.optional && !["login", "photo", "profile"].includes(st.id) && leftToPost(st) <= 3 ? `<span class="q-left">${leftToPost(st) === 1 ? "さいごの問い" : `あと${leftToPost(st)}問で投稿文`}</span>` : ""}</div>
-    ${qm ? `<div class="q-title">${esc(qm.text)}</div>${qm.sub ? `<div class="q-sub">${esc(qm.sub)}</div>` : ""}` : ""}</div></div>`;
-  const mini = `${badge}<span class="mq">${esc(qm ? qm.text : stepName(st.id))}</span><span class="mo">答える ▲</span>`;
-  const skipBtn = `<button type="button" class="btn text" id="dSkip">とばす</button>`;
-  // B 案：とばす・ここで投稿文へは、いちばん下の白い囲みに 1 行（主ボタンは入力欄の →）
-  const exits = `<div class="exits"><button type="button" id="dSkip">とばす</button>${canExit ? `<i aria-hidden="true"></i><button type="button" id="dExit">ここで投稿文へ</button>` : ""}</div>`;
-  const tile = (o, on, mark) => `<button type="button" class="chip${on ? " on" : ""}${o.ai ? " ai" : ""}${String(o.label).length > 10 ? " wide" : ""}" data-id="${esc(o.id)}" aria-pressed="${!!on}"><span>${o.ai ? `<small>${hasPhoto() ? "写真から" : "AIの案"}</small>` : ""}${esc(o.label)}</span>${mark || ""}</button>`;
+  const rest = remainingSteps().filter(x => x.id !== "profile").length;
+  const canExit = S.done.includes("text1") && !["login", "reflect", "photo", "single"].includes(st.kind) && rest > 0 && !st.optional;
+  const qm = [...S.msgs].reverse().find(m => m.qid === st.id), num = stepNum(st);
+  // H 案：問いは答える欄の 1 か所（番号＋問いの 1 行）
+  const head = qm ? `<div class="q-card"><div class="q-line">${num ? `<span class="q-num">${esc(num)}</span>` : ""}<span class="q-title">${esc(qm.text)}</span></div>${qm.sub ? `<div class="q-sub">${esc(qm.sub)}</div>` : ""}</div>` : "";
+  const mini = `<span class="mq">${esc(qm ? qm.text : stepName(st.id))}</span><span class="mo">答える ▲</span>`;
+  // H 案：操作はいつも「ヒント ｜ とばす ｜ 投稿文へ」の 1 行
+  const ctl = (hint, skip) => {
+    const parts = [];
+    if (skip) parts.push(`<button type="button" class="lnk2" id="dSkip">とばす</button>`);
+    if (canExit) parts.push(`<button type="button" class="lnk2" id="dExit">投稿文へ</button>`);
+    if (!hint && !parts.length) return "";
+    return `<div class="ctl">${hint ? `<button type="button" class="hint-btn" id="dHint" aria-haspopup="dialog">${ICON.bulb}ヒント</button>` : ""}<span class="ctl-sp"></span>${parts.join('<i aria-hidden="true"></i>')}</div>`;
+  };
   let html = "", act = "";
   if (st.kind === "login") {
     html = loginHtml("はじめる") + (CONFIG.ALLOW_NO_LOGIN ? `<div class="row center"><button type="button" class="lnk" id="dNoLogin">ログインせずに使う（AI・記録なし）</button></div>` : "");
   } else if (st.kind === "photo") {
     const pc = matchMedia("(pointer:fine)").matches;
-    html = `<button type="button" class="photo-tile" id="dPhoto">${ICON.camera}<b>写真をえらぶ</b><small>${pc ? "パソコンのフォルダから（ここにドラッグしてもOK）" : "カメラ・アルバムから"}</small></button><div class="err" id="dErr"></div>`;
+    html = `<button type="button" class="photo-tile" id="dPhoto">${ICON.camera}<b>写真をえらぶ</b><small>${pc ? "ここにドラッグしてもOK" : "カメラ・アルバムから"}</small></button><div class="err" id="dErr"></div>`;
     act = `<div class="row center" style="margin-top:0"><button type="button" class="lnk" id="dNoPhoto">写真なしで進む</button></div>`;
   } else if (st.kind === "text") {
     html = `<div class="inrow"><textarea class="input" id="dIn" rows="2" maxlength="${st.max}" placeholder="${esc(st.ph ? st.ph() : "")}" enterkeyhint="send"></textarea><button type="button" class="send" id="dSend" aria-label="送る" disabled>${ICON.send}</button></div>
-      <div class="row" style="margin-top:6px"><span class="cnt-sm" id="dCnt">0 / ${st.max}</span></div><div class="err" id="dErr"></div>${st.required ? "" : `<div class="row">${skipBtn}</div>`}`;
-  } else if (st.kind === "free" && RT.confirm && RT.confirm.step === st.id) {
-    // だれと・しめ：書いたことばを区分に当てはめて、本人に確かめる（ちがえば選び直す）
-    const c = RT.confirm, labs = c.picks.map(id => (item(st.opts, id) || {}).label).filter(Boolean);
-    const short = c.text.length > 16 ? c.text.slice(0, 15) + "…" : c.text;
-    if (c.mode === "confirm") {
-      html = `<div class="say"><div class="avatar">${charSvg()}</div><p>${esc(T(st.id === "who" ? "who_confirm" : "next_confirm", { t: short, l: labs.join("」「") }))}</p></div>`;
-      act = `<div class="row"><button type="button" class="btn ghost wide" id="dNo">ちがう</button><button type="button" class="btn wide" id="dYes">OK</button></div>`;
-    } else {
-      html = `<div class="say"><div class="avatar">${charSvg()}</div><p>${esc(T("pick_q"))}</p></div>${pickHead(c.picks.length, st.max, "近いものをえらぶ")}<div class="chips${st.max > 1 && c.picks.length >= st.max ? " full" : ""}">${V[st.opts].filter(x => !x.hidden).map(o => { const k = c.picks.indexOf(o.id); return tile(o, k >= 0, k >= 0 ? `<span class="ck">✓</span>` : ""); }).join("")}</div><div class="hint" id="dMax" hidden>${st.max > 1 ? `選べるのは${st.max}つまでです` : ""}</div>`;
-      act = `<div class="row"><button type="button" class="btn text" id="dBack">書きなおす</button><button type="button" class="btn wide" id="dYes" ${c.picks.length ? "" : "disabled"}>次へ</button></div>`;
-    }
+      <div class="row" style="margin-top:4px"><span class="cnt-sm" id="dCnt">0 / ${st.max}</span></div><div class="err" id="dErr"></div>`;
+    act = ctl(false, !st.required);
   } else if (st.kind === "free") {
-    // 自分のことばが先。迷ったら「ヒント」で候補がぜんぶ出る（押すと答えに足される）
-    const open = !!RT.hintOpen[st.id], sel = RT.sel, txt = RT.freeText[st.id] || "", n = sel.length + (txt.trim() ? 1 : 0);
-    const cands = open ? optionsOf(st) : [];
-    html = `<div class="inrow"><textarea class="input" id="dIn" rows="1" maxlength="${CONFIG.MAX_FREE}" placeholder="${esc(st.ph ? st.ph() : "")}" enterkeyhint="send" aria-label="自分のことばで答える">${esc(txt)}</textarea><button type="button" class="send" id="dSend" aria-label="送る" ${n ? "" : "disabled"}>${ICON.send}</button></div>
-      <button type="button" class="hint-btn${open ? " open" : ""}" id="dHint" aria-expanded="${open}" aria-label="${open ? "ヒントをとじる" : "ヒントを見る"}">${ICON.bulb}ヒント${open ? CHEV_UP : CHEV_DOWN}</button>
-      <div class="err" id="dErr"></div>
-      ${sel.length && !open ? `${pickHead(sel.length, st.max, "えらんだもの")}<div class="chips">${sel.map(x => `<button type="button" class="chip on" data-rm="${esc(x.id)}"><span>${esc(x.label)}</span><span class="ck">×</span></button>`).join("")}</div>` : ""}
-      ${open ? `<div class="hint-box">${pickHead(sel.length, st.max, "近いものをえらぶ")}
-        ${cands.length ? `<div class="chips${st.max > 1 && sel.length >= st.max ? " full" : ""}">${cands.map(o => { const k = sel.findIndex(x => x.id === o.id); return tile(o, k >= 0, k >= 0 ? `<span class="ord">${st.max === 1 ? "✓" : k + 1}</span>` : ""); }).join("")}</div>` : `<p class="hint">${esc(T("hint_none"))}</p>`}
-        <div class="hint" id="dMax" hidden>${st.max ? `選べるのは${st.max}つまでです` : ""}</div></div>` : ""}`;
-    act = st.optional
-      ? `<div class="row"><button type="button" class="btn ghost wide" id="dOptDone">投稿文をつくる</button><button type="button" class="btn wide${n ? "" : " ghost"}" id="dOk">${n ? "次へ" : "とばす"}</button></div><div class="hint" style="text-align:center">任意の問い：あと${optRemaining()}つ</div>`
-      : (open || sel.length ? `<button type="button" class="btn full" id="dOk" ${n ? "" : "disabled"}>次へ</button>` : "") + exits;   // B 案：「次へ」はヒントを開いた・候補を選んだときだけ
+    const sel = RT.sel, txt = RT.freeText[st.id] || "", n = sel.length + (txt.trim() ? 1 : 0), first = CHIPS_FIRST.includes(st.id);
+    const input = `<div class="inrow"><textarea class="input" id="dIn" rows="1" maxlength="${CONFIG.MAX_FREE}" placeholder="${esc(first ? "自分のことばで書いてもOK" : (st.ph ? st.ph() : ""))}" enterkeyhint="send" aria-label="自分のことばで答える">${esc(txt)}</textarea><button type="button" class="send" id="dSend" aria-label="送る" ${n ? "" : "disabled"}>${ICON.send}</button></div><div class="err" id="dErr"></div>`;
+    if (first) {   // 気持ち・だれと：候補が先（1 つだけの問いは押したら進む）
+      const oo = optionsOf(st), ordered = oo.filter(o => !o.ai).concat(oo.filter(o => o.ai));   // AI の候補はあとから届くので、いちばん後ろに（押そうとした候補が動かないように）
+      html = `<div class="chips pills" id="dChips">${ordered.map(o => chipHtml(o, sel.some(x => x.id === o.id))).join("")}</div>${st.max > 1 ? `<div class="hint">${st.max}つまでえらべます。えらんだら →</div>` : ""}<div class="gap8"></div>` + input;
+      act = ctl(false, true);
+    } else {      // どこが・しめ：書くのが先。ヒントの候補でえらんだものは、入力欄の上に
+      html = (sel.length ? `<div class="chips pills picked">${sel.map(x => `<button type="button" class="chip on" data-rm="${esc(x.id)}" aria-label="${esc(x.label)}を外す"><span>${esc(x.label)}</span><span class="ck">×</span></button>`).join("")}</div>` : "") + input;
+      act = ctl(true, true);
+    }
   } else if (st.kind === "reflect") {
     const opts = (S.reflect && S.reflect.options) || [];
     if (RT.reflectEdit != null) {
       html = `<div class="inrow"><textarea class="input" id="dIn" rows="2" maxlength="30" placeholder="${esc(T("reflect_ph"))}" enterkeyhint="send">${esc(RT.reflectEdit)}</textarea><button type="button" class="send" id="dSend" aria-label="送る">${ICON.send}</button></div><div class="err" id="dErr"></div>`;
-      act = `<div class="row"><button type="button" class="btn text" id="dBack">もどる</button></div>`;
+      act = `<div class="ctl"><button type="button" class="lnk2" id="dBack">もどる</button></div>`;
     } else {
       html = `<div class="chips">${opts.map((o, i) => `<button type="button" class="chip wide" data-i="${i}"><span>${esc(o)}</span></button>`).join("")}</div>`;
-      act = `<div class="row"><button type="button" class="btn ghost wide sm" id="dOwn">自分で直す</button><button type="button" class="btn ghost wide sm" id="dNone">どれもちがう</button></div>`;
+      act = `<div class="ctl"><span class="ctl-sp"></span><button type="button" class="lnk2" id="dOwn">自分で直す</button><i aria-hidden="true"></i><button type="button" class="lnk2" id="dNone">どれもちがう</button></div>`;
     }
   } else if (st.kind === "single") {
-    html = `<div class="chips">${optionsOf(st).map(o => tile(o, false)).join("")}</div><div id="dFreeBox"></div>`;
-    act = `<div class="row center" style="margin-top:0"><button type="button" class="lnk" id="dSkip">${st.id === "profile" ? "答えない" : "とばす"}</button></div>`;
+    html = `<div class="chips pills">${optionsOf(st).map(o => chipHtml(o, false)).join("")}</div><div id="dFreeBox"></div>`;
+    act = `<div class="ctl"><span class="ctl-sp"></span><button type="button" class="lnk2" id="dSkip">${st.id === "profile" ? "答えない" : "とばす"}</button></div>`;
   } else if (st.kind === "scale") {
     html = `<div class="scale">${Array.from({ length: 10 }, (_, i) => `<button type="button" data-v="${i + 1}">${i + 1}</button>`).join("")}</div>
       <div class="scale-lab"><span>1 イマイチ</span><span>5 ふつう</span><span>10 最高</span></div>`;
-    act = exits;
+    act = ctl(false, true);
   }
   dock(html, act, head, mini);
   bindDock(st);
@@ -1598,8 +1732,7 @@ function bindDock(st) {
         const g = RT.gen, d = S.det, short = v.length > 22 ? v.slice(0, 21) + "…" : v;
         const neg = d.negCue || d.feels.some(id => { const it = item("feel", id) || {}; return it.negative || (typeof it.val === "number" && it.val < 0); });
         const pos = !neg && d.feels.some(id => { const it = item("feel", id) || {}; return typeof it.val === "number" && it.val > 0; });
-        const r1 = T(neg ? "react_neg" : pos ? "react_pos" : "react_neu", { t: short });   // H 案：短いあいづちだけ
-        if (!await bot(r1)) return;
+        // H 案：あいづちは出さず、すぐ次の問いへ
         await advance(st.id, g);
         return;
       }
@@ -1608,48 +1741,24 @@ function bindDock(st) {
     if (st.id === "text1" && S.ans.text1) { ta.value = S.ans.text1; sync(); ta.dispatchEvent(new Event("input")); }
     if (!coarse()) ta.focus();
   }
-  if (st.kind === "free" && RT.confirm && RT.confirm.step === st.id) {
-    const c = RT.confirm;
-    on("dNo", () => { c.mode = "pick"; c.picks = []; renderDock(); });
-    on("dBack", () => { RT.freeText[st.id] = c.text; RT.confirm = null; renderDock(); const i = $("dIn"); if (i && !coarse()) i.focus(); });
-    $("dockIn").querySelectorAll(".chip[data-id]").forEach(b => b.addEventListener("click", () => {
-      const o = item(st.opts, b.dataset.id); if (!o) return;
-      const k = c.picks.indexOf(o.id);
-      if (k >= 0) c.picks.splice(k, 1);
-      else if (o.neutral || st.max === 1) c.picks = [o.id];
-      else { c.picks = c.picks.filter(id => !(item(st.opts, id) || {}).neutral); if (c.picks.length >= st.max) { b.classList.add("shake"); const m = $("dMax"); if (m) { m.hidden = false; m.style.color = "var(--err)"; } setTimeout(() => b.classList.remove("shake"), 320); return; } c.picks.push(o.id); }
-      renderDock();
-    }));
-    on("dYes", () => { if (!c.picks.length) return; commitFree(st, c.text, c.picks.map(id => item(st.opts, id)).filter(Boolean).map(o => ({ id: o.id, label: o.label })), c.mode === "confirm" ? "本人が確認" : "候補から（書いたあと）"); });
-    return;
-  }
   if (st.kind === "free") {
     const ta = $("dIn"), send = $("dSend");
     const count = () => RT.sel.length + (ta.value.trim() ? 1 : 0);
-    const sync = () => { RT.freeText[st.id] = ta.value; const n = count(); send.disabled = !n; const ok = $("dOk"); if (ok) { ok.disabled = !n && !st.optional; ok.textContent = n ? "次へ" : st.optional ? "とばす" : "次へ"; if (st.optional) ok.classList.toggle("ghost", !n); } const e = $("dErr"); if (e && e.textContent) e.textContent = ""; };
+    const sync = () => { RT.freeText[st.id] = ta.value; send.disabled = !count(); const e = $("dErr"); if (e && e.textContent) e.textContent = ""; };
     bindTextarea(ta, () => submitFree(st), sync);
     send.addEventListener("click", () => submitFree(st));
-    on("dOk", () => submitFree(st));
-    armNudge(st, ta);
-    on("dHint", () => { clearNudge(); RT.freeText[st.id] = ta.value; RT.hintOpen[st.id] = !RT.hintOpen[st.id]; renderDock(); if (RT.hintOpen[st.id]) { const b = $("dockScroll"); if (b) b.scrollTop = b.scrollHeight; } });
+    if (!CHIPS_FIRST.includes(st.id)) armNudge(st, ta);
+    on("dHint", () => openHintSheet(st));
     $("dockIn").querySelectorAll(".chip[data-rm]").forEach(b => b.addEventListener("click", () => { RT.sel = RT.sel.filter(x => x.id !== b.dataset.rm); RT.freeText[st.id] = ta.value; renderDock(); }));
-    $("dockIn").querySelectorAll(".hint-box .chip[data-id]").forEach(b => b.addEventListener("click", () => {
+    $("dockIn").querySelectorAll("#dChips .chip[data-id]").forEach(b => b.addEventListener("click", () => {
       if (RT.busy) return;
       RT.freeText[st.id] = ta.value;
       const o = optionsOf(st).find(x => x.id === b.dataset.id); if (!o) return;
-      if (st.id === "next" && o.ai) {   // しめの AI の案は、ことばとして入れる（このあと区分を確かめる）
-        RT.freeText.next = o.label; RT.sel = []; RT.hintOpen.next = false; renderDock(); const i = $("dIn"); if (i && !coarse()) i.focus(); return;
-      }
-      const k = RT.sel.findIndex(x => x.id === o.id);
-      if (k >= 0) { RT.sel.splice(k, 1); renderDock(); return; }
-      if (st.max === 1) RT.sel = [];
-      if (RT.sel.length >= st.max) { b.classList.add("shake"); const m = $("dMax"); if (m) { m.hidden = false; m.style.color = "var(--err)"; } setTimeout(() => b.classList.remove("shake"), 320); return; }
-      if (o.neutral) RT.sel = [];
-      else RT.sel = RT.sel.filter(x => !(item(st.opts, x.id) || {}).neutral);
-      RT.sel.push({ id: o.id, label: o.label, src: o.ai ? "AI候補" : "候補", ...(st.id === "why" ? { layer: o.layer, w: o.w, say: o.say, tag: o.tag } : {}) });
-      renderDock();
+      if (o.free) { RT.sel = []; renderDock(); const i = $("dIn"); if (i) i.focus(); return; }   // 「その他」：自分のことばで
+      if (st.max === 1) { RT.sel = [selItem(st, o)]; submitFree(st); return; }   // 1 つだけの問いは、押したら進む
+      if (toggleSel(st, o, b)) renderDock();
     }));
-    if (!coarse() && !RT.hintOpen[st.id]) ta.focus();
+    if (!coarse() && !CHIPS_FIRST.includes(st.id)) ta.focus();
   }
   if (st.kind === "reflect") {
     const opts = (S.reflect && S.reflect.options) || [];
@@ -1689,23 +1798,48 @@ function bindDock(st) {
     }));
   }
 }
+/** えらんだ候補（どこが は KPI の重みも持つ） */
+function selItem(st, o) { return { id: o.id, label: o.label, src: o.ai ? "AI候補" : "候補", ...(st.id === "why" ? { layer: o.layer, w: o.w, say: o.say, tag: o.tag } : {}) }; }
+/** 候補をえらぶ・外す（上限・「ふつう」「とくにない」などはほかと一緒にえらべない） */
+function toggleSel(st, o, b) {
+  const k = RT.sel.findIndex(x => x.id === o.id);
+  if (k >= 0) { RT.sel.splice(k, 1); return true; }
+  if (st.max === 1 || o.neutral) RT.sel = [];
+  else RT.sel = RT.sel.filter(x => !(item(st.opts, x.id) || {}).neutral);
+  if (RT.sel.length >= st.max) { if (b) { b.classList.add("shake"); setTimeout(() => b.classList.remove("shake"), 320); } toast(`${st.max}つまでです`); return false; }
+  RT.sel.push(selItem(st, o)); return true;
+}
+/** H 案：ヒントは下から出るシート。候補を押すと閉じて、答えに入る */
+function openHintSheet(st) {
+  if (RT.busy) return;
+  clearNudge();
+  const ta = $("dIn"); if (ta) RT.freeText[st.id] = ta.value;
+  RT.hintOpen[st.id] = true; S.hintOpens = (S.hintOpens || 0) + 1; save();
+  const cands = optionsOf(st), qm = [...S.msgs].reverse().find(m => m.qid === st.id);
+  openSheet("ヒント", `${qm ? `<p class="hint-q">${esc(qm.text)}</p>` : ""}${cands.length ? `<div class="chips pills">${cands.map(o => chipHtml(o, RT.sel.some(x => x.id === o.id))).join("")}</div>` : `<p>${esc(T("hint_none"))}</p>`}`);
+  $("sheetBody").querySelectorAll(".chip[data-id]").forEach(b => b.addEventListener("click", () => {
+    const o = cands.find(x => x.id === b.dataset.id); if (!o) return;
+    if (st.id === "next" && o.ai) { RT.freeText.next = o.label; RT.sel = []; }   // しめの AI の案は、ことばとして入れる
+    else if (!toggleSel(st, o, b)) return;
+    closeModal(); renderDock();
+    const i = $("dIn"); if (i && !coarse()) i.focus();
+  }));
+}
 /** 自分のことば＋ヒントで選んだ候補を答えにする。だれと・しめは、書いたことばを区分に当てはめて確かめる */
 async function submitFree(st) {
   if (RT.busy) return;
   const ta = $("dIn"), text = oneLine(ta ? ta.value : "").replace(/^[#＃]/, "").slice(0, CONFIG.MAX_FREE), sel = RT.sel.slice();
-  if (!text && !sel.length) { if (st.optional) skipStep(st); return; }
+  if (!text && !sel.length) return;
   if (text && !await piiGate(text)) return;
-  if (st.confirm && text && !sel.length) {
+  if (st.confirm && text && !sel.length) {   // H 案：区分は聞かずに当てはめる（違えば、答えの下の ✎ で直せる）
     const hits = matchKind(st.opts, text).filter((x, i, a) => !(x.neutral && a.length > 1)).slice(0, st.max);
-    const exact = hits.length === 1 && normNick(hits[0].label).replace(/(と|で|と話した)$/, "") === normNick(text).replace(/(と|で|と話した)$/, "");
-    if (exact) return commitFree(st, text, [{ id: hits[0].id, label: hits[0].label }], "本人が確認");
-    RT.freeText[st.id] = text;
-    RT.confirm = { step: st.id, text, picks: hits.map(x => x.id), mode: hits.length ? "confirm" : "pick" };
-    renderDock(); return;
+    let picks = hits.map(x => ({ id: x.id, label: x.label }));
+    if (!picks.length && st.id === "who") { const o = item("who", "other"); if (o) picks = [{ id: o.id, label: o.label }]; }
+    return commitFree(st, text, picks, hits.length ? "自動で当てはめ" : "本人", { fix: st.id });
   }
   commitFree(st, text, sel, sel.length ? (text ? "本人＋候補" : "候補から") : "本人");
 }
-function commitFree(st, text, sel, src) {
+function commitFree(st, text, sel, src, extra) {
   S.own[st.id] = text; S.src[st.id] = src;
   if (st.id === "who") {
     const o = sel[0] && item("who", sel[0].id);
@@ -1717,7 +1851,7 @@ function commitFree(st, text, sel, src) {
   }
   RT.confirm = null; RT.hintOpen[st.id] = false; RT.freeText[st.id] = "";
   const shown = [text, ...sel.map(x => x.label).filter(l => l !== text)].filter(Boolean);
-  answered(st, st.confirm && text ? text : shown.join("　"));   // H 案：確かめたあとは、書いたことばだけを出す（区分は重ねて出さない）
+  answered(st, st.confirm && text ? text : shown.join("　"), extra);   // H 案：確かめたあとは、書いたことばだけを出す（区分は重ねて出さない）
 }
 async function pickSingle(st, o, label) {
   const v = { id: o.id, label };
@@ -1950,7 +2084,7 @@ async function finishCompose(useAI, g = RT.gen) {
     if (!await bot(T(k, { n: CONFIG.AI_MAX }))) return;
   }
   S.msgs.push({ who: "bot", card: "compose" });
-  RT.busy = false; RT.compare = false; RT.lineOpen = -1; RT.editAI = false;
+  RT.busy = false; RT.compare = false; RT.lineOpen = -1; RT.editAI = false; RT.editOpen = false;
   renderMsgs(); renderComposeDock(); renderStaff(); save();
   sendLog("finish");
 }
@@ -1958,25 +2092,26 @@ function composeCardHtml() {
   const tags = autoTags(), len = finalText().length, ds = S.drafts || [];
   const keys = ds.map((_, i) => draftKey(i)).concat(["自分の言葉"]);
   const d = chosenDraft(), cav = d && d.result ? (d.result.caveats || []).map(c => `<div class="note warn">※ ${esc(c)}</div>`).join("") : "";
-  const lineMode = !!d && d.lines.length && !(S.edits && S.edits[S.chosen] != null) && !RT.editAI;
-  const tabs = ds.length ? `<div class="seg" role="tablist" style="grid-template-columns:repeat(${keys.length},minmax(0,1fr))">${keys.map(k => `<button type="button" role="tab" data-v="${k}" class="${S.chosen === k ? "on" : ""}" aria-selected="${S.chosen === k}">${tabLabel(k)}</button>`).join("")}</div>` : "";
+  const edit = !!RT.editOpen;   // H 案：ふだんは できた文を大きく見せる。「直す」で 1 行ずつの言いかえ・直接の編集
+  const lineMode = edit && !!d && d.lines.length && !(S.edits && S.edits[S.chosen] != null) && !RT.editAI;
+  const tabs = keys.length >= (edit ? 2 : 3) ? `<div class="seg" role="tablist" style="grid-template-columns:repeat(${keys.length},minmax(0,1fr))">${keys.map(k => `<button type="button" role="tab" data-v="${k}" class="${S.chosen === k ? "on" : ""}" aria-selected="${S.chosen === k}">${tabLabel(k)}</button>`).join("")}</div>` : "";
   const compare = `<div class="cmp">${keys.map(k => `<div class="cmp-item${S.chosen === k ? " on" : ""}"><div class="cmp-h"><b>${k === "自分の言葉" ? "自分の言葉の文" : tabLabel(k) + "（AI）"}</b>${S.chosen === k ? '<span class="cmp-on">えらんでいる</span>' : `<button type="button" class="btn ghost sm" data-pick="${k}">これにする</button>`}</div><div class="cmp-t">${esc(bodyOf(k))}</div></div>`).join("")}</div>`;
   const lines = lineMode ? `<div class="lines" id="cLines">${d.lines.map((l, i) => { const o = lineOpts(l), k = d.sel[i] || 0, op = RT.lineOpen === i && o.length > 1;
       return `<button type="button" class="ln${op ? " open" : ""}" data-ln="${i}" aria-expanded="${op}">${esc(o[k])}${o.length > 1 ? ICON.swap : ""}</button>${op ? `<div class="alts">${o.map((t, j) => `<button type="button" class="${j === k ? "on" : ""}" data-ln="${i}" data-alt="${j}">${esc(t)}</button>`).join("")}</div>` : ""}`; }).join("")}</div>` : "";
-  return `<div class="card" id="composeCard">
-    <div class="card-hd"><span class="post-label">あなたの投稿</span></div>
-    ${tabs}
-    ${ds.length || canMoreAI() ? `<div class="ai-more">${ds.length ? `<button type="button" class="lnk" id="cCompare">${RT.compare ? "1つずつ見る" : `ならべて見る（${keys.length}つ）`}</button>` : ""}${canMoreAI() ? `<button type="button" class="btn ghost sm" id="cMore" style="margin-left:auto">${ICON.spark}AI でもう一案</button>` : ""}</div>` : ""}
-    ${RT.compare ? compare : `${PHOTO.img ? `<div class="post-photo-wrap"><img class="post-photo" src="${esc(PHOTO.img)}" alt="えらんだ写真">${!S.copied ? `<button type="button" class="photo-chg" data-repick="1">写真を変える</button>` : ""}</div>` : ""}
-    ${lineMode ? lines : `<textarea id="cText" rows="5" maxlength="${CONFIG.MAX_FINAL}" aria-label="投稿文（タップして直せます）">${esc(bodyOf(S.chosen))}</textarea>`}
-    <div class="card-foot"><span class="cnt" id="cCnt">${len} 字</span>${lineMode ? `<button type="button" class="lnk" id="cEdit" style="padding:4px 2px">直接直す</button>` : d && isEdited() ? `<button type="button" class="lnk" id="cUndo" style="padding:4px 2px">直す前にもどす</button>` : ""}<label class="switch"><input type="checkbox" id="cTagsOn" ${S.tagsOn ? "checked" : ""}>ハッシュタグ</label></div>
-    ${S.tagsOn && tags.length ? `<div class="tags">${tags.map(t => `<button type="button" class="tag${S.tagOff.includes(t) ? " off" : ""}" data-tag="${esc(t)}">${esc(t)}</button>`).join("")}</div><div class="hint">タグを押すと外せます</div>` : ""}
-    ${cav}`}
-  </div>`;
+  const photo = PHOTO.img && !edit ? `<div class="post-photo-wrap"><img class="post-photo" src="${esc(PHOTO.img)}" alt="えらんだ写真">${!S.copied ? `<button type="button" class="photo-chg" data-repick="1">写真を変える</button>` : ""}</div>` : "";
+  const tagView = S.tagsOn && activeTags().length ? `<div class="tags">${activeTags().map(t => `<span class="tag">${esc(t)}</span>`).join("")}</div>` : "";
+  const view = `<div class="final" id="cFinal">${esc(bodyOf(S.chosen))}</div>${tagView}${cav}
+    <div class="card-foot"><span class="cnt" id="cCnt">${len} 字</span><span class="sp"></span>${canMoreAI() ? `<button type="button" class="btn ghost sm" id="cMore">${ICON.spark}AI でもう一案</button>` : ""}<button type="button" class="btn ghost sm" id="cEditOpen">直す</button></div>`;
+  const editor = RT.compare ? `${compare}<div class="card-foot"><span class="sp"></span><button type="button" class="btn sm" id="cCompare">1つずつ見る</button></div>`
+    : `${lineMode ? lines : `<textarea id="cText" rows="5" maxlength="${CONFIG.MAX_FINAL}" aria-label="投稿文">${esc(bodyOf(S.chosen))}</textarea>`}
+    <div class="card-foot"><span class="cnt" id="cCnt">${len} 字</span>${lineMode ? `<button type="button" class="lnk" id="cEdit">直接直す</button>` : d && isEdited() ? `<button type="button" class="lnk" id="cUndo">直す前にもどす</button>` : ""}${ds.length ? `<button type="button" class="lnk" id="cCompare">ならべて見る</button>` : ""}<span class="sp"></span><button type="button" class="btn sm" id="cEditDone">できた</button></div>
+    ${S.tagsOn && tags.length ? `<div class="tags">${tags.map(t => `<button type="button" class="tag${S.tagOff.includes(t) ? " off" : ""}" data-tag="${esc(t)}">${esc(t)}</button>`).join("")}</div>` : ""}${cav}`;
+  return `<div class="card" id="composeCard"><div class="card-hd"><span class="post-label">あなたの投稿</span>${lineMode ? '<span class="cnt" style="margin-left:auto">行を押すと言いかえ</span>' : ""}</div>${tabs}${photo}${edit ? editor : view}</div>`;
 }
 function bindCards() {
   bindRate(); bindTreasure();
   document.querySelectorAll("[data-repick]").forEach(b => b.addEventListener("click", repickPhoto));
+  document.querySelectorAll("[data-fix]").forEach(b => { b.onclick = () => openFix(b.dataset.fix); });
   document.querySelectorAll("[data-openwant]").forEach(b => b.addEventListener("click", openWant));
   document.querySelectorAll("[data-openposts]").forEach(b => b.addEventListener("click", openPosts));
   const ta = $("cText");
@@ -1997,6 +2132,8 @@ function bindCards() {
     else RT.lineOpen = RT.lineOpen === i ? -1 : i;
     refreshCompose();
   }));
+  const eo = $("cEditOpen"); if (eo) eo.addEventListener("click", () => { RT.editOpen = true; RT.lineOpen = -1; refreshCompose(); });
+  const edn = $("cEditDone"); if (edn) edn.addEventListener("click", () => { RT.editOpen = false; RT.editAI = false; RT.compare = false; RT.lineOpen = -1; refreshCompose(); });
   const ed = $("cEdit"); if (ed) ed.addEventListener("click", () => { RT.editAI = true; refreshCompose(); const t = $("cText"); if (t) t.focus(); });
   const ud = $("cUndo"); if (ud) ud.addEventListener("click", () => { if (S.edits) delete S.edits[S.chosen]; RT.editAI = false; refreshCompose(); });
   document.querySelectorAll("#composeCard .tag").forEach(b => b.addEventListener("click", () => { const t = b.dataset.tag; S.tagOff = S.tagOff.includes(t) ? S.tagOff.filter(x => x !== t) : S.tagOff.concat(t); refreshCompose(); }));
@@ -2337,9 +2474,10 @@ async function copyFinal() {
     if (S.msgs.some(m => m.card === "treasure" || m.card === "survey")) { /* コピーしないで次へ のあとにコピーした：宝箱・質問はもう出ている */ }
     else if (CONFIG.RECOMMEND_ON && CS.items.length) { recNow(); S.msgs.push({ who: "bot", card: "treasure" }, { who: "bot", card: "survey" }); }
     else S.msgs.push({ who: "bot", card: "survey" });
-    renderMsgs(); save();
+    RT.noScroll = true; renderMsgs(); RT.noScroll = false; save();
   } else { savePostLog(text, false); toast("コピーしました"); }
   renderComposeDock();
+  if (first) setTimeout(() => scrollToEl(".card.stamp"), 80);   // H 案：まず「本日の DROP（通算○本目）」を見せる。おすすめ・質問はその下
   sendLog("copy");
 }
 
@@ -2707,7 +2845,8 @@ function buildRecord(end) {
     answered: answeredCount(),
     last_step: S.phase === "compose" ? (S.early ? "途中で投稿文へ（" + stepName(lastAsked) + "）" : "最後まで") : stepName(lastAsked),
     early: S.early, has_photo: hasPhoto(), photo_redo: S.photoRedo || 0,
-    ui_variant: UI_VARIANT, nudges: (S.nudges || []).slice(), posts_opens: S.postsOpens || 0,   // B 案：見せ方の案・ヒントの声かけをした問い・これまでの投稿を開いた回数
+    ui_variant: UI_VARIANT, nudges: (S.nudges || []).slice(), posts_opens: S.postsOpens || 0,
+    fixes: S.fixes || 0, hint_opens: S.hintOpens || 0, auto_steps: (S.autoSteps || []).slice(),   // H 案：区分を ✎ で直した回数・ヒントを開いた回数・ひとことからわかって聞かなかった問い   // B 案：見せ方の案・ヒントの声かけをした問い・これまでの投稿を開いた回数
     text1: A.text1,
     detected: { ...S.det, feel_labels: S.det.feels.map(id => (item("feel", id) || {}).label || id), who_label: S.det.who ? item("who", S.det.who).label : "" },
     subject: subjectOf(),
@@ -2821,7 +2960,7 @@ async function loadSamples() {
   try { return JSON.parse($("sampleFallback").textContent); } catch (e) { return { records: [] }; }
 }
 const hasTokensAny = () => !!(LS.get(CONFIG.KEYS.TOKEN, null) || LS.get(CONFIG.KEYS.LOG_TOKEN, null));
-function syncMenu() { $("mLogout").hidden = !(getCreds() || hasTokensAny()); $("mBig").textContent = document.documentElement.classList.contains("big") ? "文字を標準にもどす" : "文字を大きく"; }
+function syncMenu() { $("mVoice").textContent = VOICE === "kansai" ? "ふつうの話し方にもどす" : "関西弁にする"; $("mTags").textContent = S && S.tagsOn ? "投稿文のハッシュタグを外す" : "投稿文にハッシュタグを付ける"; $("mLogout").hidden = !(getCreds() || hasTokensAny()); $("mBig").textContent = document.documentElement.classList.contains("big") ? "文字を標準にもどす" : "文字を大きく"; }
 $("menuBtn").addEventListener("click", () => { const m = $("menu"); m.hidden = !m.hidden; $("menuBtn").setAttribute("aria-expanded", String(!m.hidden)); syncMenu(); });
 const closeMenu = () => { $("menu").hidden = true; $("menuBtn").setAttribute("aria-expanded", "false"); };
 document.addEventListener("click", e => { if (!$("menu").hidden && !e.target.closest("#menu") && !e.target.closest("#menuBtn")) closeMenu(); });
@@ -2839,11 +2978,18 @@ $("voiceBtn").addEventListener("click", () => {
   if (!RT.busy) { if (S.phase === "compose") renderComposeDock(); else renderDock(); }
 });
 $("mWant").addEventListener("click", () => { closeMenu(); openWant(); });
+$("mVoice").addEventListener("click", () => { closeMenu(); $("voiceBtn").click(); });   // H 案：関西弁はメニューから
+$("mTags").addEventListener("click", () => {   // H 案：ハッシュタグはメニューから（投稿文カードには出さない）
+  closeMenu(); if (!S) return;
+  S.tagsOn = !S.tagsOn; if (S.tagsOn) S.tagOff = []; save();
+  toast(S.tagsOn ? "ハッシュタグを付けました" : "ハッシュタグを外しました");
+  if (S.phase === "compose") refreshCompose();
+});
 $("mPosts").addEventListener("click", () => { closeMenu(); openPosts(); });
 $("mAbout").addEventListener("click", () => {
   closeMenu();
   openSheet("このチャットについて", `
-    <p>写真1枚から、DROP に投稿する文を一緒につくるチャットです。問いはとばせます。いつでも「ここで投稿文へ」で終われます。</p>
+    <p>写真1枚から、DROP に投稿する文を一緒につくるチャットです。問いはとばせます。いつでも「投稿文へ」で終われます。</p>
     <p><b>おすすめ：</b>コピーのあと、答えをもとに、このあと楽しめそうなところを 3 つ出します（AI は使っていません）。</p>
     <p><b>AI について：</b>写真とあなたの答えをもとに、AI が文を読みやすく整えます。あなたが書いていない出来事や気持ちは足さないようにしています。AI の案（最大4つ）と「自分の言葉の文」を見比べて選べます。</p>
     <p><b>答えの使い道：</b>答えと投稿文は、CULTURE SNACK の効果を確かめる分析にだけ使います。投稿文は、あなたがコピーして DROP に投稿するまで公開されません。ニックネームは分析画面にだけ表示されます。分析では、この端末につけたランダムな番号（端末 ID）とニックネームで人数を数えます。</p>
