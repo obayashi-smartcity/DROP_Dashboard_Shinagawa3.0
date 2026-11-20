@@ -47,7 +47,6 @@
 .cs-mock{display:inline-block;font-size:12px;padding:2px 10px;border-radius:999px;background:var(--cs-gray-l);color:var(--color-fg);font-weight:600;margin-bottom:6px}
 .cs-title{font-size:var(--cds-font-size-title, 24px);font-weight:600;margin:2px 0;line-height:1.35}
 .cs-sub{margin:0;color:var(--color-fg-muted, #52514e);font-size:13px}
-.cs-lede{margin:10px 0 0;font-size:15px}
 .cs-root b{font-variant-numeric:tabular-nums}
 .cs-bar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:flex-end;margin:16px 0 0;padding:10px 12px;border:1px solid var(--color-border-line, #e1e0d9);border-radius:var(--cds-radius, 8px) var(--cds-radius, 8px) 0 0;background:var(--color-panel, #fff)}
 .cs-field{display:flex;flex-direction:column;gap:2px;font-size:12px;color:var(--color-fg-muted)}
@@ -150,7 +149,6 @@
 .cs-lg-t{font-weight:600;color:var(--color-fg)}
 .cs-dlead{color:var(--color-fg);font-weight:600}
 .cs-dn{margin-left:auto;font-variant-numeric:tabular-nums}
-.cs-vrange{font-size:12px;color:var(--color-fg-muted)}
 .cs-kpihead{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:flex-end;justify-content:space-between;margin:0 0 12px}
 .cs-kpihead h2{font-size:var(--cds-font-size-heading, 18px);margin:0;font-weight:600}
 .cs-q{margin:2px 0 0;font-size:13px;color:var(--color-fg-muted)}
@@ -238,7 +236,6 @@
 .cs-inds{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:8px}
 .cs-tri .cs-inds{grid-template-columns:minmax(0,1fr)}
 .cs-ind{border:1px solid var(--color-border-line);border-radius:8px;padding:8px 10px;background:var(--color-bg, transparent)}
-.cs-ind-q{border-style:dashed}
 .cs-ind-h{display:flex;gap:6px;align-items:baseline;font-size:12px;color:var(--color-fg);line-height:1.45}
 .cs-ind-v{margin-top:2px}
 .cs-ind-v b{font-size:22px;font-weight:600}
@@ -267,9 +264,6 @@
 .cs-dark .cs-flag{color:#0b0b0b}
 .cs-card.cs-featcard{border:2px solid var(--cs-struct);background:color-mix(in srgb, var(--cs-struct) 5%, transparent)}
 /* 知りたいことから探す */
-.cs-guide{margin:4px 0 16px}
-.cs-guide-h{font-size:13px;font-weight:700;margin-bottom:6px}
-.cs-guide-g{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
 .cs-qb{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;font:inherit;padding:9px 12px;border:1px solid var(--color-border-line);border-radius:10px;background:transparent;color:var(--color-fg);cursor:pointer}
 .cs-qb b{font-size:13.5px}
 .cs-qb span{font-size:11.5px;opacity:.7}
@@ -387,11 +381,6 @@
 .cs-cvs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:8px 18px}
 .cs-cvs-part{min-width:0}
 .cs-cvs-tiles{margin-top:10px}
-/* 改善版：目的から見る（概要のいちばん上） */
-.cs-guide{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:center;margin:4px 0 14px;padding:8px 12px;border-radius:10px;background:color-mix(in srgb, var(--cs-struct) 6%, transparent);font-size:12.5px}
-.cs-guide > b{color:var(--cs-struct);font-size:13px}
-.cs-guide-i{display:inline-flex;flex-wrap:wrap;align-items:center;gap:4px}
-.cs-guide .cs-btn{font-size:12px;padding:3px 10px}
 /* スポットと投稿した人のネットワーク：出展者の種類の色見本（触れるとその種類を強調） */
 .cs-pnlg{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:center;font-size:12px;color:var(--color-fg-muted);margin:0 0 6px}
 .cs-pnlg-i{display:inline-flex;align-items:center;gap:2px;padding:1px 6px;border-radius:999px;cursor:default;color:var(--color-fg)}
@@ -435,12 +424,18 @@
 .cs-fw .cs-donut-v{font-size:32px}
 .cs-fw .cs-donut-v span{font-size:15px}
 /* 概要：参加の流れ（ファネル。人数と％は帯の中、前の段とのくらべは段の間の台形に） */
-.cs-sfun-rows{display:grid;margin-top:10px}
-.cs-sfun-row,.cs-sfun-gap{display:grid;grid-template-columns:minmax(150px,270px) minmax(0,1fr);column-gap:14px;align-items:center}
+.cs-sfun-rows{--sfl:270px;display:grid;margin-top:10px;margin-bottom:12px}
+.cs-sfun-row,.cs-sfun-gap{display:grid;grid-template-columns:var(--sfl) minmax(0,1fr);column-gap:14px;align-items:center}
+.cs-sfun-row{position:relative;min-height:40px}
+.cs-sfun-l{position:absolute;left:0;top:0;width:var(--sfl)}
+.cs-sfun-row > .cs-sfun-m{grid-column:2}
+.cs-sfun-bar{min-height:40px}
 .cs-sfun-name{font-size:13px;font-weight:600}
-.cs-sfun-sub{font-size:11.5px;color:var(--color-fg-muted)}
+.cs-sfun-sub{font-size:11.5px;line-height:1.4;color:var(--color-fg-muted)}
 .cs-sfun-sub b{color:var(--color-fg);font-weight:600}
-.cs-sfun-note{color:var(--color-fg)}
+.cs-sfun-note{word-break:keep-all}
+.cs-sfun-note,.cs-sfun-note b{color:var(--cs-bad)}
+.cs-dark .cs-sfun-note,.cs-dark .cs-sfun-note b{color:var(--cs-bad-l)}
 .cs-sfun-m,.cs-sfun-cm{display:flex;justify-content:center;min-width:0}
 .cs-sfun-bar{position:relative;container-type:inline-size;min-height:36px;border-radius:6px;background:var(--cs-o3);color:var(--color-panel);display:flex;align-items:center;justify-content:center}
 .cs-sfun-in{display:flex;flex-wrap:wrap;justify-content:center;align-items:baseline;column-gap:12px;padding:3px 10px;line-height:1.25}
@@ -449,16 +444,89 @@
 .cs-sfun-p{font-size:12px;white-space:nowrap}
 .cs-sfun-bar b{color:inherit;font-weight:700}
 @container (max-width:118px){.cs-sfun-in{position:absolute;left:calc(100% + 8px);top:50%;transform:translateY(-50%);justify-content:flex-start;width:max-content;padding:0;color:var(--color-fg)}}
-.cs-sfun-cm{position:relative;height:28px;align-items:stretch}
+.cs-sfun-cm{position:relative;height:34px;align-items:stretch}
 .cs-sfun-conn{background:var(--cs-o1);opacity:.45}
 .cs-sfun-ct{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);text-align:center;font-size:11.5px;color:var(--color-fg);white-space:nowrap}
 .cs-sfun-ct b{font-weight:700}
-@media (max-width:560px){.cs-sfun-row,.cs-sfun-gap{grid-template-columns:minmax(0,1fr)}.cs-sfun-gl{display:none}.cs-sfun-l{margin-top:2px}}
-/* 概要：流れの外の人数（KPIをくらべられる人）と、スタンプ・投稿の件数（人数の流れとは分けて出す） */
-.cs-sfx{display:grid;grid-template-columns:minmax(220px,1fr) minmax(0,2.6fr);gap:12px;align-items:stretch;margin:0 0 12px}
-.cs-sfx > .cs-card{margin-bottom:0}
-.cs-scount .cs-tiles{margin:8px 0 0}
-@media (max-width:900px){.cs-sfx{grid-template-columns:minmax(0,1fr)}}
+@media (max-width:900px){.cs-sfun-rows{--sfl:210px}}
+@media (max-width:560px){.cs-sfun-row,.cs-sfun-gap{grid-template-columns:minmax(0,1fr)}.cs-sfun-gl{display:none}.cs-sfun-l{position:static;transform:none;width:auto;margin-top:2px}.cs-sfun-row > .cs-sfun-m{grid-column:1}.cs-sfun-rows{margin-top:10px}}
+/* アンケートの答え（主観）と、スタンプ・投稿の記録（客観）の札 */
+.cs-dtag{display:inline-block;font-size:11.5px;font-weight:700;line-height:1.5;letter-spacing:.02em;border-radius:999px;padding:0 10px;margin:0 6px 4px 0;vertical-align:1px;color:var(--cs-struct);border:1.5px solid var(--cs-struct);background:transparent;white-space:nowrap}
+.cs-dtag-s{border-style:dashed}
+.cs-dtag-r{background:color-mix(in srgb, var(--cs-struct) 13%, transparent)}
+/* 概要：スタンプと投稿の数（記録）。左に件数、右に2階への周遊 */
+.cs-scx{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:12px;align-items:stretch}
+.cs-scx > .cs-tiles{grid-template-columns:minmax(0,1fr);margin:0}
+.cs-card .cs-subcard{margin:0;padding:12px 14px}
+.cs-subcard > h3{font-size:14px}
+.cs-subcard .cs-fw{margin:4px 0 6px}
+@media (max-width:900px){.cs-scx{grid-template-columns:minmax(0,1fr)}.cs-scx > .cs-tiles{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))}}
+/* 3つのKPIのウォッチ：くらべられる人（先頭に1行で）・投稿の行（アンケートの数字と分ける）・街への愛着（1枚で、中を左右に） */
+.cs-wbase{padding:12px 16px}
+.cs-wbase-b{display:flex;flex-wrap:wrap;align-items:center;gap:2px 18px;margin-top:2px}
+.cs-wbase-b .cs-wbig{flex:0 0 auto}
+.cs-wbase-b .cs-cap{flex:1 1 320px;margin:0;font-size:12.5px}
+.cs-wbase-b .cs-cap b{color:var(--color-fg)}
+.cs-attw-b{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr);gap:6px 28px;align-items:center;margin:2px 0 8px}
+.cs-attw-l{display:flex;flex-direction:column;gap:6px;min-width:0}
+.cs-attw-r{min-width:0}
+@media (max-width:900px){.cs-attw-b{grid-template-columns:minmax(0,1fr)}}
+/* KPIごとに、左＝アンケートの答え（主観。点線の枠）、右＝3つの変革：スタンプ・投稿の記録（客観。実線の枠と淡い地） */
+.cs-dleg{display:flex;flex-wrap:wrap;gap:4px 20px;font-size:12px;color:var(--color-fg-muted);margin:0 0 12px}
+.cs-dleg .cs-dtag{margin-bottom:0}
+.cs-kwatch{display:grid;gap:12px;margin-bottom:12px}
+.cs-kwatch > .cs-card{margin:0}
+.cs-krow-h{display:flex;align-items:baseline;gap:10px;margin:0 0 8px}
+.cs-krow-h b{font-size:16px;font-weight:600}
+.cs-kpair{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;align-items:stretch}
+.cs-kp{display:flex;flex-direction:column;gap:6px;min-width:0;border-radius:10px;padding:10px 12px}
+.cs-kp-s{border:1.5px dashed color-mix(in srgb, var(--cs-struct) 50%, transparent)}
+.cs-kp-r{border:1.5px solid color-mix(in srgb, var(--cs-struct) 50%, transparent);background:color-mix(in srgb, var(--cs-struct) 5%, transparent)}
+.cs-kp > .cs-dtag{align-self:flex-start;margin:0}
+.cs-kp-q{margin:0;font-size:12px;line-height:1.5;color:var(--color-fg-muted)}
+.cs-kp .cs-tiles{margin:2px 0 0}
+.cs-kp-r .cs-inds{grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
+.cs-krow > .cs-ctas{margin-top:10px}
+.cs-kpage{margin:0 0 10px}
+.cs-kpage + .cs-more{margin-top:0}
+.cs-tnote{margin-top:2px}
+@media (max-width:900px){.cs-kpair{grid-template-columns:minmax(0,1fr)}}
+/* 目的から選ぶ（概要のいちばん上。目立つ枠で、ページの使い道を並べる） */
+.cs-pg{border:2px solid var(--cs-struct);border-radius:12px;padding:10px 14px 10px;margin:2px 0 14px;background:color-mix(in srgb, var(--cs-struct) 6%, transparent)}
+.cs-pg-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px;margin:0 0 4px}
+.cs-pg-h b{font-size:16px;font-weight:700;color:var(--cs-struct)}
+.cs-pg-h span{font-size:12px;color:var(--color-fg-muted)}
+.cs-pg-r{display:grid;grid-template-columns:150px minmax(0,1fr);gap:6px 12px;align-items:center;padding:8px 0;border-top:1px dashed color-mix(in srgb, var(--cs-struct) 35%, transparent)}
+.cs-pg-h + .cs-pg-r{border-top:0}
+.cs-pg-p{font-size:14px;font-weight:700;line-height:1.35}
+.cs-pg-p small{display:block;font-size:11.5px;font-weight:400;color:var(--color-fg-muted);margin-top:2px}
+.cs-pg-bs{display:grid;grid-template-columns:repeat(auto-fill,minmax(205px,1fr));gap:8px}
+.cs-pg-b{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0;text-align:left;font:inherit;color:var(--color-fg);background:var(--color-panel, #fff);border:1px solid var(--color-border-line);border-radius:8px;padding:7px 11px;cursor:pointer}
+.cs-pg-b b{font-size:13.5px;font-weight:700;color:var(--cs-struct)}
+.cs-pg-b span{font-size:11.5px;line-height:1.45;color:var(--color-fg-muted)}
+.cs-pg-b:hover{border-color:var(--cs-struct);box-shadow:inset 0 0 0 1px var(--cs-struct)}
+.cs-pg-b:focus-visible{outline:2px solid var(--cs-struct);outline-offset:2px}
+@media (max-width:700px){.cs-pg-r{grid-template-columns:minmax(0,1fr)}}
+/* 補足：3つを同じ重さのカードで（数字1つと、行き先のボタン） */
+.cs-sup{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));gap:12px;margin:0 0 12px}
+.cs-supc{display:flex;flex-direction:column;gap:6px;min-width:0;background:var(--color-panel, #fff);border:1px solid var(--color-border-line);border-radius:var(--cds-radius, 8px);padding:12px 14px}
+.cs-supk{align-self:flex-start;font-size:11px;font-weight:600;line-height:1.6;color:var(--color-fg-muted);border:1px solid var(--color-border-line);border-radius:999px;padding:0 8px}
+.cs-supt{font-size:15px;font-weight:600;line-height:1.4;padding-left:9px;border-left:3px solid var(--cs-struct)}
+.cs-supd{font-size:12px;line-height:1.5;color:var(--color-fg-muted)}
+.cs-supv{display:flex;flex-wrap:wrap;align-items:baseline;gap:0 4px;margin-top:2px}
+.cs-supv > b{font-size:28px;font-weight:600;line-height:1.15}
+.cs-supv > span{font-size:13px;color:var(--color-fg-muted)}
+.cs-supv small{flex:1 0 100%;font-size:11.5px;color:var(--color-fg-muted)}
+.cs-supv small b{color:var(--color-fg);font-weight:600}
+.cs-supc > .cs-btn{align-self:flex-start;margin-top:auto}
+/* 上に止まる帯：絞り込む〜ページの切りかえ（全幅）と、色の見方（本文の列の上）。高さはスクリプトが --cs-stick-h・--cs-leg-h に入れる */
+.cs-stick{position:sticky;top:0;z-index:16;background:var(--color-bg, #faf9f5);padding-top:8px}
+.cs-stick > .cs-fwrap{margin:0 0 8px}
+.cs-main > .cs-legwrap{position:sticky;top:var(--cs-stick-h, 0px);z-index:12;background:var(--color-bg, #faf9f5);margin:0;padding:10px 0 6px}
+.cs-toc{top:calc(var(--cs-stick-h, 0px) + 12px);max-height:calc(100vh - var(--cs-stick-h, 0px) - 24px)}
+.cs-main .cs-card,.cs-main .cs-sechead,.cs-main .cs-feature,.cs-main [data-toc],.cs-main [id],.cs-ops,.cs-notes{scroll-margin-top:calc(var(--cs-stick-h, 0px) + var(--cs-leg-h, 0px) + 12px)}
+.cs-body{scroll-margin-top:var(--cs-stick-h, 0px)}
+@media (max-height:560px){.cs-stick,.cs-main > .cs-legwrap{position:static}}
 /* cs_coach.css — DROP.Coach の部品（概要の判定と目標の入力・投稿のことば・スタンプの回り方の宝箱・運営のふりかえり） */
 .cs-root .cc-judges{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 @media (max-width:760px){.cs-root .cc-judges{grid-template-columns:repeat(2,minmax(0,1fr))}}
@@ -591,9 +659,9 @@
     <h1 class='cs-title'>CULTURE SNACK 2026 × みんまちDROP 効果検証ダッシュボード</h1>
     <p class='cs-sub'>会期 2026年11月20日（金）16:00–20:00・21日（土）11:00–18:00｜コクヨ様の3つのKPIの変化を、同じ人の事前・事後アンケートと、DROPの投稿・スタンプで見ます</p>
     <p class='cs-fresh' data-source='data_time clean_log'>集計したデータ：<b data-draw='v' data-source='data_time' data-field='last' data-row='0' data-fmt='text'>—</b> までの記録。運営・テストの記録は外し、DROP.Coach WS で先に自分で書いた投稿は Coach 版と1件にまとめて数えています（くわしくは概要の「集計の前処理」）</p>
-    <p class='cs-lede' id='lede'>事前・事後の両方に答えた <b data-draw='v' data-source='tiles' data-field='matched' data-row='0'>—</b>人のうち、上がった人は ① <b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k1'>—</b>%・② <b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k2'>—</b>%・③ <b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k3'>—</b>%（参考：街への愛着 <b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=att'>—</b>%）。スタンプを押した人のうち2階まで回った人は <b data-draw='v' data-source='floor_reach' data-field='pct' data-where='day=all'>—</b>%。</p>
   </header>
 
+  <div class='cs-stick' id='cs-stick'>
   <details class='cs-fwrap' id='fwrap'><summary>絞り込む（参加した日・年代・性別・来場者の区分・階・事前の答え）</summary>
   <div class='cs-bar' id='filters' role='group' aria-label='絞り込み'>
     <label class='cs-field'>参加した日
@@ -674,6 +742,7 @@
       <button type='button' class='cs-subtab' role='tab' id='tab-list' data-tab='list' aria-selected='false'>投稿を読む</button>
     </div>
   </div>
+  </div>
 
   <div class='cs-body'>
   <aside class='cs-toc' aria-label='目次'>
@@ -695,32 +764,61 @@
 
   <!-- ===================== 概要（ウォッチ） ===================== -->
   <section class='cs-sec' id='summary' role='tabpanel' aria-labelledby='tab-summary'>
-    <nav class='cs-guide' aria-label='目的から見る'>
-      <b>目的から見る</b>
-      <span class='cs-guide-i'>報告に使う：この概要 →<button type='button' class='cs-btn cs-go' data-go='kpi1'>KPIをくわしく</button></span>
-      <span class='cs-guide-i'>次の企画に活かす：<button type='button' class='cs-btn cs-go' data-go='floor'>会場での動き</button><button type='button' class='cs-btn cs-go' data-go='booth'>出展者ごとの違い</button></span>
-      <span class='cs-guide-i'>DROP.Coach をふりかえる：<button type='button' class='cs-btn cs-go' data-go='cfx'>DROP.Coachの効果</button></span>
+    <nav class='cs-pg' aria-label='目的から選ぶ'>
+      <div class='cs-pg-h'><b>目的から選ぶ</b><span>何に使うかで、見るページを選べます。押すとそのページへ移り、右下の「もとの画面に戻る」でここへ戻れます</span></div>
+      <div class='cs-pg-r'>
+        <div class='cs-pg-p'>報告に使う<small>この概要が土台。くわしくは</small></div>
+        <div class='cs-pg-bs'>
+          <button type='button' class='cs-pg-b' data-go='kpi1'><b>KPIをくわしく →</b><span>①②③ごとに、誰が・どの体験で変わったかを報告する</span></button>
+          <button type='button' class='cs-pg-b' data-go='booth'><b>出展者ごとの違い →</b><span>ブースによる傾向の差があれば、報告で取り上げる</span></button>
+          <button type='button' class='cs-pg-b' data-go='list'><b>投稿を読む →</b><span>来た人のことばを、報告に引用する</span></button>
+        </div>
+      </div>
+      <div class='cs-pg-r'>
+        <div class='cs-pg-p'>次の企画に活かす<small>会場・ブース・中身を考える</small></div>
+        <div class='cs-pg-bs'>
+          <button type='button' class='cs-pg-b' data-go='floor'><b>2階への周遊 →</b><span>いつ・どこから2階へ上がったかを見て、案内や企画の時刻を決める</span></button>
+          <button type='button' class='cs-pg-b' data-go='stamp'><b>スタンプの回り方 →</b><span>人を呼んだブース・入口になったブースを見て、配置や回る順路を決める</span></button>
+          <button type='button' class='cs-pg-b' data-go='net'><b>つながりの地図 →</b><span>いっしょに回られるブース・区分をこえて人が交わるブースを見て、組み合わせを決める</span></button>
+          <button type='button' class='cs-pg-b' data-go='post'><b>投稿のことば →</b><span>どのブースが、どんな行動・気持ちにつながったかを見て、企画の中身を考える</span></button>
+        </div>
+      </div>
+      <div class='cs-pg-r'>
+        <div class='cs-pg-p'>DROP.Coach をふりかえる<small>投稿づくりの手伝い</small></div>
+        <div class='cs-pg-bs'>
+          <button type='button' class='cs-pg-b' data-go='cfx'><b>DROP.Coachの効果 →</b><span>使った人・使わなかった人の差を見て、直すところを決める</span></button>
+        </div>
+      </div>
     </nav>
     <div class='cs-card cs-sfun' id='summary-tiles' data-source='funnel tiles'>
       <h3>参加の流れ</h3>
       <p class='cs-cap'>参加した人を100としたときに、どこまで進んだか（ファネル。人数で見ます）。参加した人＝本イベントの登録時アンケートに答えた人＋別イベントで DROP に登録済みで、スタンプか投稿をした人（この人たちには本イベントの登録時アンケートが出ません）。帯の中は人数と、参加した人を100としたときの割合。段の間は、ひとつ上の段から進んだ割合と、減った人数です</p>
       <div data-draw='sumfunnel'></div>
     </div>
-    <div class='cs-sfx'>
-      <div class='cs-card' id='summary-matched' data-source='tiles'>
-        <h3>KPIの変化をくらべられる人</h3>
-        <p class='cs-cap'>事前・事後の両方のアンケートに答えた人。参加の流れとは別に数えます。3つのKPIのウォッチは、この人たちで見ます</p>
-        <div class='cs-wbig'><b data-draw='v' data-source='tiles' data-field='matched' data-row='0'>—</b><span>人</span></div>
-        <div class='cs-ts'>参加した <b data-draw='v' data-source='tiles' data-field='joined' data-row='0'>—</b>人の <b data-draw='v' data-source='tiles' data-field='matched_pct' data-row='0'>—</b>%</div>
-      </div>
-      <div class='cs-card cs-scount' id='summary-counts' data-source='tiles'>
-        <h3>スタンプと投稿の数</h3>
-        <p class='cs-cap'>人数ではなく、スタンプ・投稿の件数で見た数字です（上の「参加の流れ」は人数）</p>
+    <div class='cs-card cs-scount' id='summary-counts' data-source='tiles floor_reach targets'>
+      <h3>スタンプと投稿の数</h3>
+      <p class='cs-cap'><span class='cs-dtag cs-dtag-r'>記録（客観）</span>スタンプと投稿の記録から数えた数字です。アンケートの答えは使いません。スタンプ・投稿は件数、2階への周遊は人数で見ます（上の「参加の流れ」は人数）</p>
+      <div class='cs-scx'>
         <div class='cs-tiles'>
           <div class='cs-tile'><div class='cs-tl'>押されたスタンプ</div><div class='cs-tv'><b data-draw='v' data-source='tiles' data-field='stamps' data-row='0'>—</b><span>個</span></div><div class='cs-ts'>押した人1人あたり <b data-draw='v' data-source='tiles' data-field='stamps_per' data-row='0' data-fmt='pct1'>—</b>個</div></div>
           <div class='cs-tile'><div class='cs-tl'>投稿</div><div class='cs-tv'><b data-draw='v' data-source='tiles' data-field='posts' data-row='0'>—</b><span>件</span></div><div class='cs-ts'>投稿した人1人あたり <b data-draw='v' data-source='tiles' data-field='posts_per' data-row='0' data-fmt='pct1'>—</b>件</div></div>
-          <div class='cs-tile'><div class='cs-tl'>写真つきの投稿</div><div class='cs-tv'><b data-draw='v' data-source='tiles' data-field='photo_pct' data-row='0'>—</b><span>%</span></div><div class='cs-ts'>投稿 <b data-draw='v' data-source='tiles' data-field='posts' data-row='0'>—</b>件のうち <b data-draw='v' data-source='tiles' data-field='photo_n' data-row='0'>—</b>件</div></div>
           <div class='cs-tile'><div class='cs-tl'>DROP.Coachで作った投稿</div><div class='cs-tv'><b data-draw='v' data-source='tiles' data-field='coach_posts' data-row='0'>—</b><span>件</span></div><div class='cs-ts'>投稿の <b data-draw='v' data-source='tiles' data-field='coach_pct' data-row='0'>—</b>%（文面の一致で判定）</div></div>
+        </div>
+        <div class='cs-card cs-subcard' id='floor-watch' data-source='floor_reach targets'>
+          <h3>2階への周遊</h3>
+          <p class='cs-cap'>スタンプを押した人のうち、2階のスポットで1つ以上押した人（階はスポット表から判定）。<i class='cs-dot' style='background:var(--cs-emph)'></i>2階まで回った人 <i class='cs-dot' style='background:var(--cs-gray)'></i>1階だけの人。輪を横切る線は目標（仮）</p>
+          <div class='cs-verdict' data-draw='ftarget'></div>
+          <div class='cs-fw'>
+          <div class='cs-fw-l' data-draw='floordonut' data-size='148'></div>
+          <dl class='cs-wstat cs-fw-r'>
+            <dt>11/20（金）</dt><dd><b data-draw='v' data-source='floor_reach' data-field='pct' data-where='day=11/20'>—</b>%（<span data-draw='v' data-source='floor_reach' data-field='n' data-where='day=11/20'>—</span>人のうち <span data-draw='v' data-source='floor_reach' data-field='f2_n' data-where='day=11/20'>—</span>人）</dd>
+            <dt>11/21（土）</dt><dd><b data-draw='v' data-source='floor_reach' data-field='pct' data-where='day=11/21'>—</b>%（<span data-draw='v' data-source='floor_reach' data-field='n' data-where='day=11/21'>—</span>人のうち <span data-draw='v' data-source='floor_reach' data-field='f2_n' data-where='day=11/21'>—</span>人）</dd>
+          </dl>
+          </div>
+          <div class='cs-ctas'>
+            <button type='button' class='cs-btn cs-go' data-go='floor'>2階への周遊を見る →</button>
+            <button type='button' class='cs-btn cs-golist' data-golist='all|all' data-golist-set='floor=2F'>2階まで回った人の投稿を読む →</button>
+          </div>
         </div>
       </div>
     </div>
@@ -734,54 +832,92 @@
         <p>事後アンケートに答えたのは <b data-draw='v' data-source='tiles' data-field='post' data-row='0'>—</b>人だけです。事前の①の平均は、答えた人 <b data-draw='v' data-source='selection' data-field='applied_mean' data-where='kpi=k1' data-fmt='dec2'>—</b>、答えなかった人 <b data-draw='v' data-source='selection' data-field='not_mean' data-where='kpi=k1' data-fmt='dec2'>—</b>。参加に積極的な人に寄っている可能性があります。</p></div>
     </div>
 
-    <div class='cs-sechead cs-chap'><h2>3つのKPIのウォッチ</h2><p>同じ人の事前と事後の答えをくらべます。しるしは、人数による数字のぶれを見込んでも平均がプラスなら「上がったと言える」としています。「深掘りする」で、誰が・どの体験で・どのスポットで変わったかを見られます</p></div>
-    <div class='cs-watch' id='watch'>
-      <div class='cs-card' id='watch-k1' data-kpi='k1' data-source='kpi_change post_themes kpi_top targets'>
-        <div class='cs-wtop'><span class='cs-wnum'>①</span><div><b>自分らしく挑戦できる風土</b><span>設問（仮）：仕事以外でも、新しいことに挑戦してみたい</span></div></div>
-        <div class='cs-verdict' data-draw='verdict' data-range='off'></div>
-        <div class='cs-wbig'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k1'>—</b><span>% の人が上がった</span></div>
-        <div class='cs-kchart cs-chart' data-draw='kdot'></div>
-        <dl class='cs-wstat'>
-          <dt>平均の変化</dt><dd><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k1' data-fmt='signed2'>—</b></dd>
-          <dt>下がった人</dt><dd><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k1'>—</b>%</dd>
-          <dt>投稿でこのKPIに触れた割合</dt><dd><b data-draw='v' data-source='post_themes' data-field='pct' data-where='theme=k1'>—</b>%</dd>
-          <dt>差がいちばん大きい体験</dt><dd><span data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k1' data-fmt='text'>—</span>（<span data-draw='v' data-source='kpi_top' data-field='exp_gap' data-where='kpi=k1' data-fmt='gap'>—</span>・<span data-draw='v' data-source='kpi_top' data-field='exp_judge' data-where='kpi=k1' data-fmt='text'>—</span>）</dd>
-          <dt>くらべた人数</dt><dd><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k1'>—</b>人</dd>
-        </dl>
+    <div class='cs-sechead cs-chap'><h2>3つのKPIのウォッチ</h2><p>KPIごとに、2つのデータを左右に並べて見ます。左は、同じ人の事前と事後のアンケート回答を比べた変化（本人がどう感じたか）。右は、そのKPIにつながる変化（3つの変革）が会場で起きたかを、スタンプと投稿で見た記録です。両方が同じ向きに動いていれば、変化が起きたと言いやすくなります。「深掘りする」で、誰が・どの体験で・どのスポットで変わったかを見られます</p>
+      <div class='cs-dleg'><span><span class='cs-dtag cs-dtag-s'>アンケートの答え（主観）</span>本人がどう感じたか。しるしは、人数による数字のぶれを見込んでも平均がプラスなら「上がったと言える」</span><span><span class='cs-dtag cs-dtag-r'>3つの変革：スタンプ・投稿の記録（客観）</span>会場で実際に起きたこと</span></div></div>
+    <div class='cs-card cs-wbase' id='summary-matched' data-source='tiles'>
+      <h3>KPIの変化をくらべられる人</h3>
+      <div class='cs-wbase-b'>
+        <div class='cs-wbig'><b data-draw='v' data-source='tiles' data-field='matched' data-row='0'>—</b><span>人</span></div>
+        <p class='cs-cap'>事前・事後の両方のアンケートに答えた人（参加した <b data-draw='v' data-source='tiles' data-field='joined' data-row='0'>—</b>人の <b data-draw='v' data-source='tiles' data-field='matched_pct' data-row='0'>—</b>%）。参加の流れとは別に数えます。各KPIの「アンケートの答え」と街への愛着は、この人たちで見ます</p>
+      </div>
+    </div>
+    <div class='cs-kwatch' id='watch'>
+      <div class='cs-card cs-krow' id='watch-k1' data-kpi='k1' data-source='kpi_change kpi_top targets transform'>
+        <div class='cs-krow-h'><span class='cs-wnum'>①</span><b>自分らしく挑戦できる風土</b></div>
+        <div class='cs-kpair'>
+          <div class='cs-kp cs-kp-s'>
+            <span class='cs-dtag cs-dtag-s'>アンケートの答え（主観）</span>
+            <p class='cs-kp-q'>設問（仮）：仕事以外でも、新しいことに挑戦してみたい</p>
+            <div class='cs-verdict' data-draw='verdict' data-range='off'></div>
+            <div class='cs-wbig'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k1'>—</b><span>% の人が上がった</span></div>
+            <div class='cs-kchart cs-chart' data-draw='kdot'></div>
+            <dl class='cs-wstat'>
+                <dt>平均の変化</dt><dd><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k1' data-fmt='signed2'>—</b></dd>
+                <dt>下がった人</dt><dd><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k1'>—</b>%</dd>
+                <dt>くらべた人数</dt><dd><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k1'>—</b>人</dd>
+                <dt>差がいちばん大きい体験</dt><dd><span data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k1' data-fmt='text'>—</span>（<span data-draw='v' data-source='kpi_top' data-field='exp_gap' data-where='kpi=k1' data-fmt='gap'>—</span>・<span data-draw='v' data-source='kpi_top' data-field='exp_judge' data-where='kpi=k1' data-fmt='text'>—</span>）</dd>
+              </dl>
+          </div>
+          <div class='cs-kp cs-kp-r'>
+            <span class='cs-dtag cs-dtag-r'>3つの変革：スタンプ・投稿の記録（客観）</span>
+            <p class='cs-kp-q'>社員が「好き」を出展し、応援され、来場者にも「やってみたい」が広がる</p>
+            <div class='cs-inds' data-draw='transform'></div>
+          </div>
+        </div>
         <div class='cs-ctas'>
           <button type='button' class='cs-btn cs-go' data-go='kpi1'>①を深掘りする →</button>
           <button type='button' class='cs-btn cs-golist' data-golist='k1|up'>上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k1'>—</span>人の投稿を読む →</button>
         </div>
       </div>
-      <div class='cs-card' id='watch-k2' data-kpi='k2' data-source='kpi_change post_themes kpi_top targets'>
-        <div class='cs-wtop'><span class='cs-wnum'>②</span><div><b>属性横断でのつながり</b><span>設問（仮）：会社や立場の違う人と、気軽に話せるつながりがある</span></div></div>
-        <div class='cs-verdict' data-draw='verdict' data-range='off'></div>
-        <div class='cs-wbig'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k2'>—</b><span>% の人が上がった</span></div>
-        <div class='cs-kchart cs-chart' data-draw='kdot'></div>
-        <dl class='cs-wstat'>
-          <dt>平均の変化</dt><dd><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k2' data-fmt='signed2'>—</b></dd>
-          <dt>下がった人</dt><dd><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k2'>—</b>%</dd>
-          <dt>投稿でこのKPIに触れた割合</dt><dd><b data-draw='v' data-source='post_themes' data-field='pct' data-where='theme=k2'>—</b>%</dd>
-          <dt>差がいちばん大きい体験</dt><dd><span data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k2' data-fmt='text'>—</span>（<span data-draw='v' data-source='kpi_top' data-field='exp_gap' data-where='kpi=k2' data-fmt='gap'>—</span>・<span data-draw='v' data-source='kpi_top' data-field='exp_judge' data-where='kpi=k2' data-fmt='text'>—</span>）</dd>
-          <dt>くらべた人数</dt><dd><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k2'>—</b>人</dd>
-        </dl>
+      <div class='cs-card cs-krow' id='watch-k2' data-kpi='k2' data-source='kpi_change kpi_top targets transform'>
+        <div class='cs-krow-h'><span class='cs-wnum'>②</span><b>属性横断でのつながり</b></div>
+        <div class='cs-kpair'>
+          <div class='cs-kp cs-kp-s'>
+            <span class='cs-dtag cs-dtag-s'>アンケートの答え（主観）</span>
+            <p class='cs-kp-q'>設問（仮）：会社や立場の違う人と、気軽に話せるつながりがある</p>
+            <div class='cs-verdict' data-draw='verdict' data-range='off'></div>
+            <div class='cs-wbig'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k2'>—</b><span>% の人が上がった</span></div>
+            <div class='cs-kchart cs-chart' data-draw='kdot'></div>
+            <dl class='cs-wstat'>
+                <dt>平均の変化</dt><dd><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k2' data-fmt='signed2'>—</b></dd>
+                <dt>下がった人</dt><dd><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k2'>—</b>%</dd>
+                <dt>くらべた人数</dt><dd><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k2'>—</b>人</dd>
+                <dt>差がいちばん大きい体験</dt><dd><span data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k2' data-fmt='text'>—</span>（<span data-draw='v' data-source='kpi_top' data-field='exp_gap' data-where='kpi=k2' data-fmt='gap'>—</span>・<span data-draw='v' data-source='kpi_top' data-field='exp_judge' data-where='kpi=k2' data-fmt='text'>—</span>）</dd>
+              </dl>
+          </div>
+          <div class='cs-kp cs-kp-r'>
+            <span class='cs-dtag cs-dtag-r'>3つの変革：スタンプ・投稿の記録（客観）</span>
+            <p class='cs-kp-q'>普段の所属・属性とはちがう人のブースに立ち寄っている</p>
+            <div class='cs-inds' data-draw='transform'></div>
+          </div>
+        </div>
         <div class='cs-ctas'>
           <button type='button' class='cs-btn cs-go' data-go='kpi2'>②を深掘りする →</button>
           <button type='button' class='cs-btn cs-golist' data-golist='k2|up'>上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k2'>—</span>人の投稿を読む →</button>
         </div>
       </div>
-      <div class='cs-card' id='watch-k3' data-kpi='k3' data-source='kpi_change post_themes kpi_top targets'>
-        <div class='cs-wtop'><span class='cs-wnum'>③</span><div><b>会社への信頼・心理的安全性</b><span>設問（仮）：職場で、仕事以外の話（趣味や好きなこと）をしてもいいと思える</span></div></div>
-        <div class='cs-verdict' data-draw='verdict' data-range='off'></div>
-        <div class='cs-wbig'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k3'>—</b><span>% の人が上がった</span></div>
-        <div class='cs-kchart cs-chart' data-draw='kdot'></div>
-        <dl class='cs-wstat'>
-          <dt>平均の変化</dt><dd><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k3' data-fmt='signed2'>—</b></dd>
-          <dt>下がった人</dt><dd><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k3'>—</b>%</dd>
-          <dt>投稿でこのKPIに触れた割合</dt><dd><b data-draw='v' data-source='post_themes' data-field='pct' data-where='theme=k3'>—</b>%</dd>
-          <dt>差がいちばん大きい体験</dt><dd><span data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k3' data-fmt='text'>—</span>（<span data-draw='v' data-source='kpi_top' data-field='exp_gap' data-where='kpi=k3' data-fmt='gap'>—</span>・<span data-draw='v' data-source='kpi_top' data-field='exp_judge' data-where='kpi=k3' data-fmt='text'>—</span>）</dd>
-          <dt>くらべた人数</dt><dd><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k3'>—</b>人</dd>
-        </dl>
+      <div class='cs-card cs-krow' id='watch-k3' data-kpi='k3' data-source='kpi_change kpi_top targets transform'>
+        <div class='cs-krow-h'><span class='cs-wnum'>③</span><b>会社への信頼・心理的安全性</b></div>
+        <div class='cs-kpair'>
+          <div class='cs-kp cs-kp-s'>
+            <span class='cs-dtag cs-dtag-s'>アンケートの答え（主観）</span>
+            <p class='cs-kp-q'>設問（仮）：職場で、仕事以外の話（趣味や好きなこと）をしてもいいと思える</p>
+            <div class='cs-verdict' data-draw='verdict' data-range='off'></div>
+            <div class='cs-wbig'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k3'>—</b><span>% の人が上がった</span></div>
+            <div class='cs-kchart cs-chart' data-draw='kdot'></div>
+            <dl class='cs-wstat'>
+                <dt>平均の変化</dt><dd><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k3' data-fmt='signed2'>—</b></dd>
+                <dt>下がった人</dt><dd><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k3'>—</b>%</dd>
+                <dt>くらべた人数</dt><dd><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k3'>—</b>人</dd>
+                <dt>差がいちばん大きい体験</dt><dd><span data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k3' data-fmt='text'>—</span>（<span data-draw='v' data-source='kpi_top' data-field='exp_gap' data-where='kpi=k3' data-fmt='gap'>—</span>・<span data-draw='v' data-source='kpi_top' data-field='exp_judge' data-where='kpi=k3' data-fmt='text'>—</span>）</dd>
+              </dl>
+          </div>
+          <div class='cs-kp cs-kp-r'>
+            <span class='cs-dtag cs-dtag-r'>3つの変革：スタンプ・投稿の記録（客観）</span>
+            <p class='cs-kp-q'>社員のB面を見て、会社・社員への見え方が良い方向に変わる（社内の心理的安全性そのものは、出展した社員への事後アンケートで補う）</p>
+            <div class='cs-inds' data-draw='transform'></div>
+          </div>
+        </div>
         <div class='cs-ctas'>
           <button type='button' class='cs-btn cs-go' data-go='kpi3'>③を深掘りする →</button>
           <button type='button' class='cs-btn cs-golist' data-golist='k3|up'>上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k3'>—</span>人の投稿を読む →</button>
@@ -789,57 +925,53 @@
       </div>
     </div>
 
-    <div class='cs-grid2'>
-      <div class='cs-card' id='floor-watch' data-source='floor_reach exp_gap targets'>
-        <h3>2階への周遊</h3>
-        <p class='cs-cap'>スタンプを押した人のうち、2階のスポットで1つ以上押した人（階はスポット表から判定）。<i class='cs-dot' style='background:var(--cs-emph)'></i>2階まで回った人 <i class='cs-dot' style='background:var(--cs-gray)'></i>1階だけの人。輪を横切る線は目標（仮）</p>
-        <div class='cs-verdict' data-draw='ftarget'></div>
-        <div class='cs-fw'>
-        <div class='cs-fw-l' data-draw='floordonut' data-size='148'></div>
-        <dl class='cs-wstat cs-fw-r'>
-          <dt>11/20（金）</dt><dd><b data-draw='v' data-source='floor_reach' data-field='pct' data-where='day=11/20'>—</b>%（<span data-draw='v' data-source='floor_reach' data-field='n' data-where='day=11/20'>—</span>人のうち <span data-draw='v' data-source='floor_reach' data-field='f2_n' data-where='day=11/20'>—</span>人）</dd>
-          <dt>11/21（土）</dt><dd><b data-draw='v' data-source='floor_reach' data-field='pct' data-where='day=11/21'>—</b>%（<span data-draw='v' data-source='floor_reach' data-field='n' data-where='day=11/21'>—</span>人のうち <span data-draw='v' data-source='floor_reach' data-field='f2_n' data-where='day=11/21'>—</span>人）</dd>
-          <dt>2階まで回った人の①が上がった割合</dt><dd><b data-draw='v' data-source='exp_gap' data-field='yes_up' data-where='kpi=k1&amp;exp=f2'>—</b>%（1階だけの人 <span data-draw='v' data-source='exp_gap' data-field='no_up' data-where='kpi=k1&amp;exp=f2'>—</span>%）</dd>
-        </dl>
+    <div class='cs-card cs-attw' id='att-watch' data-kpi='att' data-source='kpi_change bench targets'>
+      <h3>参考：品川の街への愛着</h3>
+      <p class='cs-cap'><span class='cs-dtag cs-dtag-s'>アンケートの答え（主観）</span>事前・事後アンケートの設問（仮）：品川の街に親しみを感じる（5段階）。2025年とくらべる2本は、2025年と同じ設問（事後アンケートで「当てはまる」の割合）</p>
+      <div class='cs-attw-b'>
+        <div class='cs-attw-l'>
+          <div class='cs-verdict' data-draw='verdict' data-range='off'></div>
+          <div class='cs-wbig'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=att'>—</b><span>% の人が上がった</span></div>
+          <div class='cs-kchart cs-chart' data-draw='kdot'></div>
         </div>
-        <div class='cs-ctas'>
-          <button type='button' class='cs-btn cs-go' data-go='floor'>2階への周遊を見る →</button>
-          <button type='button' class='cs-btn cs-golist' data-golist='all|all' data-golist-set='floor=2F'>2階まで回った人の投稿を読む →</button>
+        <div class='cs-attw-r'>
+          <div class='cs-brow'><span>この街に親近感がわいた、愛着が生まれた</span><div class='cs-tbar cs-chart' data-draw='bench' data-item='att'></div><span class='cs-num'><b data-draw='v' data-source='bench' data-field='y2026' data-where='item=att' data-fmt='pct1'>—</b>%（2025年 <span data-draw='v' data-source='bench' data-field='y2025' data-where='item=att' data-fmt='pct1'>—</span>%）</span></div>
+          <div class='cs-brow'><span>新しい知り合いができた、増えた（②に近い）</span><div class='cs-tbar cs-chart' data-draw='bench' data-item='new'></div><span class='cs-num'><b data-draw='v' data-source='bench' data-field='y2026' data-where='item=new' data-fmt='pct1'>—</b>%（2025年 <span data-draw='v' data-source='bench' data-field='y2025' data-where='item=new' data-fmt='pct1'>—</span>%）</span></div>
+          <p class='cs-hint'><i class='cs-sw' style='background:var(--cs-gray)'></i>2025年（当日アンケート・223人） <i class='cs-sw' style='background:var(--cs-emph)'></i>2026年（DROPの事後アンケート）</p>
         </div>
       </div>
-      <div class='cs-card' id='att-watch' data-kpi='att' data-source='kpi_change bench targets'>
-        <h3>参考：品川の街への愛着</h3>
-        <p class='cs-cap'>設問（仮）：品川の街に親しみを感じる（5段階・事前と事後）。下の2本は2025年と同じ設問（事後アンケートで「当てはまる」の割合）</p>
-        <div class='cs-verdict' data-draw='verdict' data-range='off'></div>
-        <div class='cs-wbig'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=att'>—</b><span>% の人が上がった</span></div>
-        <div class='cs-kchart cs-chart' data-draw='kdot'></div>
-        <div class='cs-brow'><span>この街に親近感がわいた、愛着が生まれた</span><div class='cs-tbar cs-chart' data-draw='bench' data-item='att'></div><span class='cs-num'><b data-draw='v' data-source='bench' data-field='y2026' data-where='item=att' data-fmt='pct1'>—</b>%（2025年 <span data-draw='v' data-source='bench' data-field='y2025' data-where='item=att' data-fmt='pct1'>—</span>%）</span></div>
-        <div class='cs-brow'><span>新しい知り合いができた、増えた（②に近い）</span><div class='cs-tbar cs-chart' data-draw='bench' data-item='new'></div><span class='cs-num'><b data-draw='v' data-source='bench' data-field='y2026' data-where='item=new' data-fmt='pct1'>—</b>%（2025年 <span data-draw='v' data-source='bench' data-field='y2025' data-where='item=new' data-fmt='pct1'>—</span>%）</span></div>
-        <p class='cs-hint'><i class='cs-sw' style='background:var(--cs-gray)'></i>2025年（当日アンケート・223人） <i class='cs-sw' style='background:var(--cs-emph)'></i>2026年（DROPの事後アンケート）</p>
-        <div class='cs-ctas'>
-          <button type='button' class='cs-btn cs-go' data-go='net'>つながりの地図を見る →</button>
-          <button type='button' class='cs-btn cs-golist' data-golist='att|up'>愛着が上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=att'>—</span>人の投稿を読む →</button>
-        </div>
+      <div class='cs-ctas'>
+        <button type='button' class='cs-btn cs-go' data-go='net'>つながりの地図を見る →</button>
+        <button type='button' class='cs-btn cs-golist' data-golist='att|up'>愛着が上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=att'>—</span>人の投稿を読む →</button>
       </div>
     </div>
 
-    <div class='cs-feature' id='change3'>
-    <div class='cs-sechead'><span class='cs-flag'>3つの変革</span><h2>3つの変革は起きたか（スタンプ・投稿で見る）</h2><p>コクヨ様の3つのKPIにつながる変化（3つの変革）が会場で起きたかを、スタンプと投稿の指標で見ます。アンケートの事前→事後（上のウォッチ）とあわせて見ます</p></div>
-    <div class='cs-tri' data-source='transform'>
-      <div class='cs-card' data-kpi='k1'><h3>① 自分らしく挑戦できる風土</h3><p class='cs-cap'>社員が「好き」を出展し、応援され、来場者にも「やってみたい」が広がる</p><div class='cs-inds' data-draw='transform'></div></div>
-      <div class='cs-card' data-kpi='k2'><h3>② 属性横断でのつながり</h3><p class='cs-cap'>普段の所属・属性とはちがう人のブースに立ち寄っている</p><div class='cs-inds' data-draw='transform'></div></div>
-      <div class='cs-card' data-kpi='k3'><h3>③ 会社への信頼・心理的安全性</h3><p class='cs-cap'>社員のB面を見て、会社・社員への見え方が良い方向に変わる（社内の心理的安全性そのものは、出展した社員への事後アンケートで補う）</p><div class='cs-inds' data-draw='transform'></div></div>
-    </div>
+    <div class='cs-sechead cs-chap'><h2>補足</h2><p>本筋の数字を読むときに、あわせて見ておくものです。3つあります</p></div>
+    <div class='cs-sup'>
+      <div class='cs-supc' data-source='coach_vs'>
+        <span class='cs-supk'>別のページへ</span>
+        <b class='cs-supt'>DROP.Coach の効果</b>
+        <span class='cs-supd'>投稿づくりの手伝いは役に立ったか。使った人・使わなかった人の差と、目標（仮）とのくらべ</span>
+        <div class='cs-supv'><b data-draw='v' data-source='coach_vs' data-field='na' data-where='kind=head'>—</b><span>人</span><small>DROP.Coachで投稿を作った人（使わずに投稿した人 <b data-draw='v' data-source='coach_vs' data-field='nb' data-where='kind=head'>—</b>人）</small></div>
+        <button type='button' class='cs-btn cs-go' data-go='cfx'>DROP.Coachの効果を見る →</button>
+      </div>
+      <div class='cs-supc' data-source='rally'>
+        <span class='cs-supk'>このページの下で開く</span>
+        <b class='cs-supt'>スタンプラリーの達成と、分析の細かさ</b>
+        <span class='cs-supd'>1段階目・2段階目に届いた人と、いまの件数でどこまで細かく分けて見られるか</span>
+        <div class='cs-supv'><b data-draw='v' data-source='rally' data-field='rally1' data-row='0'>—</b><span>人</span><small>1段階目に届いた人（2段階目 <b data-draw='v' data-source='rally' data-field='rally2' data-row='0'>—</b>人）</small></div>
+        <button type='button' class='cs-btn' data-jump='rally-more'>開いて見る ↓</button>
+      </div>
+      <div class='cs-supc' data-source='clean_log'>
+        <span class='cs-supk'>このページの下で開く</span>
+        <b class='cs-supt'>データの確かさ（集計の前処理）</b>
+        <span class='cs-supd'>運営・テストの記録など、集計の前に外したもの・まとめたもの</span>
+        <div class='cs-supv'><b data-draw='v' data-source='clean_log' data-field='n' data-where='item=運営・テスト用のアカウント'>—</b><span>人</span><small>外した運営・テスト用のアカウント（その投稿・スタンプ <b data-draw='v' data-source='clean_log' data-field='n' data-where='item=そのアカウントの投稿・スタンプ'>—</b>件も外した）</small></div>
+        <button type='button' class='cs-btn' data-jump='prep-more'>開いて見る ↓</button>
+      </div>
     </div>
 
-    <div class='cs-sechead cs-chap'><h2>補足：DROP.Coach とデータの確かさ</h2><p>DROP.Coach（投稿づくりの手伝い）の効果への入口と、スタンプラリーの達成・分析の細かさ・集計の前処理です。何人が参加し、どこまで進んだかは、いちばん上の「参加の流れ」で見ます</p></div>
-
-    <div class='cs-ctas cs-ctarow' aria-label='DROP.Coachの効果へ'>
-      <span>DROP.Coach（投稿づくりの手伝い）は役に立ったか：使った人・使わなかった人の差と、目標（仮）とのくらべ →</span>
-      <button type='button' class='cs-btn cs-go' data-go='cfx'>DROP.Coachの効果を見る →</button>
-    </div>
-
-    <details class='cs-more'><summary>くわしく見る：スタンプラリーの達成と、分析の細かさ</summary>
+    <details class='cs-more' id='rally-more'><summary>くわしく見る：スタンプラリーの達成と、分析の細かさ</summary>
     <div class='cs-card' id='rally-card' data-source='rally'>
       <h3>スタンプラリーの達成と、分析の細かさ</h3>
       <p class='cs-cap'>スタンプラリーの設計（仮。1段階目：スタンプ3個＋投稿1件、2段階目：スタンプ5個・体験の形式2種類以上、目標100件）。いまの件数では「<b data-draw='v' data-source='rally' data-field='level' data-row='0' data-fmt='text'>—</b>」。1人あたりのスタンプ <b data-draw='v' data-source='rally' data-field='stamps_avg' data-row='0' data-fmt='text'>—</b>個（2025年の1人あたりの立ち寄り 約<span data-draw='v' data-source='rally' data-field='base2025' data-row='0' data-fmt='text'>—</span>。DROPの参加者だけの数字なので、そのままはくらべられません）</p>
@@ -859,53 +991,31 @@
 
   <!-- ===================== ① 自分らしく挑戦できる風土 ===================== -->
   <section class='cs-sec' id='kpi1' data-kpi='k1' role='tabpanel' aria-labelledby='tab-kpi1' hidden>
-    <div class='cs-kpihead' data-source='kpi_change targets'>
+    <div class='cs-kpihead'>
       <div>
         <h2>① 自分らしく挑戦できる風土</h2>
-        <p class='cs-q'>設問（仮）：仕事以外でも、新しいことに挑戦してみたい（5段階・事前と事後に同じ文）</p>
-      </div>
-      <div class='cs-verdict' data-draw='verdict'></div>
-    </div>
-
-    <div class='cs-tiles'>
-      <div class='cs-tile'><div class='cs-tl'>上がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k1'>—</b><span>%</span></div><div class='cs-ts'><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k1'>—</b>人のうち <b data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k1'>—</b>人</div></div>
-      <div class='cs-tile'><div class='cs-tl'>平均の変化</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k1' data-fmt='signed2'>—</b><span>段階</span></div><div class='cs-ts'>事前 <b data-draw='v' data-source='kpi_change' data-field='pre_mean' data-where='kpi=k1' data-fmt='dec2'>—</b> → 事後 <b data-draw='v' data-source='kpi_change' data-field='post_mean' data-where='kpi=k1' data-fmt='dec2'>—</b></div></div>
-      <div class='cs-tile'><div class='cs-tl'>下がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k1'>—</b><span>%</span></div><div class='cs-ts'>変わらない <b data-draw='v' data-source='kpi_change' data-field='same_pct' data-where='kpi=k1'>—</b>%</div></div>
-      <div class='cs-tile'><div class='cs-tl'>投稿でこのKPIに触れた割合</div><div class='cs-tv'><b data-draw='v' data-source='post_themes' data-field='pct' data-where='theme=k1'>—</b><span>%</span></div><div class='cs-ts'>投稿 <b data-draw='v' data-source='tiles' data-field='posts' data-row='0'>—</b>件のうち <b data-draw='v' data-source='post_themes' data-field='n' data-where='theme=k1'>—</b>件</div></div>
-    </div>
-    <div class='cs-ctas cs-ctarow' aria-label='この人たちの投稿を読む'>
-      <span>この人たちの投稿を読む：</span>
-      <button type='button' class='cs-btn cs-golist' data-golist='self|up'>上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k1'>—</span>人 →</button>
-      <button type='button' class='cs-btn cs-golist' data-golist='self|same'>変わらない <span data-draw='v' data-source='kpi_change' data-field='same_n' data-where='kpi=k1'>—</span>人 →</button>
-      <button type='button' class='cs-btn cs-golist' data-golist='self|down'>下がった <span data-draw='v' data-source='kpi_change' data-field='down_n' data-where='kpi=k1'>—</span>人 →</button>
-    </div>
-    <div class='cs-card cs-featcard' data-source='transform'>
-      <span class='cs-flag'>3つの変革</span>
-      <h3>3つの変革のチェック（スタンプ・投稿で見る）</h3>
-      <p class='cs-cap'>このKPIにつながる変化が会場で起きたかを、スタンプと投稿の指標で見ます。ラベルは使うデータ（スタンプ・投稿・両方）。最後の「アンケート」は事前→事後の変化</p>
-      <div class='cs-inds' data-draw='transform'></div>
-    </div>
-
-    <div class='cs-find' data-source='kpi_top'>
-      <b>上がった人が多かったところ</b>
-      <span>グループ：<b data-draw='v' data-source='kpi_top' data-field='group' data-where='kpi=k1' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='group_up' data-where='kpi=k1'>—</b>%）</span>
-      <span>体験：<b data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k1' data-fmt='text'>—</b>（した人 <b data-draw='v' data-source='kpi_top' data-field='exp_yes' data-where='kpi=k1'>—</b>%・しなかった人 <b data-draw='v' data-source='kpi_top' data-field='exp_no' data-where='kpi=k1'>—</b>%）</span>
-      <span>スポット：<b data-draw='v' data-source='kpi_top' data-field='spot' data-where='kpi=k1' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='spot_up' data-where='kpi=k1'>—</b>%）</span>
-    </div>
-
-    <div class='cs-sechead cs-chap'><h2>どう変わったか</h2><p>どのグループの人が上がったか（答えの分かれ方・一人ひとりの動きは「くわしく見る」に）</p></div>
-    <div class='cs-card' data-source='seg'>
-      <h3>誰が変わったか</h3>
-      <p class='cs-cap'>グループごとの「上がった人の割合」と、その人数（事前・事後の両方に答えた〇人中、上がった〇人）。点線は全体。行を押すと、そのグループで絞り込みます（もう一度押すと戻ります）。10人未満は薄く表示</p>
-      <div class='cs-seggrid'>
-        <div><h4>年代（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='age'></div></div>
-        <div><h4>来場者の区分（登録時。上で4区分・2区分を切りかえ）</h4><div class='cs-chart' data-draw='segk' data-dim='role'></div></div>
-        <div><h4>性別（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='gender'></div></div>
-        <div><h4>参加した日</h4><div class='cs-chart' data-draw='segk' data-dim='day'></div></div>
+        <p class='cs-q'>このKPIを、2つのデータで見ます。左は事前・事後のアンケート回答の変化（主観）、右はこのKPIにつながる変化（3つの変革）が会場で起きたかを、スタンプと投稿で見た記録（客観）です</p>
       </div>
     </div>
 
-    <details class='cs-more'><summary>くわしく見る：答えの分かれ方・一人ひとりの動き</summary>
+    <div class='cs-kpair cs-kpage'>
+      <div class='cs-kp cs-kp-s' data-source='kpi_change targets'>
+        <span class='cs-dtag cs-dtag-s'>アンケートの答え（主観）</span>
+        <p class='cs-kp-q'>設問（仮）「仕事以外でも、新しいことに挑戦してみたい」に、同じ人が事前と事後に5段階で答えたもの</p>
+        <div class='cs-verdict' data-draw='verdict'></div>
+        <div class='cs-tiles'>
+          <div class='cs-tile'><div class='cs-tl'>上がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k1'>—</b><span>%</span></div><div class='cs-ts'><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k1'>—</b>人のうち <b data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k1'>—</b>人</div><div class='cs-ts cs-tnote' data-draw='roomnote' data-dir='up'></div></div>
+          <div class='cs-tile'><div class='cs-tl'>平均の変化</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k1' data-fmt='signed2'>—</b><span>段階</span></div><div class='cs-ts'>事前 <b data-draw='v' data-source='kpi_change' data-field='pre_mean' data-where='kpi=k1' data-fmt='dec2'>—</b> → 事後 <b data-draw='v' data-source='kpi_change' data-field='post_mean' data-where='kpi=k1' data-fmt='dec2'>—</b></div></div>
+          <div class='cs-tile'><div class='cs-tl'>下がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k1'>—</b><span>%</span></div><div class='cs-ts'>変わらない <b data-draw='v' data-source='kpi_change' data-field='same_pct' data-where='kpi=k1'>—</b>%</div><div class='cs-ts cs-tnote' data-draw='roomnote' data-dir='down'></div></div>
+        </div>
+      </div>
+      <div class='cs-kp cs-kp-r' data-source='transform'>
+        <span class='cs-dtag cs-dtag-r'>3つの変革：スタンプ・投稿の記録（客観）</span>
+        <p class='cs-kp-q'>社員が「好き」を出展し、応援され、来場者にも「やってみたい」が広がる。ラベルは使うデータ（スタンプ・投稿・両方）</p>
+        <div class='cs-inds' data-draw='transform'></div>
+      </div>
+    </div>
+    <details class='cs-more'><summary>くわしく見る：アンケートの答えの分かれ方・一人ひとりの動き</summary>
     <div class='cs-grid2'>
       <div class='cs-card' data-source='kpi_dist kpi_change'>
         <h3>答えの変化</h3>
@@ -920,6 +1030,31 @@
       </div>
     </div>
     </details>
+    <div class='cs-ctas cs-ctarow' aria-label='この人たちの投稿を読む'>
+      <span>この人たちの投稿を読む：</span>
+      <button type='button' class='cs-btn cs-golist' data-golist='self|up'>上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k1'>—</span>人 →</button>
+      <button type='button' class='cs-btn cs-golist' data-golist='self|same'>変わらない <span data-draw='v' data-source='kpi_change' data-field='same_n' data-where='kpi=k1'>—</span>人 →</button>
+      <button type='button' class='cs-btn cs-golist' data-golist='self|down'>下がった <span data-draw='v' data-source='kpi_change' data-field='down_n' data-where='kpi=k1'>—</span>人 →</button>
+    </div>
+
+    <div class='cs-find' data-source='kpi_top'>
+      <b>上がった人が多かったところ</b>
+      <span>グループ：<b data-draw='v' data-source='kpi_top' data-field='group' data-where='kpi=k1' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='group_up' data-where='kpi=k1'>—</b>%）</span>
+      <span>体験：<b data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k1' data-fmt='text'>—</b>（した人 <b data-draw='v' data-source='kpi_top' data-field='exp_yes' data-where='kpi=k1'>—</b>%・しなかった人 <b data-draw='v' data-source='kpi_top' data-field='exp_no' data-where='kpi=k1'>—</b>%）</span>
+      <span>スポット：<b data-draw='v' data-source='kpi_top' data-field='spot' data-where='kpi=k1' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='spot_up' data-where='kpi=k1'>—</b>%）</span>
+    </div>
+
+    <div class='cs-sechead cs-chap'><h2>どう変わったか</h2><p>どのグループの人が上がったか（アンケートの答えの分かれ方・一人ひとりの動きは、いちばん上の「アンケートの答え」の下で開けます）</p></div>
+    <div class='cs-card' data-source='seg'>
+      <h3>誰が変わったか</h3>
+      <p class='cs-cap'>グループごとの「上がった人の割合」と、その人数（事前・事後の両方に答えた〇人中、上がった〇人）。点線は全体。行を押すと、そのグループで絞り込みます（もう一度押すと戻ります）。10人未満は薄く表示</p>
+      <div class='cs-seggrid'>
+        <div><h4>年代（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='age'></div></div>
+        <div><h4>来場者の区分（登録時。上で4区分・2区分を切りかえ）</h4><div class='cs-chart' data-draw='segk' data-dim='role'></div></div>
+        <div><h4>性別（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='gender'></div></div>
+        <div><h4>参加した日</h4><div class='cs-chart' data-draw='segk' data-dim='day'></div></div>
+      </div>
+    </div>
 
     <div class='cs-sechead cs-chap'><h2>何とつながったか</h2><p>どの体験をした人が上がったか（スポット・WB は「くわしく見る」に）</p></div>
     <div class='cs-card' data-source='exp_gap'>
@@ -961,53 +1096,31 @@
 
   <!-- ===================== ② 属性横断でのつながり ===================== -->
   <section class='cs-sec' id='kpi2' data-kpi='k2' role='tabpanel' aria-labelledby='tab-kpi2' hidden>
-    <div class='cs-kpihead' data-source='kpi_change targets'>
+    <div class='cs-kpihead'>
       <div>
         <h2>② 属性横断でのつながり</h2>
-        <p class='cs-q'>設問（仮）：会社や立場の違う人と、気軽に話せるつながりがある（5段階・事前と事後に同じ文）</p>
-      </div>
-      <div class='cs-verdict' data-draw='verdict'></div>
-    </div>
-
-    <div class='cs-tiles'>
-      <div class='cs-tile'><div class='cs-tl'>上がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k2'>—</b><span>%</span></div><div class='cs-ts'><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k2'>—</b>人のうち <b data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k2'>—</b>人</div></div>
-      <div class='cs-tile'><div class='cs-tl'>平均の変化</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k2' data-fmt='signed2'>—</b><span>段階</span></div><div class='cs-ts'>事前 <b data-draw='v' data-source='kpi_change' data-field='pre_mean' data-where='kpi=k2' data-fmt='dec2'>—</b> → 事後 <b data-draw='v' data-source='kpi_change' data-field='post_mean' data-where='kpi=k2' data-fmt='dec2'>—</b></div></div>
-      <div class='cs-tile'><div class='cs-tl'>下がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k2'>—</b><span>%</span></div><div class='cs-ts'>変わらない <b data-draw='v' data-source='kpi_change' data-field='same_pct' data-where='kpi=k2'>—</b>%</div></div>
-      <div class='cs-tile'><div class='cs-tl'>投稿でこのKPIに触れた割合</div><div class='cs-tv'><b data-draw='v' data-source='post_themes' data-field='pct' data-where='theme=k2'>—</b><span>%</span></div><div class='cs-ts'>投稿 <b data-draw='v' data-source='tiles' data-field='posts' data-row='0'>—</b>件のうち <b data-draw='v' data-source='post_themes' data-field='n' data-where='theme=k2'>—</b>件</div></div>
-    </div>
-    <div class='cs-ctas cs-ctarow' aria-label='この人たちの投稿を読む'>
-      <span>この人たちの投稿を読む：</span>
-      <button type='button' class='cs-btn cs-golist' data-golist='self|up'>上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k2'>—</span>人 →</button>
-      <button type='button' class='cs-btn cs-golist' data-golist='self|same'>変わらない <span data-draw='v' data-source='kpi_change' data-field='same_n' data-where='kpi=k2'>—</span>人 →</button>
-      <button type='button' class='cs-btn cs-golist' data-golist='self|down'>下がった <span data-draw='v' data-source='kpi_change' data-field='down_n' data-where='kpi=k2'>—</span>人 →</button>
-    </div>
-    <div class='cs-card cs-featcard' data-source='transform'>
-      <span class='cs-flag'>3つの変革</span>
-      <h3>3つの変革のチェック（スタンプ・投稿で見る）</h3>
-      <p class='cs-cap'>このKPIにつながる変化が会場で起きたかを、スタンプと投稿の指標で見ます。ラベルは使うデータ（スタンプ・投稿・両方）。最後の「アンケート」は事前→事後の変化</p>
-      <div class='cs-inds' data-draw='transform'></div>
-    </div>
-
-    <div class='cs-find' data-source='kpi_top'>
-      <b>上がった人が多かったところ</b>
-      <span>グループ：<b data-draw='v' data-source='kpi_top' data-field='group' data-where='kpi=k2' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='group_up' data-where='kpi=k2'>—</b>%）</span>
-      <span>体験：<b data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k2' data-fmt='text'>—</b>（した人 <b data-draw='v' data-source='kpi_top' data-field='exp_yes' data-where='kpi=k2'>—</b>%・しなかった人 <b data-draw='v' data-source='kpi_top' data-field='exp_no' data-where='kpi=k2'>—</b>%）</span>
-      <span>スポット：<b data-draw='v' data-source='kpi_top' data-field='spot' data-where='kpi=k2' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='spot_up' data-where='kpi=k2'>—</b>%）</span>
-    </div>
-
-    <div class='cs-sechead cs-chap'><h2>どう変わったか</h2><p>どのグループの人が上がったか（答えの分かれ方・一人ひとりの動きは「くわしく見る」に）</p></div>
-    <div class='cs-card' data-source='seg'>
-      <h3>誰が変わったか</h3>
-      <p class='cs-cap'>グループごとの「上がった人の割合」と、その人数（事前・事後の両方に答えた〇人中、上がった〇人）。点線は全体。行を押すと、そのグループで絞り込みます（もう一度押すと戻ります）。10人未満は薄く表示</p>
-      <div class='cs-seggrid'>
-        <div><h4>年代（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='age'></div></div>
-        <div><h4>来場者の区分（登録時。上で4区分・2区分を切りかえ）</h4><div class='cs-chart' data-draw='segk' data-dim='role'></div></div>
-        <div><h4>性別（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='gender'></div></div>
-        <div><h4>参加した日</h4><div class='cs-chart' data-draw='segk' data-dim='day'></div></div>
+        <p class='cs-q'>このKPIを、2つのデータで見ます。左は事前・事後のアンケート回答の変化（主観）、右はこのKPIにつながる変化（3つの変革）が会場で起きたかを、スタンプと投稿で見た記録（客観）です</p>
       </div>
     </div>
 
-    <details class='cs-more'><summary>くわしく見る：答えの分かれ方・一人ひとりの動き</summary>
+    <div class='cs-kpair cs-kpage'>
+      <div class='cs-kp cs-kp-s' data-source='kpi_change targets'>
+        <span class='cs-dtag cs-dtag-s'>アンケートの答え（主観）</span>
+        <p class='cs-kp-q'>設問（仮）「会社や立場の違う人と、気軽に話せるつながりがある」に、同じ人が事前と事後に5段階で答えたもの</p>
+        <div class='cs-verdict' data-draw='verdict'></div>
+        <div class='cs-tiles'>
+          <div class='cs-tile'><div class='cs-tl'>上がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k2'>—</b><span>%</span></div><div class='cs-ts'><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k2'>—</b>人のうち <b data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k2'>—</b>人</div><div class='cs-ts cs-tnote' data-draw='roomnote' data-dir='up'></div></div>
+          <div class='cs-tile'><div class='cs-tl'>平均の変化</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k2' data-fmt='signed2'>—</b><span>段階</span></div><div class='cs-ts'>事前 <b data-draw='v' data-source='kpi_change' data-field='pre_mean' data-where='kpi=k2' data-fmt='dec2'>—</b> → 事後 <b data-draw='v' data-source='kpi_change' data-field='post_mean' data-where='kpi=k2' data-fmt='dec2'>—</b></div></div>
+          <div class='cs-tile'><div class='cs-tl'>下がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k2'>—</b><span>%</span></div><div class='cs-ts'>変わらない <b data-draw='v' data-source='kpi_change' data-field='same_pct' data-where='kpi=k2'>—</b>%</div><div class='cs-ts cs-tnote' data-draw='roomnote' data-dir='down'></div></div>
+        </div>
+      </div>
+      <div class='cs-kp cs-kp-r' data-source='transform'>
+        <span class='cs-dtag cs-dtag-r'>3つの変革：スタンプ・投稿の記録（客観）</span>
+        <p class='cs-kp-q'>普段の所属・属性とはちがう人のブースに立ち寄っている。ラベルは使うデータ（スタンプ・投稿・両方）</p>
+        <div class='cs-inds' data-draw='transform'></div>
+      </div>
+    </div>
+    <details class='cs-more'><summary>くわしく見る：アンケートの答えの分かれ方・一人ひとりの動き</summary>
     <div class='cs-grid2'>
       <div class='cs-card' data-source='kpi_dist kpi_change'>
         <h3>答えの変化</h3>
@@ -1022,6 +1135,32 @@
       </div>
     </div>
     </details>
+    <div class='cs-ctas cs-ctarow' aria-label='この人たちの投稿を読む'>
+      <span>この人たちの投稿を読む：</span>
+      <button type='button' class='cs-btn cs-golist' data-golist='self|up'>上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k2'>—</span>人 →</button>
+      <button type='button' class='cs-btn cs-golist' data-golist='self|same'>変わらない <span data-draw='v' data-source='kpi_change' data-field='same_n' data-where='kpi=k2'>—</span>人 →</button>
+      <button type='button' class='cs-btn cs-golist' data-golist='self|down'>下がった <span data-draw='v' data-source='kpi_change' data-field='down_n' data-where='kpi=k2'>—</span>人 →</button>
+    </div>
+
+    <div class='cs-find' data-source='kpi_top'>
+      <b>上がった人が多かったところ</b>
+      <span>グループ：<b data-draw='v' data-source='kpi_top' data-field='group' data-where='kpi=k2' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='group_up' data-where='kpi=k2'>—</b>%）</span>
+      <span>体験：<b data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k2' data-fmt='text'>—</b>（した人 <b data-draw='v' data-source='kpi_top' data-field='exp_yes' data-where='kpi=k2'>—</b>%・しなかった人 <b data-draw='v' data-source='kpi_top' data-field='exp_no' data-where='kpi=k2'>—</b>%）</span>
+      <span>スポット：<b data-draw='v' data-source='kpi_top' data-field='spot' data-where='kpi=k2' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='spot_up' data-where='kpi=k2'>—</b>%）</span>
+    </div>
+
+    <div class='cs-sechead cs-chap'><h2>どう変わったか</h2><p>どのグループの人が上がったか（アンケートの答えの分かれ方・一人ひとりの動きは、いちばん上の「アンケートの答え」の下で開けます）</p></div>
+    <div class='cs-card' data-source='seg'>
+      <h3>誰が変わったか</h3>
+      <p class='cs-cap'>グループごとの「上がった人の割合」と、その人数（事前・事後の両方に答えた〇人中、上がった〇人）。点線は全体。行を押すと、そのグループで絞り込みます（もう一度押すと戻ります）。10人未満は薄く表示</p>
+      <div class='cs-seggrid'>
+        <div><h4>年代（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='age'></div></div>
+        <div><h4>来場者の区分（登録時。上で4区分・2区分を切りかえ）</h4><div class='cs-chart' data-draw='segk' data-dim='role'></div></div>
+        <div><h4>性別（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='gender'></div></div>
+        <div><h4>参加した日</h4><div class='cs-chart' data-draw='segk' data-dim='day'></div></div>
+      </div>
+    </div>
+
 
     <div class='cs-sechead cs-chap'><h2>何とつながったか</h2><p>どの体験をした人が上がったか（スポット・WB は「くわしく見る」に）</p></div>
     <div class='cs-card' data-source='exp_gap'>
@@ -1063,53 +1202,31 @@
 
   <!-- ===================== ③ 会社への信頼・心理的安全性 ===================== -->
   <section class='cs-sec' id='kpi3' data-kpi='k3' role='tabpanel' aria-labelledby='tab-kpi3' hidden>
-    <div class='cs-kpihead' data-source='kpi_change targets'>
+    <div class='cs-kpihead'>
       <div>
         <h2>③ 会社への信頼・心理的安全性</h2>
-        <p class='cs-q'>設問（仮）：職場で、仕事以外の話（趣味や好きなこと）をしてもいいと思える（5段階・事前と事後に同じ文。職場のない人は「あてはまらない」を選べるようにし、集計から除きます）</p>
-      </div>
-      <div class='cs-verdict' data-draw='verdict'></div>
-    </div>
-
-    <div class='cs-tiles'>
-      <div class='cs-tile'><div class='cs-tl'>上がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k3'>—</b><span>%</span></div><div class='cs-ts'><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k3'>—</b>人のうち <b data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k3'>—</b>人</div></div>
-      <div class='cs-tile'><div class='cs-tl'>平均の変化</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k3' data-fmt='signed2'>—</b><span>段階</span></div><div class='cs-ts'>事前 <b data-draw='v' data-source='kpi_change' data-field='pre_mean' data-where='kpi=k3' data-fmt='dec2'>—</b> → 事後 <b data-draw='v' data-source='kpi_change' data-field='post_mean' data-where='kpi=k3' data-fmt='dec2'>—</b></div></div>
-      <div class='cs-tile'><div class='cs-tl'>下がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k3'>—</b><span>%</span></div><div class='cs-ts'>変わらない <b data-draw='v' data-source='kpi_change' data-field='same_pct' data-where='kpi=k3'>—</b>%</div></div>
-      <div class='cs-tile'><div class='cs-tl'>投稿でこのKPIに触れた割合</div><div class='cs-tv'><b data-draw='v' data-source='post_themes' data-field='pct' data-where='theme=k3'>—</b><span>%</span></div><div class='cs-ts'>投稿 <b data-draw='v' data-source='tiles' data-field='posts' data-row='0'>—</b>件のうち <b data-draw='v' data-source='post_themes' data-field='n' data-where='theme=k3'>—</b>件</div></div>
-    </div>
-    <div class='cs-ctas cs-ctarow' aria-label='この人たちの投稿を読む'>
-      <span>この人たちの投稿を読む：</span>
-      <button type='button' class='cs-btn cs-golist' data-golist='self|up'>上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k3'>—</span>人 →</button>
-      <button type='button' class='cs-btn cs-golist' data-golist='self|same'>変わらない <span data-draw='v' data-source='kpi_change' data-field='same_n' data-where='kpi=k3'>—</span>人 →</button>
-      <button type='button' class='cs-btn cs-golist' data-golist='self|down'>下がった <span data-draw='v' data-source='kpi_change' data-field='down_n' data-where='kpi=k3'>—</span>人 →</button>
-    </div>
-    <div class='cs-card cs-featcard' data-source='transform'>
-      <span class='cs-flag'>3つの変革</span>
-      <h3>3つの変革のチェック（スタンプ・投稿で見る）</h3>
-      <p class='cs-cap'>このKPIにつながる変化が会場で起きたかを、スタンプと投稿の指標で見ます。ラベルは使うデータ（スタンプ・投稿・両方）。最後の「アンケート」は事前→事後の変化</p>
-      <div class='cs-inds' data-draw='transform'></div>
-    </div>
-
-    <div class='cs-find' data-source='kpi_top'>
-      <b>上がった人が多かったところ</b>
-      <span>グループ：<b data-draw='v' data-source='kpi_top' data-field='group' data-where='kpi=k3' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='group_up' data-where='kpi=k3'>—</b>%）</span>
-      <span>体験：<b data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k3' data-fmt='text'>—</b>（した人 <b data-draw='v' data-source='kpi_top' data-field='exp_yes' data-where='kpi=k3'>—</b>%・しなかった人 <b data-draw='v' data-source='kpi_top' data-field='exp_no' data-where='kpi=k3'>—</b>%）</span>
-      <span>スポット：<b data-draw='v' data-source='kpi_top' data-field='spot' data-where='kpi=k3' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='spot_up' data-where='kpi=k3'>—</b>%）</span>
-    </div>
-
-    <div class='cs-sechead cs-chap'><h2>どう変わったか</h2><p>どのグループの人が上がったか（答えの分かれ方・一人ひとりの動きは「くわしく見る」に）</p></div>
-    <div class='cs-card' data-source='seg'>
-      <h3>誰が変わったか</h3>
-      <p class='cs-cap'>グループごとの「上がった人の割合」と、その人数（事前・事後の両方に答えた〇人中、上がった〇人）。点線は全体。行を押すと、そのグループで絞り込みます（もう一度押すと戻ります）。10人未満は薄く表示</p>
-      <div class='cs-seggrid'>
-        <div><h4>年代（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='age'></div></div>
-        <div><h4>来場者の区分（登録時。上で4区分・2区分を切りかえ）</h4><div class='cs-chart' data-draw='segk' data-dim='role'></div></div>
-        <div><h4>性別（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='gender'></div></div>
-        <div><h4>参加した日</h4><div class='cs-chart' data-draw='segk' data-dim='day'></div></div>
+        <p class='cs-q'>このKPIを、2つのデータで見ます。左は事前・事後のアンケート回答の変化（主観）、右はこのKPIにつながる変化（3つの変革）が会場で起きたかを、スタンプと投稿で見た記録（客観）です</p>
       </div>
     </div>
 
-    <details class='cs-more'><summary>くわしく見る：答えの分かれ方・一人ひとりの動き</summary>
+    <div class='cs-kpair cs-kpage'>
+      <div class='cs-kp cs-kp-s' data-source='kpi_change targets'>
+        <span class='cs-dtag cs-dtag-s'>アンケートの答え（主観）</span>
+        <p class='cs-kp-q'>設問（仮）「職場で、仕事以外の話（趣味や好きなこと）をしてもいいと思える」に、同じ人が事前と事後に5段階で答えたもの（職場のない人は「あてはまらない」を選べるようにし、集計から除きます）</p>
+        <div class='cs-verdict' data-draw='verdict'></div>
+        <div class='cs-tiles'>
+          <div class='cs-tile'><div class='cs-tl'>上がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='up_pct' data-where='kpi=k3'>—</b><span>%</span></div><div class='cs-ts'><b data-draw='v' data-source='kpi_change' data-field='n' data-where='kpi=k3'>—</b>人のうち <b data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k3'>—</b>人</div><div class='cs-ts cs-tnote' data-draw='roomnote' data-dir='up'></div></div>
+          <div class='cs-tile'><div class='cs-tl'>平均の変化</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='diff' data-where='kpi=k3' data-fmt='signed2'>—</b><span>段階</span></div><div class='cs-ts'>事前 <b data-draw='v' data-source='kpi_change' data-field='pre_mean' data-where='kpi=k3' data-fmt='dec2'>—</b> → 事後 <b data-draw='v' data-source='kpi_change' data-field='post_mean' data-where='kpi=k3' data-fmt='dec2'>—</b></div></div>
+          <div class='cs-tile'><div class='cs-tl'>下がった人</div><div class='cs-tv'><b data-draw='v' data-source='kpi_change' data-field='down_pct' data-where='kpi=k3'>—</b><span>%</span></div><div class='cs-ts'>変わらない <b data-draw='v' data-source='kpi_change' data-field='same_pct' data-where='kpi=k3'>—</b>%</div><div class='cs-ts cs-tnote' data-draw='roomnote' data-dir='down'></div></div>
+        </div>
+      </div>
+      <div class='cs-kp cs-kp-r' data-source='transform'>
+        <span class='cs-dtag cs-dtag-r'>3つの変革：スタンプ・投稿の記録（客観）</span>
+        <p class='cs-kp-q'>社員のB面を見て、会社・社員への見え方が良い方向に変わる（社内の心理的安全性そのものは、出展した社員への事後アンケートで補う）。ラベルは使うデータ（スタンプ・投稿・両方）</p>
+        <div class='cs-inds' data-draw='transform'></div>
+      </div>
+    </div>
+    <details class='cs-more'><summary>くわしく見る：アンケートの答えの分かれ方・一人ひとりの動き</summary>
     <div class='cs-grid2'>
       <div class='cs-card' data-source='kpi_dist kpi_change'>
         <h3>答えの変化</h3>
@@ -1124,6 +1241,32 @@
       </div>
     </div>
     </details>
+    <div class='cs-ctas cs-ctarow' aria-label='この人たちの投稿を読む'>
+      <span>この人たちの投稿を読む：</span>
+      <button type='button' class='cs-btn cs-golist' data-golist='self|up'>上がった <span data-draw='v' data-source='kpi_change' data-field='up_n' data-where='kpi=k3'>—</span>人 →</button>
+      <button type='button' class='cs-btn cs-golist' data-golist='self|same'>変わらない <span data-draw='v' data-source='kpi_change' data-field='same_n' data-where='kpi=k3'>—</span>人 →</button>
+      <button type='button' class='cs-btn cs-golist' data-golist='self|down'>下がった <span data-draw='v' data-source='kpi_change' data-field='down_n' data-where='kpi=k3'>—</span>人 →</button>
+    </div>
+
+    <div class='cs-find' data-source='kpi_top'>
+      <b>上がった人が多かったところ</b>
+      <span>グループ：<b data-draw='v' data-source='kpi_top' data-field='group' data-where='kpi=k3' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='group_up' data-where='kpi=k3'>—</b>%）</span>
+      <span>体験：<b data-draw='v' data-source='kpi_top' data-field='exp' data-where='kpi=k3' data-fmt='text'>—</b>（した人 <b data-draw='v' data-source='kpi_top' data-field='exp_yes' data-where='kpi=k3'>—</b>%・しなかった人 <b data-draw='v' data-source='kpi_top' data-field='exp_no' data-where='kpi=k3'>—</b>%）</span>
+      <span>スポット：<b data-draw='v' data-source='kpi_top' data-field='spot' data-where='kpi=k3' data-fmt='text'>—</b>（<b data-draw='v' data-source='kpi_top' data-field='spot_up' data-where='kpi=k3'>—</b>%）</span>
+    </div>
+
+    <div class='cs-sechead cs-chap'><h2>どう変わったか</h2><p>どのグループの人が上がったか（アンケートの答えの分かれ方・一人ひとりの動きは、いちばん上の「アンケートの答え」の下で開けます）</p></div>
+    <div class='cs-card' data-source='seg'>
+      <h3>誰が変わったか</h3>
+      <p class='cs-cap'>グループごとの「上がった人の割合」と、その人数（事前・事後の両方に答えた〇人中、上がった〇人）。点線は全体。行を押すと、そのグループで絞り込みます（もう一度押すと戻ります）。10人未満は薄く表示</p>
+      <div class='cs-seggrid'>
+        <div><h4>年代（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='age'></div></div>
+        <div><h4>来場者の区分（登録時。上で4区分・2区分を切りかえ）</h4><div class='cs-chart' data-draw='segk' data-dim='role'></div></div>
+        <div><h4>性別（DROPのプロフィール）</h4><div class='cs-chart' data-draw='segk' data-dim='gender'></div></div>
+        <div><h4>参加した日</h4><div class='cs-chart' data-draw='segk' data-dim='day'></div></div>
+      </div>
+    </div>
+
 
     <div class='cs-sechead cs-chap'><h2>何とつながったか</h2><p>どの体験をした人が上がったか（スポット・WB は「くわしく見る」に）</p></div>
     <div class='cs-card' data-source='exp_gap'>
@@ -1616,7 +1759,7 @@
       <dt>設問（仮）</dt><dd>① 仕事以外でも、新しいことに挑戦してみたい／② 会社や立場の違う人と、気軽に話せるつながりがある／③ 職場で、仕事以外の話（趣味や好きなこと）をしてもいいと思える／愛着 品川の街に親しみを感じる。5段階（そう思う〜そう思わない）で、事前と事後に同じ文で聞きます。③は職場のない人が「あてはまらない」を選べるようにし、集計から除きます</dd>
       <dt>参加した人</dt><dd>本イベントの登録時アンケートに答えた人と、別イベントで DROP に登録済みで、スタンプか投稿をした人（別イベントで登録した人には、本イベントの登録時アンケートが出ないため）。参加の流れの1段目で、各段の％のもとになります。本イベントの登録時アンケートに答えていない人は事前の答えがないため、KPI の事前→事後には入りません</dd>
       <dt>事前・事後</dt><dd>事前＝みんまちDROPでCULTURE SNACKに参加登録するとき。事後＝スタンプラリーの特典に応募するとき（応募の条件は未定）。同じ人の答えをユーザーIDでつないでくらべます</dd>
-      <dt>上がった・しるし</dt><dd>「上がった」＝事後の答えが事前より1段階以上高い。しるしは、同じ人の事後−事前の平均で判定します。人数が少ないと数字がぶれるため、ぶれを見込んでもプラスなら「上がったと言える」、プラスにもマイナスにもなりうるなら「はっきりしない」、マイナスなら「下がったと言える」とし、10人未満は判定しません。事前から5の人は上がりようがないため、「KPIをくわしく」では、その人を除いた「上がった人の割合」も出します。体験した人・しなかった人の差も、ぶれを見込んで差がはっきりしているときだけ強調します</dd>
+      <dt>上がった・しるし</dt><dd>「上がった」＝事後の答えが事前より1段階以上高い。しるしは、同じ人の事後−事前の平均で判定します。人数が少ないと数字がぶれるため、ぶれを見込んでもプラスなら「上がったと言える」、プラスにもマイナスにもなりうるなら「はっきりしない」、マイナスなら「下がったと言える」とし、10人未満は判定しません。事前から5の人は上がりようがなく、事前から1の人は下がりようがないため、「KPIをくわしく」では、その人を除いた「上がった人」「下がった人」の割合も出します。体験した人・しなかった人の差も、ぶれを見込んで差がはっきりしているときだけ強調します</dd>
       <dt>データのつなぎ方</dt><dd>DROPのユーザーIDで、プロフィール（年齢・性別）、スタンプ（スポット名・日時・緯度経度）、投稿（写真・本文・日時・緯度経度）、事前・事後アンケートをつなぎます。年齢・性別はプロフィールから、来場者の区分は登録時の項目（勤務先ビル・品川との関わり）から取るため、アンケートでは聞きません</dd>
       <dt>階（1階・2階）</dt><dd>スポット表（スポット名・種類・階・ポイント）の「階」で判定します。緯度経度は同じ建物の上下を区別できないため使いません</dd>
       <dt>DROP.Coachとのつなぎ方</dt><dd>ユーザー名の入力は使いません。DROP.Coachで「コピー」された文面（コピーの時刻つき）と、DROPの投稿文を2文字ずつの重なりでくらべ、コピーの5分前〜2時間後の投稿で重なりが0.6以上のいちばん近いものを同じ投稿とみなします。運営のテスト（ニックネーム・端末ID）は先に外します。このサンプルでは、コピーされた <b data-draw='v' data-source='coach_stats' data-field='copied' data-row='0'>—</b>件のうち <b data-draw='v' data-source='coach_stats' data-field='matched' data-row='0'>—</b>件（<b data-draw='v' data-source='coach_stats' data-field='match_pct' data-row='0'>—</b>%）が投稿と一致しました。絵文字や一言を足した投稿も一致します</dd>
@@ -2042,7 +2185,7 @@ dash.calc('funnel', {
 dash.calc('kpi_change', {
   inputs: ['people'],
   title: 'KPIの事前→事後',
-  description: '事前・事後の両方に答えた人の5段階の平均と変化。上がった＝事後が事前より1段階以上高い。95%の範囲は同じ人の前後の差から（t分布）。判定：範囲が0を上回れば上がった、下回れば下がった、0をまたげばはっきりしない、10人未満は人数が少ない。room_n＝事前が4以下で上がる余地があった人、up_room_pct＝そのうち上がった人の割合（事前から5の人は上がりようがないため）',
+  description: '事前・事後の両方に答えた人の5段階の平均と変化。上がった＝事後が事前より1段階以上高い。95%の範囲は同じ人の前後の差から（t分布）。判定：範囲が0を上回れば上がった、下回れば下がった、0をまたげばはっきりしない、10人未満は人数が少ない。room_n＝事前が4以下で上がる余地があった人、up_room_pct＝そのうち上がった人の割合（事前から5の人は上がりようがないため）。bottom_n＝事前が1で下がりようがない人、droom_n＝事前が2以上の人、down_room_pct＝そのうち下がった人の割合',
   fn: (people) => {
     const tcrit = (df) => { const z = 1.959964; return z + (z ** 3 + z) / (4 * df) + (5 * z ** 5 + 16 * z ** 3 + 3 * z) / (96 * df * df); };
     const r2 = (x) => Math.round(x * 100) / 100;
@@ -2050,7 +2193,7 @@ dash.calc('kpi_change', {
     return ['k1', 'k2', 'k3', 'att'].map((kpi) => {
       const m = people.filter((r) => r[kpi + '_pre'] != null && r[kpi + '_post'] != null);
       const n = m.length;
-      if (n < 2) return { kpi, n, verdict: 'few', pre_mean: null, post_mean: null, diff: null, lo: null, hi: null, up_n: null, same_n: null, down_n: null, up_pct: null, same_pct: null, down_pct: null, top_n: null, room_n: null, up_room_pct: null };
+      if (n < 2) return { kpi, n, verdict: 'few', pre_mean: null, post_mean: null, diff: null, lo: null, hi: null, up_n: null, same_n: null, down_n: null, up_pct: null, same_pct: null, down_pct: null, top_n: null, room_n: null, up_room_pct: null, bottom_n: null, droom_n: null, down_room_pct: null };
       const d = m.map((r) => r[kpi + '_post'] - r[kpi + '_pre']);
       const md = mean(d);
       const sd = Math.sqrt(d.reduce((a, b) => a + (b - md) ** 2, 0) / (n - 1));
@@ -2058,13 +2201,15 @@ dash.calc('kpi_change', {
       const up = d.filter((x) => x > 0).length, down = d.filter((x) => x < 0).length, same = n - up - down;
       const pct = (k) => Math.round((100 * k) / n);
       const lo = r2(md - half), hi = r2(md + half);
-      const room = m.filter((r) => r[kpi + '_pre'] <= 4);
+      const room = m.filter((r) => r[kpi + '_pre'] <= 4), droom = m.filter((r) => r[kpi + '_pre'] >= 2);
       return {
         kpi, n, verdict: n < 10 ? 'few' : lo > 0 ? 'up' : hi < 0 ? 'down' : 'unclear',
         pre_mean: r2(mean(m.map((r) => r[kpi + '_pre']))), post_mean: r2(mean(m.map((r) => r[kpi + '_post']))),
         diff: r2(md), lo, hi, up_n: up, same_n: same, down_n: down, up_pct: pct(up), same_pct: pct(same), down_pct: pct(down),
         top_n: n - room.length, room_n: room.length,
         up_room_pct: room.length ? Math.round((100 * room.filter((r) => r[kpi + '_post'] > r[kpi + '_pre']).length) / room.length) : null,
+        bottom_n: n - droom.length, droom_n: droom.length,
+        down_room_pct: droom.length ? Math.round((100 * droom.filter((r) => r[kpi + '_post'] < r[kpi + '_pre']).length) / droom.length) : null,
       };
     });
   },
@@ -2687,7 +2832,7 @@ window.CS = window.CS || {};
     if (lg) lg.open = id === 'summary';
     if (CS.tocSync) CS.tocSync();
     dash.setLink(id);
-    if (scroll) { const nav = document.getElementById('cs-tabs'); if (nav && nav.scrollIntoView) nav.scrollIntoView({ block: 'start' }); }
+    if (scroll) { if (CS.stickH) CS.stickH(); const bd = document.querySelector('.cs-root .cs-body'); if (bd && bd.scrollIntoView) bd.scrollIntoView({ block: 'start' }); }
     if (CS.syncBack) CS.syncBack();
   };
   CS.showTab = showTab;
@@ -2921,6 +3066,20 @@ window.CS = window.CS || {};
   let tocRaf = 0;
   document.addEventListener('scroll', () => { if (!tocRaf) tocRaf = requestAnimationFrame(() => { tocRaf = 0; tocSync(); }); }, { capture: true, passive: true });
 
+  // ---------- 上に止まる帯（絞り込む〜ページの切りかえ）と色の見方の高さ。ジャンプした先が帯に隠れないよう、余白と目次の位置に使う ----------
+  const stick = document.getElementById('cs-stick'), legw = document.querySelector('.cs-root .cs-main > .cs-legwrap'), rootEl = document.getElementById('cs');
+  const stickH = () => {
+    const on = getComputedStyle(stick).position === 'sticky';
+    rootEl.style.setProperty('--cs-stick-h', (on ? Math.floor(stick.getBoundingClientRect().height) : 0) + 'px');
+    rootEl.style.setProperty('--cs-leg-h', (on && legw ? Math.ceil(legw.getBoundingClientRect().height) : 0) + 'px');
+  };
+  if (stick && rootEl) {
+    CS.stickH = stickH;
+    stickH();
+    if ('ResizeObserver' in window) { const ro = new ResizeObserver(stickH); ro.observe(stick); if (legw) ro.observe(legw); }
+    window.addEventListener('resize', stickH);
+  }
+
   // ---------- いちばん上へ（上の見出しが見えなくなったら出す。右下についてくる） ----------
   const totop = document.getElementById('cs-totop'), head = document.getElementById('top');
   if (totop && head) {
@@ -2985,18 +3144,21 @@ window.CS = window.CS || {};
     el.appendChild(chip);
     const tg = (CS.rows('targets') || []).find((x) => x.kpi === kpi);
     if (tg && r && r.up_pct != null) el.appendChild(CS.targetChip(tg, r.up_pct, '上がった人'));
-    if (r && r.lo != null && el.dataset.range !== 'off') {
-      const s = document.createElement('span');
-      s.className = 'cs-vrange';
-      s.textContent = `平均の変化 ${CS.fmt(r.diff, 'signed2')}`;
-      el.appendChild(s);
-      if (r.top_n > 0 && r.up_room_pct != null) {
-        const s2 = document.createElement('span');
-        s2.className = 'cs-vrange';
-        s2.textContent = `事前から5（上がる余地なし）の${r.top_n}人を除くと、上がった人 ${r.up_room_pct}%`;
-        el.appendChild(s2);
-      }
-    }
+  });
+
+  // ---------- 上がった人・下がった人のタイルの補足：上がる（下がる）余地のない人を除いた割合。いないときは出さない ----------
+  dash.draw('roomnote', (el) => {
+    const rows = CS.rows('kpi_change');
+    el.replaceChildren();
+    if (!rows) return;
+    const r = rows.find((x) => x.kpi === CS.kpiOf(el));
+    if (!r) return;
+    const up = el.dataset.dir !== 'down';
+    const n = up ? r.top_n : r.bottom_n, pct = up ? r.up_room_pct : r.down_room_pct;
+    if (!(n > 0) || pct == null) return;
+    const b1 = document.createElement('b'); b1.textContent = String(n);
+    const b2 = document.createElement('b'); b2.textContent = String(pct);
+    el.append(up ? '事前が5（上がる余地なし）の ' : '事前が1（下がる余地なし）の ', b1, '人を除くと ', b2, '%');
   });
 
   // ---------- 事前→事後の平均（1行）。事前は灰、事後は上がったら青・下がったら赤・同じなら黄。点の上に「事前」「事後」 ----------
@@ -3101,7 +3263,7 @@ window.CS = window.CS || {};
       // 投稿の段：スタンプは0個で投稿だけした人がいるときは、そのことを注記（前の段の内側ではない人がふくまれる）
       if (st.stage === 'posted' && t.posted_nostamp > 0) {
         const nt = mk('div', 'cs-sfun-sub cs-sfun-note');
-        nt.append(tx('※ スタンプは0個で投稿だけした人 '), num('tiles', 'posted_nostamp', t.posted_nostamp), tx('人をふくむ'));
+        nt.append(tx('※ スタンプ0個で投稿だけの人 '), num('tiles', 'posted_nostamp', t.posted_nostamp), tx('人を含む'));
         lab.appendChild(nt);
       }
       const mid = mk('div', 'cs-sfun-m');
@@ -4624,15 +4786,16 @@ dash.calc('cooc', {
 });
 
 dash.calc('transform', {
-  inputs: ['people', 'posts_f', 'cross', 'kpi_change'],
+  inputs: ['people', 'posts_f', 'cross', 'post_themes'],
   title: '3つの変革のチェック（スタンプ・投稿で見る）',
-  description: 'KPIごとに、3つの変革が「データでどう分かるか」の指標を計算したもの。src はデータ（スタンプ・投稿・両方・アンケート）。会社・社員のことば＝本文に「会社」「社員」「コクヨ」を含む投稿、交流のことば＝「話せ」「話し」「話が」「楽しそう」「盛り上が」を含む投稿',
-  fn: (people, posts_f, cross, kpi_change) => {
+  description: 'KPIごとに、3つの変革が「データでどう分かるか」の指標を計算したもの。src はデータ（スタンプ・投稿・両方）。アンケートの答えは使わない。最後の行は、投稿でそのKPIに触れた割合（AIの読み取り）。会社・社員のことば＝本文に「会社」「社員」「コクヨ」を含む投稿、交流のことば＝「話せ」「話し」「話が」「楽しそう」「盛り上が」を含む投稿',
+  fn: (people, posts_f, cross, post_themes) => {
     const P = new Map(people.map((r) => [r.user_id, r]));
     const st = people.filter((r) => r.stamps > 0);
     const pct = (a, b) => (b ? Math.round((100 * a) / b) : null);
     const c = (k) => cross.find((x) => x.key === k) || {};
-    const kc = (k) => kpi_change.find((x) => x.kpi === k) || {};
+    const th = (k) => post_themes.find((x) => x.theme === k) || {};
+    const themeRow = (k) => ({ kpi: k, key: 'theme', src: '投稿', label: '投稿でこのKPIに触れた割合（AIの読み取り）', value: th(k).pct ?? null, unit: '%', sub: `投稿 ${posts_f.length}件のうち ${th(k).n ?? 0}件` });
     const by = new Map();
     posts_f.forEach((p) => { if (!by.has(p.user_id)) by.set(p.user_id, []); by.get(p.user_id).push(p); });
     const tries = (r) => (by.get(r.user_id) || []).some((p) => p.theme === 3 || String(p.emo || '').split('|').includes('やってみたい'));
@@ -4648,15 +4811,15 @@ dash.calc('transform', {
       { kpi: 'k1', key: 'club', src: 'スタンプ', label: '社員の部活ブースに立ち寄った人', value: club.length, unit: '人', sub: `スタンプを押した人の ${pct(club.length, st.length) ?? '—'}%` },
       { kpi: 'k1', key: 'cheer', src: '投稿', label: 'テーマ②「応援したい」で、社員の部活に向けた投稿', value: posts_f.filter((p) => p.theme === 2 && p.content === '社員部活').length, unit: '件', sub: `テーマ②の投稿 ${posts_f.filter((p) => p.theme === 2).length}件のうち` },
       { kpi: 'k1', key: 'try', src: '両方', label: '部活ブースを回った人のうち、「やってみたい」が出た人', value: pct(club.filter(tries).length, club.length), unit: '%', sub: `回らなかった人は ${pct(noclub.filter(tries).length, noclub.length) ?? '—'}%` },
-      { kpi: 'k1', key: 'kpi', src: 'アンケート', label: '①が上がった人（事前→事後）', value: kc('k1').up_pct ?? null, unit: '%', sub: `${kc('k1').n ?? 0}人のうち` },
+      themeRow('k1'),
       { kpi: 'k2', key: 'cross', src: 'スタンプ', label: '越境率：社外の人のうち、社員の部活ブースに立ち寄った人', value: c('_out').club_pct ?? null, unit: '%', sub: `社外でスタンプを押した ${c('_out').n ?? 0}人のうち` },
       { kpi: 'k2', key: 'kinds', src: 'スタンプ', label: '越境の広さ：1人が回った出展者の種類（4種類のうち）', value: c('_all').kinds_avg ?? null, unit: '種類', sub: `3種類以上の人 ${c('_all').kinds3_pct ?? '—'}%` },
       { kpi: 'k2', key: 'cheer_other', src: '投稿', label: 'テーマ②で、自分とちがう立場の人を応援した投稿', value: pct(other.length, t2.length), unit: '%', sub: `テーマ②でブースが分かる ${t2.length}件のうち ${other.length}件` },
-      { kpi: 'k2', key: 'kpi', src: 'アンケート', label: '②が上がった人（事前→事後）', value: kc('k2').up_pct ?? null, unit: '%', sub: `${kc('k2').n ?? 0}人のうち` },
+      themeRow('k2'),
       { kpi: 'k3', key: 'company', src: '投稿', label: '「会社」「社員」「コクヨ」と一緒に語られた投稿', value: co.length, unit: '件', sub: emoTop ? `一緒に出た気持ち：${emoTop}` : '一緒に出た気持ち：—' },
       { kpi: 'k3', key: 'bside', src: '投稿', label: 'テーマ①「意外なB面を見つけた」の投稿', value: posts_f.filter((p) => p.theme === 1).length, unit: '件', sub: `うち社員の部活のブース ${posts_f.filter((p) => p.theme === 1 && p.content === '社員部活').length}件` },
       { kpi: 'k3', key: 'talk', src: '投稿', label: '交流を表すことば（話せた・楽しそう など）が出た投稿', value: pct(talk.length, posts_f.length), unit: '%', sub: `投稿 ${posts_f.length}件のうち ${talk.length}件` },
-      { kpi: 'k3', key: 'kpi', src: 'アンケート', label: '③が上がった人（事前→事後）', value: kc('k3').up_pct ?? null, unit: '%', sub: `${kc('k3').n ?? 0}人のうち` },
+      themeRow('k3'),
     ];
   },
 });
@@ -4780,9 +4943,9 @@ dash.calc('transform', {
     if (!rows) return CS.mark(el, CS.status('transform'));
     const kpi = el.dataset.kpi || CS.kpiOf(el);
     el.replaceChildren();
-    rows.filter((r) => r.kpi === kpi).forEach((r) => {
+    rows.filter((r) => r.kpi === kpi && r.src !== 'アンケート').forEach((r) => {
       const d = document.createElement('div');
-      d.className = 'cs-ind' + (r.src === 'アンケート' ? ' cs-ind-q' : '');
+      d.className = 'cs-ind';
       const top = document.createElement('div');
       top.className = 'cs-ind-h';
       const chip = document.createElement('span'); chip.className = 'cs-src cs-src-' + ({ 'スタンプ': 's', '投稿': 'p', '両方': 'b', 'アンケート': 'q' }[r.src] || 'q'); chip.textContent = r.src; top.appendChild(chip);
