@@ -180,6 +180,7 @@
   .cmp-t{white-space:pre-wrap;font-size:15.5px;line-height:1.75;color:var(--ink)}
   .card-foot{display:flex;align-items:center;gap:10px;margin-top:8px;flex-wrap:wrap}
   .card-foot .cnt{font-size:12.5px;color:var(--dim)}
+  .card-foot .cnt .over{color:var(--err);font-weight:800}
   .switch{display:inline-flex;align-items:center;gap:6px;font-size:13.5px;color:var(--ink-2);cursor:pointer;user-select:none;margin-left:auto}
   .switch input{width:20px;height:20px;accent-color:var(--brown)}
   .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
@@ -217,6 +218,9 @@
   .sg-fade{animation:sgFade 1s ease-out both}
   @keyframes sgFade{from{opacity:0}to{opacity:1}}
   .sg-glint{animation:sgGlint 1s ease-out both;pointer-events:none}
+  .sg-glint2{animation:sgGlint 1.1s ease-out both;pointer-events:none}   /* B 案：ふだんのきらめき */
+  .sg-was{animation:sgWas .5s ease-out both}   /* B 案：はまる前の点線（前の窓の状態を見せてから、ガラスがはまる） */
+  @keyframes sgWas{0%{opacity:.85}100%{opacity:0}}
   @keyframes sgGlint{0%{opacity:0}35%{opacity:.85}100%{opacity:0}}
   .sg-spark{transform-box:fill-box;transform-origin:center;animation:sgSpark 1.3s ease-out both}
   @keyframes sgSpark{0%{transform:scale(0) rotate(0);opacity:0}40%{transform:scale(1.3) rotate(45deg);opacity:1}100%{transform:scale(0) rotate(90deg);opacity:0}}
@@ -282,6 +286,7 @@
   .rate-btns button,.pulse-btns button{height:48px;border-radius:14px;border:1.5px solid var(--line);background:#fff;font-weight:900;font-size:16px;color:var(--ink)}
   .rate-btns button.on,.pulse-btns button.on{background:var(--brown);border-color:var(--brown);color:#fff}
   .rate-lab{display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-top:4px}
+  .rate-lab span:last-child{text-align:right}
   .rate-sel{margin:8px 0 6px;font-size:13.5px;color:var(--ink);font-weight:800}
   .rate textarea::placeholder{color:#8f8177}
   .rate textarea{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:8px 10px;font-size:16px;resize:none;background:#fff;min-height:0;line-height:1.5}
@@ -447,6 +452,10 @@
   .ex img{width:84px;height:84px;object-fit:cover;border-radius:12px;flex:none;background:var(--bg-2)}
   .ex p{margin:0;font-size:15px;line-height:1.65;white-space:pre-wrap;color:var(--ink)}
   .want{display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:16px;padding:10px 12px;margin-top:8px}
+  .want-img{flex:none;width:60px;height:60px;border-radius:10px;overflow:hidden;background:var(--bg-2)}   /* B 案：行ってみるリストの写真 */
+  .want-img img{display:block;width:100%;height:100%;object-fit:cover}
+  .want-tx{min-width:0;flex:1}
+  .want [data-unwant]{white-space:nowrap}
   .want b{display:block;font-size:15px}
   .want small{display:block;font-size:12.5px;color:var(--ink-2);margin-top:2px}
   .want a{margin-left:auto;white-space:nowrap;font-size:13.5px;font-weight:800;color:var(--ink)}
@@ -511,6 +520,21 @@
 /* =====================================================================
    DROP. Coach — 投稿づくりチャット v5（drop_coach_chat.html）  2026/11/16
    ---------------------------------------------------------------------
+   B 案 chat-v5.6b4（2026/11/20 午後）試した人の声への対応
+   - 本日の DROP：コピーのあと、まず窓が見える位置まで送り、ガラスがはまる演出（前の窓 → 新しいガラスがはまる）を見せてから宝箱を出す
+     （前は窓と宝箱を同時に出していちばん下へ送ったので、演出が画面の外で終わり「絵が進んだ感じがしない・見逃す」）。
+     あとから見返したときも：窓が画面に入ったときに 1 回、見えているあいだは数秒おきに、はまったガラスに光が走る（夜は星がずっとまたたく）。
+     画面の外では止める。「視差効果を減らす」設定では動かさない
+   - ☆行ってみるリスト（メニュー・あいさつのボタンから開く）にも、おすすめと同じ写真をサムネイルで出す
+   - しめ（最大 2 つ）で、AI の案も運営の候補と同じく 2 つまで選べるように（前は AI の案を押すと選んでいた候補が消えて入力欄に入り、1 つしか選べなかった）。
+     選んだ AI の案は、その言葉のまま投稿文に使い、区分は言葉から当てはめる（記録の cat）
+   - 投稿文の行を、プロンプトと同じ「4〜5 行・1 行 10〜16 字」にそろえる（DROP の画面は 5 行まで・1 行 20 字くらいで折り返す）：
+     AI の案と自分の言葉の文の行を、できたときに ①20 字をこえる行（DROP で折り返す）は「、」「！」などで 2 行に（区切りがなければ助詞のあと）
+     ②17〜20 字の行は、5 行に満たないときだけ区切りで 2 行に ③6 行以上なら、となりの短い行どうしを 1 行に（16 字に収まる組 → なければ 20 字まで。
+     1 行目と最後の行はなるべくそのまま）④3 行以下なら、区切りのある長い行を 2 行に。言いかえの候補も合わせる。
+     字数の横に行数を出し、5 行をこえたら「DROP は 5 行まで」。プロンプト・GAS は変えていない（A 案・H 案に影響しない）
+   - 使いごこちの 5 段階を「1 とてもつかいにくい 〜 5 とてもつかいやすい」に（前は 1 つかいにくい・2 ややつかいにくい）。
+     ボタンの下のことばは数字を付けずに両はしに置く（「1 とても…」と続くと読みづらいため）
    B 案 chat-v5.6b3（2026/11/20）レビューの声と H 案のおすすめ写真を取り込み
    - おすすめ（宝箱）のカードに、リンク先（ものコトMarket）のメイン写真をサムネイルで出す（H 案 chat-v5.6h3 と同じ仕組み。
      json/cs_images.json を読み、配信元から縮小して表示。コピーは持たない。読めないとき・写真が出ないときは写真なしのカード）
@@ -593,7 +617,7 @@
    - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v9）の /exec URL（★ 同上）。記録と「チャットの設定」の配布
    - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
 ===================================================================== */
-const APP_VERSION = "chat-v5.6b3 (2026-11-20)";
+const APP_VERSION = "chat-v5.6b4 (2026-11-20)";
 const UI_VARIANT = "B";   // 見せ方の B 案（drop_coach_chat_b.html）。記録の ui_variant
 const CONFIG = {
   // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
@@ -1692,16 +1716,13 @@ function bindDock(st) {
       if (RT.busy) return;
       RT.freeText[st.id] = ta.value;
       const o = optionsOf(st).find(x => x.id === b.dataset.id); if (!o) return;
-      if (st.id === "next" && o.ai) {   // しめの AI の案は、ことばとして入れる（このあと区分を確かめる）
-        RT.freeText.next = o.label; RT.sel = []; RT.hintOpen.next = false; renderDock(); const i = $("dIn"); if (i && !coarse()) i.focus(); return;
-      }
       const k = RT.sel.findIndex(x => x.id === o.id);
       if (k >= 0) { RT.sel.splice(k, 1); renderDock(); return; }
       if (st.max === 1) RT.sel = [];
       if (RT.sel.length >= st.max) { b.classList.add("shake"); const m = $("dMax"); if (m) { m.hidden = false; m.style.color = "var(--err)"; } setTimeout(() => b.classList.remove("shake"), 320); return; }
       if (o.neutral) RT.sel = [];
       else RT.sel = RT.sel.filter(x => !(item(st.opts, x.id) || {}).neutral);
-      RT.sel.push({ id: o.id, label: o.label, src: o.ai ? "AI候補" : "候補", ...(st.id === "why" ? { layer: o.layer, w: o.w, say: o.say, tag: o.tag } : {}) });
+      RT.sel.push({ id: o.id, label: o.label, src: o.ai ? "AI候補" : "候補", ...(o.ai ? { ai: true } : {}), ...(st.id === "why" ? { layer: o.layer, w: o.w, say: o.say, tag: o.tag } : {}) });
       renderDock();
     }));
     if (!coarse() && !RT.hintOpen[st.id]) ta.focus();
@@ -1766,7 +1787,7 @@ function commitFree(st, text, sel, src) {
     const o = sel[0] && item("who", sel[0].id);
     S.ans.who = o ? { id: o.id, label: o.label, detail: o.neutral ? "" : text, pre: false } : null;
   } else {
-    const list = sel.map(x => ({ ...x, src: x.src || src }));
+    const list = sel.map(x => ({ ...x, src: x.src || src, ...(st.id === "next" && /^ai:/.test(x.id) ? { cat: (matchKind("next", x.label)[0] || {}).id || "" } : {}) }));   // B 案：しめの AI の案は、ことばから区分を当てはめる
     if (text && st.id !== "next") list.push({ id: "other", label: text, src: "自分で", ...(st.id === "why" ? { layer: "コンテンツ", w: W0() } : {}) });
     S.ans[st.id] = list;
   }
@@ -1944,13 +1965,61 @@ function composeText() {
   else if (f && !t1HasFeel && f.ex) whyLine = fill(f.ex, "");
   // 気づき（今日の発見）・次の一歩
   const finds = A.find.map(x => { const it = item("find", x.id); if (it && it.neutral) return ""; return it && !it.free ? it.say : x.label; }).filter(Boolean).slice(0, 2);
-  const nexts = S.own.next ? [S.own.next] : A.next.map(n => { const it = item("next", n.id); if (!it || it.neutral) return ""; return (it.free ? n.label : it.say || "").replace("{v}", n.label); }).filter(Boolean).slice(0, 2);
+  const nexts = S.own.next ? [S.own.next] : A.next.map(n => { if (/^ai:/.test(n.id)) return n.label; const it = item("next", n.id); if (!it || it.neutral) return ""; return (it.free ? n.label : it.say || "").replace("{v}", n.label); }).filter(Boolean).slice(0, 2);
   const rf = S.reflect && S.reflect.text ? S.reflect.text : "";   // そうそう！で選んだ 1 行（気持ちとどこがを言い表した行なので、そのときは「どこが」の行を出さない）
   // 2 番目以降に選んだ気持ち（ひとことに無いもの）は、行に余裕があるときだけ
   const f2 = A.feel.map(x => ({ ...item("feel", x.id), v: x.label })).find(x => x && x.id !== (f && f.id) && !x.neutral && !(x.key && new RegExp(x.key).test(t1raw)));
   const body = [...head, ...(rf ? [rf] : []), ...people, rf ? "" : whyLine, ...finds];
   if (f2 && f2.ex && body.filter(Boolean).length + nexts.length < 5) body.push(String(f2.ex).replace("{v}", f2.v));
-  return uniq(body.concat(nexts).map(s => String(s || "").trim()).filter(Boolean)).slice(0, 6).join("\n");
+  let L = fitLines(uniq(body.concat(nexts).map(s => String(s || "").trim()).filter(Boolean)).map(t => ({ text: t }))).map(l => l.text);   // B 案：5 行にそろえる
+  if (L.length > LINE_N) L = L.slice(0, LINE_N - 1).concat(L.slice(-1));   // それでも多いときは、最後の行（しめ）を残して途中を減らす
+  return L.join("\n");
+}
+/* ---------- B 案：投稿文の行を、プロンプトと同じ 4〜5 行・1 行 10〜16 字にそろえる（DROP の画面は 5 行まで・1 行 20 字くらいで折り返す） ---------- */
+const LINE_MAX = 20, LINE_N = 5, LINE_MIN_N = 4, LINE_STYLE = 16;   // LINE_MAX：DROP で折り返す字数／LINE_STYLE：プロンプトの 1 行の字数の上限
+const vlen = s => [...String(s || "")].reduce((a, c) => a + (/[\x20-\x7E\uFF61-\uFF9F]/.test(c) ? .5 : 1), 0);   // 半角は 0.5 字
+const visLines = text => String(text || "").split("\n").reduce((a, l) => a + Math.max(1, Math.ceil(vlen(l.trim()) / LINE_MAX)), 0);   // 見た目の行数
+/** 区切り（、！？〜 など）で 2 行に分ける。どちらも 3 字以上・20 字以内で、まん中に近いところ。分けられなければ null */
+function splitLine(t, soft) {
+  const ch = [...String(t || "")], half = vlen(t) / 2; let best = null;
+  const at = soft ? /[てをはがにでとも]/ : /[、，,！？!?〜…♪　 ]/;   // soft：区切りのない 20 字をこえる行だけ、助詞のあとでも分ける
+  for (let i = 1; i < ch.length - 1; i++) {
+    if (!at.test(ch[i - 1]) || /[！？!?〜…♪」）、，,ぁぃぅぇぉっゃゅょァィゥェォッャュョー]/.test(ch[i])) continue;
+    const a = ch.slice(0, i).join("").trim().replace(/[、，,]$/, ""), b = ch.slice(i).join("").trim();
+    if (vlen(a) < (soft ? 5 : 3) || vlen(b) < (soft ? 5 : 3) || vlen(a) > LINE_MAX || vlen(b) > LINE_MAX) continue;
+    const sc = Math.abs(vlen(a) - half);
+    if (!best || sc < best.sc) best = { a, b, sc };
+  }
+  return best ? [best.a, best.b] : null;
+}
+const joinLines = (a, b) => a + (/[！？!?〜…♪]$/.test(a) ? " " : /[」）]$/.test(a) ? "" : "、") + b;
+/** 行をそろえる（4〜5 行・1 行 16 字まで）：①20 字をこえる行は 2 行に ②17〜20 字の行は 5 行に満たないときだけ 2 行に
+    ③6 行以上なら、となりの短い行どうしを 1 行に（16 字に収まる組 → なければ 20 字まで）④3 行以下なら、区切りのある長い行を 2 行に。言いかえ（alts）も合わせる */
+function fitLines(lines) {
+  let L = (lines || []).map(l => ({ text: String(l.text || "").trim(), alts: (l.alts || []).map(a => String(a).trim()).filter(Boolean) })).filter(l => l.text);
+  const vis = () => L.reduce((a, l) => a + Math.max(1, Math.ceil(vlen(l.text) / LINE_MAX)), 0);
+  const split = (l, soft) => { const q = splitLine(l.text) || (soft ? splitLine(l.text, true) : null); if (!q) return null; const A = [[], []];
+    l.alts.forEach(x => { const r = splitLine(x) || (soft ? splitLine(x, true) : null); if (r) { A[0].push(r[0]); A[1].push(r[1]); } });
+    return [{ text: q[0], alts: A[0] }, { text: q[1], alts: A[1] }]; };
+  for (let i = 0; i < L.length; i++) if (vlen(L[i].text) > LINE_MAX) { const r = split(L[i], true); if (r) { L.splice(i, 1, ...r); i++; } }
+  for (let i = 0; i < L.length && vis() < LINE_N; i++) if (vlen(L[i].text) > LINE_STYLE) { const r = split(L[i]); if (r) { L.splice(i, 1, ...r); i++; } }
+  for (const lim of [LINE_STYLE, LINE_MAX]) while (vis() > LINE_N) {
+    let bi = -1, bl = Infinity;
+    for (let i = 0; i < L.length - 1; i++) {   // 1 行目（つかみ）と最後の行（しめ）は、なるべくそのまま
+      const v = vlen(joinLines(L[i].text, L[i + 1].text)), sc = v + (i + 1 === L.length - 1 ? 50 : 0) + (i === 0 ? 20 : 0);
+      if (v <= lim && sc < bl) { bl = sc; bi = i; } }
+    if (bi < 0) break;
+    const a = L[bi], b = L[bi + 1];
+    L.splice(bi, 2, { text: joinLines(a.text, b.text), alts: [0, 1].filter(k => a.alts[k] || b.alts[k]).map(k => joinLines(a.alts[k] || a.text, b.alts[k] || b.text)) });
+  }
+  while (vis() < LINE_MIN_N) {
+    let bi = -1, bl = 0, bs = null;
+    L.forEach((l, i) => { const v = vlen(l.text); if (v >= 10 && v > bl) { const r = split(l); if (r) { bi = i; bl = v; bs = r; } } });
+    if (bi < 0) break;
+    L.splice(bi, 1, ...bs);
+  }
+  L.forEach(l => { l.alts = [...new Set(l.alts.filter(a => a && a !== l.text && (vlen(a) <= LINE_MAX || vlen(l.text) > LINE_MAX)))].slice(0, 2); });
+  return L;
 }
 function autoTags() {
   const t = [];
@@ -2011,7 +2080,8 @@ async function finishCompose(useAI, g = RT.gen) {
   sendLog("finish");
 }
 /** B 案：字数（タグを付けているときは「タグこみ」） */
-const cntLabel = (len, lineMode) => `${len} 字${activeTags().length ? "（タグこみ）" : ""}${lineMode ? "・行を押すと言いかえ" : "・文をタップして直せます"}`;
+const cntLabel = (len, lineMode) => { const n = visLines(finalText());
+  return `${len} 字・${n} 行${activeTags().length ? "（タグこみ）" : ""}${n > LINE_N ? `<b class="over">（DROP は ${LINE_N} 行まで）</b>` : ""}${lineMode ? "・行を押すと言いかえ" : "・文をタップして直せます"}`; };
 /** B 案：ハッシュタグの枠。タグは文の最後に付けるだけ（本文は変わらない）とわかるように、本文と分けて出す */
 function tagBoxHtml(tags) {
   const on = !!S.tagsOn;
@@ -2041,7 +2111,7 @@ function composeCardHtml() {
   </div>`;
 }
 function bindCards() {
-  bindRate(); bindTreasure();
+  bindRate(); bindTreasure(); SPARK.watch();
   document.querySelectorAll("[data-repick]").forEach(b => b.addEventListener("click", repickPhoto));
   document.querySelectorAll("[data-openwant]").forEach(b => b.addEventListener("click", openWant));
   document.querySelectorAll("[data-openposts]").forEach(b => b.addEventListener("click", openPosts));
@@ -2050,7 +2120,7 @@ function bindCards() {
   if (ta) {
     const grow = () => { ta.style.height = "auto"; ta.style.height = Math.max(140, ta.scrollHeight) + "px"; };
     grow();
-    ta.addEventListener("input", () => { S.edits = S.edits || {}; S.edits[S.chosen] = ta.value; $("cCnt").textContent = cntLabel(finalText().length, false); grow(); save(); renderStaff(); });
+    ta.addEventListener("input", () => { S.edits = S.edits || {}; S.edits[S.chosen] = ta.value; $("cCnt").innerHTML = cntLabel(finalText().length, false); grow(); save(); renderStaff(); });
     ta.addEventListener("focus", () => document.body.classList.add("editing"));
     ta.addEventListener("blur", () => setTimeout(() => document.body.classList.remove("editing"), 60));
   }
@@ -2173,6 +2243,7 @@ const SG = (() => {
     { r: 96, start: 6, bg: 10, col: "cobalt", from: 64 }, { r: 64, start: 1, bg: 5, col: "cobalt", from: 18 }
   ];
   const view = n => n <= 10 ? 112 : n <= 15 ? 162 : 202;
+  const LEAD_IN = 0.7;   // B 案：はじめに前の窓を見せる時間（秒）。そのあと新しいガラスがはまる
   const P = [], add = o => P.push(o), Q4 = [[0, 4, 8, 12], [2, 6, 10, 14], [1, 5, 9, 13], [3, 7, 11, 15]];
   add({ t: 1, ring: 0, k: "gold", c: [0, 0, 18], R: 18 });
   add({ t: 1, ring: 0, k: "sky", d: DROP, w: 1.6, noSpark: true, R: 18 });
@@ -2244,15 +2315,15 @@ const SG = (() => {
   /** n：通算の本数、night：夜、anim：はまる演出（新しく出たときだけ）、id：SVG の中の id の頭 */
   function svg(n, night, anim, id) {
     n = Math.max(1, n);
-    const V = view(n), pv = view(Math.max(1, n - 1)), zoom = anim && pv !== V, base = zoom ? 1.0 : 0, k = V / 112;
+    const V = view(n), pv = view(Math.max(1, n - 1)), zoom = anim && pv !== V, base = (zoom ? 1.0 : 0) + (anim ? LEAD_IN : 0), k = V / 112;
     const G = c => `url(#${id}g-${c})`, frost = G(night ? "frostN" : "frostD"), vb = v => `${-v} ${-v} ${2 * v} ${2 * v}`;
-    let s = `<svg viewBox="${vb(V)}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ステンドグラスの窓（通算${n}本）">`;
-    if (zoom) s += `<animate attributeName="viewBox" from="${vb(pv)}" to="${vb(V)}" dur="1s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".45 0 .2 1"/>`;
+    let s = `<svg viewBox="${vb(zoom ? pv : V)}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="ステンドグラスの窓（通算${n}本）">`;
+    if (zoom) s += `<animate attributeName="viewBox" from="${vb(pv)}" to="${vb(V)}" begin="${LEAD_IN}s" dur="1s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines=".45 0 .2 1"/>`;
     s += defs(id, V);
-    if (night) STARS.forEach((q, i) => { s += `<circle class="${anim ? "sg-tw" : ""}" style="animation-delay:${(i % 5) * .5}s" cx="${q[0] * k}" cy="${q[1] * k}" r="${(i % 3 ? 0.9 : 1.4) * k}" fill="#FFF6D6"/>`; });
+    if (night) STARS.forEach((q, i) => { s += `<circle class="sg-tw" style="animation-delay:${(i % 5) * .5}s" cx="${q[0] * k}" cy="${q[1] * k}" r="${(i % 3 ? 0.9 : 1.4) * k}" fill="#FFF6D6"/>`; });
     if (night || n >= 10) {
       let r = ""; for (let i = 0; i < 12; i++) r += `<path transform="rotate(${i * 30})" d="M0 0 L${-9 * k} ${-1.55 * V} L${9 * k} ${-1.55 * V}Z" fill="url(#${id}ray)"/>`;
-      s += `<g opacity="${night ? (n >= 10 ? .32 : .16) : .22}"><g class="${anim ? "sg-rays" : ""}">${r}</g></g>`;
+      s += `<g opacity="${night ? (n >= 10 ? .32 : .16) : .22}"><g class="sg-rays">${r}</g></g>`;
     }
     const lit = P.filter(p => p.t <= n), extra = Math.max(0, n - 20);
     if (night) {
@@ -2285,9 +2356,10 @@ const SG = (() => {
       if (p.t <= n) {
         const isNew = anim && p.t === n;
         const d = isNew ? base + (p.late ? 1.25 + (lateI++) * 0.022 : (idx % 8) * 0.06) : 0;
-        let inner = `<g class="${isNew ? "sg-pop" : ""}" style="animation-delay:${d.toFixed(2)}s">` + shape(p, G(p.k), LEAD, p.w || 2.2);
+        let inner = `<g class="sg-pc${isNew ? " sg-pop" : ""}" style="animation-delay:${d.toFixed(2)}s">` + shape(p, G(p.k), LEAD, p.w || 2.2);
         if (isNew) inner += shape(p, "#FFFFFF", "none", 0, `class="sg-glint" style="animation-delay:${(d + .45).toFixed(2)}s"`);
-        top += place(p, inner + "</g>");
+        const was = isNew && !p.noHint ? shape(p, "none", hc, 1.3, `stroke-dasharray="3 2.5" class="sg-was" style="animation-delay:${(d + .3).toFixed(2)}s"`) : "";   // B 案：はまる場所の点線（前の窓）
+        top += place(p, was + inner + "</g>");
         if (isNew && !p.noSpark) {
           const sr = p.sr || 0;
           fx += `<g transform="rotate(${p.rot || 0}) translate(${sr ? 8 + sr * .05 : 10} ${sr ? -sr - 6 : -14}) scale(${Math.max(1, k * .8)})"><path class="sg-spark" style="animation-delay:${(d + .35).toFixed(2)}s" d="${STAR}" fill="#FFFFFF"/></g>`;
@@ -2300,14 +2372,61 @@ const SG = (() => {
     });
     for (let j = 0; j < Math.min(extra, EXTRA.length); j++) {
       const q = EXTRA[j], isNew = anim && j === extra - 1;
-      top += `<g transform="translate(${q[0]} ${q[1]}) scale(1.4)"><g class="${isNew ? "sg-pop" : ""}"><path d="${DROP}" fill="${G(EXTRA_COL[j % 5])}" stroke="${LEAD}" stroke-width="1.4"/>${isNew ? `<path class="sg-glint" style="animation-delay:.45s" d="${DROP}" fill="#fff"/>` : ""}</g></g>`;
-      if (isNew) fx += `<g transform="translate(${q[0] + 12} ${q[1] - 16}) scale(1.6)"><path class="sg-spark" style="animation-delay:.35s" d="${STAR}" fill="#FFFFFF"/></g>`;
+      top += `<g transform="translate(${q[0]} ${q[1]}) scale(1.4)"><g class="sg-pc${isNew ? " sg-pop" : ""}" style="animation-delay:${isNew ? LEAD_IN : 0}s"><path d="${DROP}" fill="${G(EXTRA_COL[j % 5])}" stroke="${LEAD}" stroke-width="1.4"/>${isNew ? `<path class="sg-glint" style="animation-delay:${(LEAD_IN + .45).toFixed(2)}s" d="${DROP}" fill="#fff"/>` : ""}</g></g>`;
+      if (isNew) fx += `<g transform="translate(${q[0] + 12} ${q[1] - 16}) scale(1.6)"><path class="sg-spark" style="animation-delay:${(LEAD_IN + .35).toFixed(2)}s" d="${STAR}" fill="#FFFFFF"/></g>`;
     }
     s += top + "</g>";
     if (anim && n % 5 === 0) [[-.62, -.62], [.66, -.54], [-.56, .68], [.62, .64]].forEach((q, i) => { s += `<g transform="translate(${q[0] * V} ${q[1] * V}) scale(${k})"><path class="sg-spark" style="animation-delay:${(base + 1.9 + i * .22).toFixed(2)}s" d="${STAR}" fill="#FFF3B8"/></g>`; });
     return s + fx + "</svg>";
   }
-  return { svg, text };
+  /** B 案：はまる演出の長さ（秒）。コピーのあと、これだけ見せてから宝箱を出す */
+  const dur = n => { n = Math.max(1, n); return LEAD_IN + (view(n) !== view(Math.max(1, n - 1)) ? 1.0 : 0) + (n % 5 === 0 ? 3.0 : 1.9); };
+  return { svg, text, dur, STAR };
+})();
+/* B 案：本日の DROP の「ふだんのきらめき」（V4-2）。窓が画面に入ったときに 1 回、見えているあいだは数秒おきに、はまったガラスに光が走る。
+   画面の外・タブが裏のときは止める。「視差効果を減らす」設定では動かさない。はまる演出のあいだ（RT.stampAnimUntil まで）は出さない */
+const SPARK = (() => {
+  const NS = "http://www.w3.org/2000/svg", vis = new Set(), obs = new Set();
+  let io = null, timer = null, lastBig = 0;
+  const off = () => matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  function glint(svg, n) {
+    const pcs = [...svg.querySelectorAll(".sg-pc")].filter(g => !g.querySelector(".sg-glint2")); if (!pcs.length) return;
+    for (let i = 0; i < n && pcs.length; i++) {
+      const g = pcs.splice(Math.floor(Math.random() * pcs.length), 1)[0], sh = g.firstElementChild; if (!sh) continue;
+      const c = sh.cloneNode(false);
+      c.setAttribute("fill", "#FFFFFF"); c.setAttribute("stroke", "none"); c.setAttribute("class", "sg-glint2"); c.style.animationDelay = (i * .35).toFixed(2) + "s";
+      g.appendChild(c); setTimeout(() => c.remove(), 1400 + i * 350);
+    }
+  }
+  function star(svg) {
+    const pcs = [...svg.querySelectorAll(".sg-pc")]; if (!pcs.length) return;
+    const g = pick(pcs); let b; try { b = g.getBBox(); } catch (e) { return; }
+    const vbw = (svg.viewBox && svg.viewBox.baseVal && svg.viewBox.baseVal.width) || 224, k = Math.max(1, vbw / 224) * 1.1;
+    const w = document.createElementNS(NS, "g"), path = document.createElementNS(NS, "path");
+    w.setAttribute("transform", `translate(${(b.x + b.width * .78).toFixed(1)} ${(b.y + b.height * .18).toFixed(1)}) scale(${k.toFixed(2)})`);
+    path.setAttribute("d", SG.STAR); path.setAttribute("fill", svg.closest(".glass.night") ? "#FFF3B8" : "#FFFFFF"); path.setAttribute("class", "sg-spark");
+    w.appendChild(path); (g.parentNode || svg).appendChild(w); setTimeout(() => w.remove(), 1500);
+  }
+  function shine(svg, big) {
+    if (off() || document.hidden || !svg.isConnected || now() < (RT.stampAnimUntil || 0)) return;
+    glint(svg, big ? 3 : 1 + (Math.random() < .5 ? 1 : 0));
+    if (big || Math.random() < .4) setTimeout(() => { if (svg.isConnected) star(svg); }, big ? 500 : 250);
+  }
+  function tick() { vis.forEach(svg => { if (!svg.isConnected) vis.delete(svg); else shine(svg, false); }); }
+  function watch() {
+    if (off() || !("IntersectionObserver" in window)) return;
+    if (!io) io = new IntersectionObserver(es => es.forEach(e => {
+      const svg = e.target;
+      if (e.isIntersecting) {
+        if (!vis.has(svg)) { vis.add(svg); if (now() - lastBig > 8000 && now() >= (RT.stampAnimUntil || 0)) { lastBig = now(); setTimeout(() => shine(svg, true), 350); } }
+      } else vis.delete(svg);
+    }), { threshold: .45 });
+    obs.forEach(svg => { if (!svg.isConnected) { io.unobserve(svg); obs.delete(svg); vis.delete(svg); } });
+    document.querySelectorAll(".card.stamp .glass svg").forEach(svg => { if (!obs.has(svg)) { obs.add(svg); io.observe(svg); } });
+    if (!timer) timer = setInterval(tick, 5200);
+  }
+  return { watch };
 })();
 /** 夜か（日本時間 CONFIG.NIGHT_FROM〜翌 4 時） */
 function isNight() {
@@ -2338,13 +2457,13 @@ function pulseHtml() {
   return `<div class="rate"><p class="rate-q">${esc(T("pulse_q"))}<small>1日1回・1タップ</small></p><div class="pulse-btns">${PULSE_OPTS.map(v => `<button type="button" data-pulse="${v}">${v}</button>`).join("")}</div></div>`;
 }
 /* ---------- このチャットの使いごこち（5 段階・任意）と運営へのひとこと ---------- */
-const RATE_LAB = ["", "つかいにくい", "ややつかいにくい", "ふつう", "つかいやすい", "とてもつかいやすい"];
+const RATE_LAB = ["", "とてもつかいにくい", "つかいにくい", "ふつう", "つかいやすい", "とてもつかいやすい"];   // B 案：両はしを「とても」でそろえた
 function rateHtml() {
   if (S.ratingSent) return `<div class="rate"><p class="rate-done">感想をありがとうございました！ 運営で、チャットの改善に使います</p></div>`;
   return `<div class="rate"><p class="rate-q">このチャット（投稿づくり）の使いごこちは？<small>任意・5段階</small></p>
     <div class="rate-btns">${[1, 2, 3, 4, 5].map(v => `<button type="button" data-rate="${v}" class="${S.rating === v ? "on" : ""}" aria-label="${v}：${RATE_LAB[v]}">${v}</button>`).join("")}</div>
-    <div class="rate-lab"><span>1 つかいにくい</span><span>5 とてもつかいやすい</span></div>
-    ${S.rating ? `<p class="rate-sel">${S.rating}：${RATE_LAB[S.rating]}</p><textarea id="rateCm" rows="2" maxlength="200" placeholder="運営へのひとこと（任意）例：問いが多かった、ヒントが便利だった">${esc(S.ratingComment || "")}</textarea>
+    <div class="rate-lab"><span>とても<br>つかいにくい</span><span>とても<br>つかいやすい</span></div>
+    ${S.rating ? `<p class="rate-sel">「${RATE_LAB[S.rating]}」をえらびました</p><textarea id="rateCm" rows="2" maxlength="200" placeholder="運営へのひとこと（任意）例：問いが多かった、ヒントが便利だった">${esc(S.ratingComment || "")}</textarea>
       <div class="pii">${esc(PII_SHORT)}</div><div class="row"><button type="button" class="btn sm wide" id="rateSend">送る</button></div>` : ""}</div>`;
 }
 function bindRate() {
@@ -2403,15 +2522,37 @@ async function copyFinal() {
   if (first) {
     await bot(T("copied"));
     // 本数は運営からのお知らせ（キャラにしゃべらせない）。そのあと「本日の DROP」→ おまけの宝箱 →（開けたら）運営からの質問
+    const sid = S.sid;
     S.msgs.push({ who: "sys", ann: `通算${S.postTotal}本目（本日${S.postNo}本目）です。`, sub: "※この端末でコピーした投稿の数" });
     S.msgs.push({ who: "bot", card: "stamp" });
-    if (S.msgs.some(m => m.card === "treasure" || m.card === "survey")) { /* コピーしないで次へ のあとにコピーした：宝箱・質問はもう出ている */ }
-    else if (CONFIG.RECOMMEND_ON && CS.items.length) { S.rec = S.rec || newRec(); S.msgs.push({ who: "bot", card: "treasure" }); }
-    else S.msgs.push({ who: "bot", card: "survey" });
+    const more = !S.msgs.some(m => m.card === "treasure" || m.card === "survey");   // コピーしないで次へ のあとにコピーした：宝箱・質問はもう出ている
+    const useRec = more && CONFIG.RECOMMEND_ON && CS.items.length;
+    if (useRec) S.rec = S.rec || newRec();
+    RT.noScroll = true; renderMsgs(); RT.noScroll = false; save();
+    renderComposeDock();
+    sendLog("copy");
+    await showStamp();   // B 案：窓が見える位置で、ガラスがはまる演出を見せてから宝箱へ
+    if (!S || S.sid !== sid || !more) return;
+    S.msgs.push({ who: "bot", card: useRec ? "treasure" : "survey" });
     renderMsgs(); save();
-  } else { savePostLog(text, false); toast("コピーしました"); }
+    return;
+  }
+  savePostLog(text, false); toast("コピーしました");
   renderComposeDock();
   sendLog("copy");
+}
+/** B 案：本日の DROP のカードが見える位置まで送り、ガラスがはまる演出が終わるまで待つ */
+async function showStamp() {
+  const reduced = matchMedia("(prefers-reduced-motion:reduce)").matches;
+  const tot = Math.max(1, S.postTotal || postStats().total), ms = reduced ? 900 : Math.min(5000, Math.round(SG.dur(tot) * 1000) + 500);
+  RT.stampAnimUntil = now() + ms;
+  await sleep(80);   // 答える欄の描きなおし（いちばん下へ送る）のあとに送る
+  const cards = document.querySelectorAll(".card.stamp"), el = cards[cards.length - 1];
+  if (el) {
+    const top = document.querySelector(".top"), y = el.getBoundingClientRect().top + window.scrollY - (top ? top.offsetHeight : 0) - 8;
+    window.scrollTo({ top: Math.max(0, y), behavior: reduced ? "auto" : "smooth" });
+  }
+  await sleep(Math.max(0, ms - 80));
 }
 
 /* =====================================================================
@@ -2458,7 +2599,7 @@ function userSignals() {
   A.why.forEach(x => LABEL_SIG.forEach(([re, t]) => { if (re.test(x.label)) add(t, 1, x.label); }));
   (mp.why || []).forEach(l => LABEL_SIG.forEach(([re, t]) => { if (re.test(l)) add(t, .8, S.own.why || l); }));
   if (A.who) add(SIG.who[A.who.id], .6, A.who.detail || A.who.label);
-  A.next.forEach(x => add(SIG.next[x.id], .8, S.own.next || x.label));
+  A.next.forEach(x => add(SIG.next[x.cat || x.id], .8, S.own.next || x.label));
   A.find.forEach(x => add(SIG.find[x.id], .6, x.label));
   if (ai.act) add(SIG.act[ai.act], .8, "");
   const text = [A.text1, ...Object.values(S.own || {}), subjectOf(), ...(ai.content || [])].join(" ").normalize("NFKC");
@@ -2574,9 +2715,10 @@ function openPosts() {
 /** ☆行ってみるリスト（この端末に保存。メニューから） */
 function openWant() {
   const w = wantList();
-  openSheet("☆行ってみるリスト", (w.length ? `<p>宝箱で☆を付けたところです。行った先の写真で、もう1本つくれます。</p>` + w.map(x => `<div class="want"><div><b>${esc(x.t)}</b><small>${esc(x.p || "")}</small></div>${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">詳しく ↗</a>` : ""}<button type="button" class="lnk" data-unwant="${x.id}" style="min-height:36px;padding:4px">外す</button></div>`).join("")
+  openSheet("☆行ってみるリスト", (w.length ? `<p>宝箱で☆を付けたところです。行った先の写真で、もう1本つくれます。</p>` + w.map(x => { const img = recImg(x.id); return `<div class="want">${img ? `<a class="want-img" href="${esc(x.url || "#")}" target="_blank" rel="noopener" aria-hidden="true" tabindex="-1"><img src="${esc(img)}" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></a>` : ""}<div class="want-tx"><b>${esc(x.t)}</b><small>${esc(x.p || "")}</small></div>${x.url ? `<a href="${esc(x.url)}" target="_blank" rel="noopener">詳しく ↗</a>` : ""}<button type="button" class="lnk" data-unwant="${x.id}" style="min-height:36px;padding:4px">外す</button></div>`; }).join("")
     : `<p>まだありません。投稿文をコピーしたあとの「ごほうびの宝箱」で☆を付けると、ここに入ります。</p>`) + `<div class="row"><button type="button" class="btn full" id="shBack">もどる</button></div>`);
   $("shBack").addEventListener("click", closeModal);
+  if (w.length && !CS_IMG && !RT.wantImgTry) { RT.wantImgTry = true; loadImages().then(() => { if (CS_IMG && $("modal").classList.contains("show") && document.querySelector(".want")) openWant(); }); }   // 写真の一覧がまだ読めていなければ、読めたら描きなおす
   document.querySelectorAll("[data-unwant]").forEach(b => b.addEventListener("click", () => { LS.set(CONFIG.KEYS.WANT, wantList().filter(x => x.id !== Number(b.dataset.unwant))); openWant(); if (S && S.rec) refreshTreasure(); }));
 }
 async function loadContents() {
@@ -2698,7 +2840,10 @@ async function runAI() {
     // 案を足す（前の案は残す）。行ごとの言いかえ（alts）があれば、行を押して選べる
     let lines = (res.result.lines || []).filter(l => l && l.text).map(l => ({ text: String(l.text), alts: (l.alts || []).filter(Boolean).map(String) }));
     if (!lines.length) lines = String(res.result.rewrite).split("\n").map(t => t.trim()).filter(Boolean).map(t => ({ text: t, alts: [] }));
-    S.drafts = (S.drafts || []).concat([{ lines, sel: lines.map(() => 0), result: res.result, at: new Date().toISOString() }]).slice(-CONFIG.AI_MAX);
+    const raw = lines.length, rawVis = visLines(lines.map(l => l.text).join("\n"));
+    lines = fitLines(lines);   // B 案：4〜5 行・1 行 16 字まで（DROP の画面は 5 行まで）
+    const fit = { from: raw, from_vis: rawVis, to: lines.length, to_vis: visLines(lines.map(l => l.text).join("\n")) };
+    S.drafts = (S.drafts || []).concat([{ lines, sel: lines.map(() => 0), result: res.result, at: new Date().toISOString(), fit }]).slice(-CONFIG.AI_MAX);
     S.chosen = draftKey(S.drafts.length - 1); if (S.edits) delete S.edits[S.chosen];
     if (res.images_note) toast(res.images_note);
     save(); return "ok";
@@ -2726,7 +2871,7 @@ const rankW = (kind, i) => { const a = ORDER_W[kind] || []; return a.length ? (a
 /** rank_w：選んだ順の重み（設定の値そのまま。例 1 / 0.75 / 0.5 / 0.25）・w：合計 1 にした重み */
 function weighted(list, kind) {
   const ws = list.map((_, i) => rankW(kind, i)), sum = ws.reduce((a, b) => a + b, 0) || 1;
-  return list.map((x, i) => ({ id: x.id, label: x.label, src: x.src || "", pre: !!x.pre, rank_w: r2(ws[i]), w: r2(ws[i] / sum),
+  return list.map((x, i) => ({ id: x.id, label: x.label, src: x.src || "", pre: !!x.pre, rank_w: r2(ws[i]), w: r2(ws[i] / sum), ...(x.cat != null ? { cat: x.cat } : {}),
     ...(kind === "feel" ? { val: (item("feel", x.id) || {}).val ?? null } : {}), ...(kind === "why" ? { layer: x.layer || "コンテンツ", kpi: x.w || W0() } : {}) }));
 }
 function softOf() {
@@ -2735,7 +2880,7 @@ function softOf() {
   if (A.who) add("who", A.who.id, 1);
   A.why.forEach((x, i) => { const w = x.w || {}; Object.keys(raw).forEach(d => { raw[d] += (w[d] || 0) * rankW("why", i); }); });
   A.feel.forEach((x, i) => add("feel", x.id, rankW("feel", i)));
-  A.next.forEach((x, i) => add("next", x.id, rankW("next", i)));
+  A.next.forEach((x, i) => add("next", x.cat || x.id, rankW("next", i)));
   A.find.forEach((x, i) => add("find", x.id, rankW("find", i)));
   A.face.forEach(x => add("face", x.id, 1));
   const tot = Object.values(raw).reduce((a, b) => a + b, 0), share = {};
@@ -2782,7 +2927,8 @@ function buildRecord(end) {
     answered: answeredCount(),
     last_step: S.phase === "compose" ? (S.early ? "途中で投稿文へ（" + stepName(lastAsked) + "）" : "最後まで") : stepName(lastAsked),
     early: S.early, has_photo: hasPhoto(), photo_redo: S.photoRedo || 0,
-    ui_variant: UI_VARIANT, nudges: (S.nudges || []).slice(), posts_opens: S.postsOpens || 0, backs: S.backs || 0, back_steps: (S.backSteps || []).slice(),   // B 案：見せ方の案・ヒントの声かけをした問い・これまでの投稿を開いた回数
+    ui_variant: UI_VARIANT, nudges: (S.nudges || []).slice(), posts_opens: S.postsOpens || 0, backs: S.backs || 0, back_steps: (S.backSteps || []).slice(),
+    lines_fit: (S.drafts || []).map(d => d.fit || null), final_lines: visLines(finalText()),   // B 案：AI の案の行をそろえたか（前→後）・コピーした文の見た目の行数   // B 案：見せ方の案・ヒントの声かけをした問い・これまでの投稿を開いた回数
     text1: A.text1,
     detected: { ...S.det, feel_labels: S.det.feels.map(id => (item("feel", id) || {}).label || id), who_label: S.det.who ? item("who", S.det.who).label : "" },
     subject: subjectOf(),
