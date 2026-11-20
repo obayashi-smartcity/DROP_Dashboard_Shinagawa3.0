@@ -245,6 +245,8 @@
   .treasure.opened .tr-hd b{font-size:15.5px;font-weight:900;display:block}
   .treasure.opened .tr-hd small{font-size:12.5px;color:var(--ink-2)}
   .recs{display:flex;flex-direction:column;gap:10px}
+  .rec-img{display:block;margin:0 0 10px;border-radius:12px;overflow:hidden;aspect-ratio:16/9;background:var(--bg-2)}   /* おすすめのサムネイル（json/cs_images.json） */
+  .rec-img img{display:block;width:100%;height:100%;object-fit:cover}
   .rec{position:relative;border-radius:18px;border:1.5px solid var(--line-2);background:var(--paper);padding:12px 12px 10px 14px;overflow:hidden;animation:pop .45s ease both}
   .rec:nth-child(2){animation-delay:.12s}.rec:nth-child(3){animation-delay:.24s}
   .rec::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--k,var(--g1))}
@@ -564,6 +566,7 @@
 /* =====================================================================
    DROP. Coach — 投稿づくりチャット v5（drop_coach_chat.html）  2026/11/16
    ---------------------------------------------------------------------
+   H 案 chat-v5.6h3（2026/11/20）おすすめのカードに、リンク先（ものコトMarket）のメイン写真をサムネイルで出す（json/cs_images.json。読めないときは写真なし）
    H 案 chat-v5.6h2（2026/11/19 夜）迷わせずにサクサク進ませる・デザインの洗練（入力 → ヒントの流れは変えない）
    流れ
    - 送る方法は入力欄の「→」1 つ（「次へ」はなし）。「あなたについて」は候補を押したら進む
@@ -661,7 +664,7 @@
    - LOG_URL : 記録用 GAS（gas/DROP_COACH_LOG.gs v9）の /exec URL（★ 同上）。記録と「チャットの設定」の配布
    - URL に ?staff=1 を付けると、分析用の記録（ノード・重み・JSON）と、この端末の記録の CSV 保存が出る
 ===================================================================== */
-const APP_VERSION = "chat-v5.6h2 (2026-11-19)";
+const APP_VERSION = "chat-v5.6h3 (2026-11-20)";
 const UI_VARIANT = "H";   // 見せ方の H 案（drop_coach_chat_h.html）。記録の ui_variant
 const CONFIG = {
   // V3 用にデプロイした GAS の /exec URL（2026-11-16 設定）。V2 の URL は使わない（V2 の記録に混ざるため）。GAS を「新しいデプロイ」で作り直したら URL が変わるので貼り直す
@@ -2491,6 +2494,15 @@ async function copyFinal() {
    - AI は呼ばない（すぐ出る・費用がかからない）。並びはセッションごとに決まる（開きなおしても同じ）。「ほかの宝もみる」は 2 回まで
 ===================================================================== */
 let CS = { items: [], stamp_rally: null };
+/* おすすめのサムネイル：json/cs_images.json（ものコトMarket の各ページのメイン写真。配信元から縮小して表示し、コピーは持たない）。読めないときは写真なし */
+let CS_IMG = null;
+function recImg(id) {
+  const m = CS_IMG, p = m && m.images && m.images[String(id)];
+  return p && /^https:\/\//.test(m.host || "") ? m.host + (m.thumb || "/") + p : "";
+}
+async function loadImages() {
+  try { const r = await fetch("json/cs_images.json", { cache: "no-cache" }); if (!r.ok) throw new Error("HTTP " + r.status); CS_IMG = await r.json(); } catch (e) { CS_IMG = null; }
+}
 const REC_KIND = { fit: { label: "ど真ん中", color: "var(--g1)", dark: "#b9531c" }, detour: { label: "ちょい冒険", color: "var(--g4)", dark: "#1d7891" }, bmen: { label: "B面の人に会う", color: "var(--g2)", dark: "#b2426c" } };
 const SIG = {
   feel: { oishii: "eat sweets drink", tanoshii: "play make perform music", kawaii: "cute craft", sugoi: "craft perform art make", kirei: "art craft nature", hokkori: "sweets drink kids craft scent", igai: "bmen world play", shigeki: "make bmen words perform" },
@@ -2570,7 +2582,8 @@ function treasureCardHtml() {
   }
   const w = wantList().map(x => x.id), left = 2 - R.rerolls;
   const cards = R.picks.map(p => { const it = csItem(p.id); if (!it) return ""; const k = REC_KIND[p.kind] || REC_KIND.fit, saved = w.includes(it.id);
-    return `<div class="rec" style="--k:${k.color};--kd:${k.dark}"><span class="kind">${esc(k.label)}</span><h4>${esc(it.t)}</h4>${it.s ? `<div class="who">${esc(it.s)}</div>` : ""}
+    const img = recImg(it.id);
+    return `<div class="rec" style="--k:${k.color};--kd:${k.dark}">${img ? `<a class="rec-img" href="${esc(it.url || "#")}" target="_blank" rel="noopener" data-rec="${it.id}" aria-hidden="true" tabindex="-1"><img src="${esc(img)}" alt="" loading="lazy" decoding="async" onerror="this.parentNode.remove()"></a>` : ""}<span class="kind">${esc(k.label)}</span><h4>${esc(it.t)}</h4>${it.s ? `<div class="who">${esc(it.s)}</div>` : ""}
       ${it.p ? `<div class="place">${PIN_SVG}${esc(it.p)}</div>` : ""}<p class="desc">${esc(it.d)}</p>${p.why ? `<p class="why">${esc(p.why)}</p>` : ""}
       <div class="row">${it.url ? `<a class="btn ghost sm wide" href="${esc(it.url)}" target="_blank" rel="noopener" data-rec="${it.id}">${ICON.open}詳しく見る</a>` : ""}<button type="button" class="btn ghost sm wide${saved ? " saved" : ""}" data-want="${it.id}" aria-pressed="${saved}">${saved ? "★ 行ってみる" : "☆ 行ってみる"}</button></div></div>`; }).join("");
   const sr = CS.stamp_rally;
@@ -3103,6 +3116,7 @@ function checkInAppBrowser() {
   syncMenu();
   loadSettings();
   loadContents().then(d => { CS = { items: Array.isArray(d.items) ? d.items : [], stamp_rally: d.stamp_rally || null }; });
+  loadImages().then(() => { if (S && S.rec && S.rec.opened && CS_IMG) refreshTreasure(); });   // おすすめのサムネイル
   const json = await loadSamples();
   SAMPLES = (Array.isArray(json) ? json : (json.records || [])).map(r => ({
     id: r.artwork_id, n: r.account_name || "", s: String(r.sentence || "").trim(), img: r.image_file_path || r.image_file_path_thumbnail || ""
